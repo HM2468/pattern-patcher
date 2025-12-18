@@ -20,7 +20,13 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
-  config.cache_store = :null_store
+  config.cache_store = :redis_cache_store, {
+    url: ENV["REDIS_URL"],
+    reconnect_attempts: 1,
+    error_handler: -> (method:, returning:, exception:) {
+      Rails.logger.error("Redis cache error: #{exception}")
+    }
+  }
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable
