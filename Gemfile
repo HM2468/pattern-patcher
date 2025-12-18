@@ -75,11 +75,11 @@ gem "solid_cable"
 # ------------------------------------------------------------
 
 # OpenAI official Ruby SDK (enable when wiring LLM features)
-# gem "openai"
+gem "openai"
 
 # HTTP client (often used with OpenAI)
-# gem "faraday"
-# gem "faraday-retry"
+gem "faraday"
+gem "faraday-retry"
 
 # ------------------------------------------------------------
 # Performance / Deployment
