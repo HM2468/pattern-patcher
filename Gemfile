@@ -1,69 +1,134 @@
 source "https://rubygems.org"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+# ------------------------------------------------------------
+# Core framework
+# ------------------------------------------------------------
+
+# Use Rails 8
 gem "rails", "~> 8.0.2", ">= 8.0.2.1"
-# The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+
+# Modern asset pipeline for Rails
+# https://github.com/rails/propshaft
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
+
+# SQLite database for Active Record
 gem "sqlite3", ">= 2.1"
-# Use the Puma web server [https://github.com/puma/puma]
+
+# Puma web server
+# https://github.com/puma/puma
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+
+# ------------------------------------------------------------
+# Frontend / Hotwire
+# ------------------------------------------------------------
+
+# JavaScript with ESM import maps
+# https://github.com/rails/importmap-rails
 gem "importmap-rails"
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
+
+# Hotwire: Turbo (SPA-like navigation)
+# https://turbo.hotwired.dev
 gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+
+# Hotwire: Stimulus (modest JS framework)
+# https://stimulus.hotwired.dev
 gem "stimulus-rails"
-# Use Tailwind CSS [https://github.com/rails/tailwindcss-rails]
+
+# Tailwind CSS integration
+# https://github.com/rails/tailwindcss-rails
 gem "tailwindcss-rails"
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+
+# Build JSON APIs
+# https://github.com/rails/jbuilder
 gem "jbuilder"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+# ------------------------------------------------------------
+# Background jobs / Async processing
+# ------------------------------------------------------------
 
+# Background job processing
+# https://github.com/sidekiq/sidekiq
+gem "sidekiq"
 
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+# Prevent duplicate jobs (important for scan / process tasks)
+# https://github.com/mhenrixon/sidekiq-unique-jobs
+gem "sidekiq-unique-jobs"
+
+# Redis client (Sidekiq dependency)
+gem "redis", ">= 4.0"
+
+# ------------------------------------------------------------
+# Caching / Queue / Cable (Rails 8 solid adapters)
+# ------------------------------------------------------------
+
+# Database-backed cache
 gem "solid_cache"
+
+# Database-backed Active Job adapter (optional, Sidekiq is primary)
 gem "solid_queue"
+
+# Database-backed Action Cable
 gem "solid_cable"
-# gem "openai"          # 官方 Ruby SDK（若你后续选 ruby-openai，也可替换）
+
+# ------------------------------------------------------------
+# LLM / HTTP (to be enabled when needed)
+# ------------------------------------------------------------
+
+# OpenAI official Ruby SDK (enable when wiring LLM features)
+# gem "openai"
+
+# HTTP client (often used with OpenAI)
 # gem "faraday"
 # gem "faraday-retry"
 
-# Reduces boot times through caching; required in config/boot.rb
+# ------------------------------------------------------------
+# Performance / Deployment
+# ------------------------------------------------------------
+
+# Boot time optimization
+# Required in config/boot.rb
 gem "bootsnap", require: false
 
-# Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
+# Deploy anywhere with Docker
+# https://kamal-deploy.org
 gem "kamal", require: false
 
-# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
+# HTTP asset caching / compression for Puma
+# https://github.com/basecamp/thruster/
 gem "thruster", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
+# ------------------------------------------------------------
+# Development & Test
+# ------------------------------------------------------------
 
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+  # Debugger
+  # https://guides.rubyonrails.org/debugging_rails_applications.html
+  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
 
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  # Static security analysis
+  # https://brakemanscanner.org/
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  # Rails Omakase RuboCop rules
+  # https://github.com/rails/rubocop-rails-omakase/
   gem "rubocop-rails-omakase", require: false
 end
 
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
+  # Console on exception pages
+  # https://github.com/rails/web-console
   gem "web-console"
+
+  # Linting / code style
   gem "rubocop", require: false
   gem "rubocop-rails", require: false
   gem "rubocop-rspec", require: false
 end
 
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  # System testing
+  # https://guides.rubyonrails.org/testing.html#system-testing
   gem "capybara"
   gem "selenium-webdriver"
 end
