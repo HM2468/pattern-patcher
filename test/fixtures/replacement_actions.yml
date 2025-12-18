@@ -1,0 +1,31 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  occurrence: one
+  repository_file: one
+  original_fragment: MyText
+  patched_fragment: MyText
+  original_line: MyText
+  patched_line: MyText
+  base_file_sha: MyString
+  decision: MyString
+  status: MyString
+  applied_at: 2025-12-18 13:49:43
+  rejected_at: 2025-12-18 13:49:43
+  rejected_reason: MyText
+  error: MyText
+
+two:
+  occurrence: two
+  repository_file: two
+  original_fragment: MyText
+  patched_fragment: MyText
+  original_line: MyText
+  patched_line: MyText
+  base_file_sha: MyString
+  decision: MyString
+  status: MyString
+  applied_at: 2025-12-18 13:49:43
+  rejected_at: 2025-12-18 13:49:43
+  rejected_reason: MyText
+  error: MyText

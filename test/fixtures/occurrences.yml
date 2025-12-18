@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  scan_run: one
+  lexeme: one
+  lexical_pattern: one
+  repository_file: one
+  line_at: 1
+  idx_start: 1
+  idx_end: 1
+  matched_text: MyText
+  context_before: MyText
+  context_after: MyText
+  status: MyString
+
+two:
+  scan_run: two
+  lexeme: two
+  lexical_pattern: two
+  repository_file: two
+  line_at: 1
+  idx_start: 1
+  idx_end: 1
+  matched_text: MyText
+  context_before: MyText
+  context_after: MyText
+  status: MyString

@@ -1,0 +1,23 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  lexeme: one
+  process_type: MyString
+  locale: MyString
+  output: MyText
+  provider: MyString
+  model: MyString
+  status: MyString
+  error: MyText
+  metadata: 
+
+two:
+  lexeme: two
+  process_type: MyString
+  locale: MyString
+  output: MyText
+  provider: MyString
+  model: MyString
+  status: MyString
+  error: MyText
+  metadata: 

@@ -1,0 +1,2 @@
+class LexicalPattern < ApplicationRecord
+end

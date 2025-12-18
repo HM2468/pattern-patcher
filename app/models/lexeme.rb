@@ -1,0 +1,2 @@
+class Lexeme < ApplicationRecord
+end
