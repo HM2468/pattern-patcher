@@ -97,9 +97,8 @@ gem "kamal", require: false
 # https://github.com/basecamp/thruster/
 gem "thruster", require: false
 
-# ------------------------------------------------------------
-# Development & Test
-# ------------------------------------------------------------
+# Rails 8 RedisCacheStore is not compatible with connection_pool 3.x (keyword-only initializer)
+gem "connection_pool", "< 3.0"
 
 group :development, :test do
   # Debugger
