@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 require 'digest'
+
+class HashUtilError < StandardError; end
+
 module HashUtilConcern
   module_function
 
@@ -8,13 +11,13 @@ module HashUtilConcern
   # @param content [Object] any object convertible to string
   # @param length [Integer] hex string length (must be even)
   # @return [String] hex string
-  # @raise [ArgumentError] if length is not an Integer or not even
+  # @raise [HashUtilError] if length is not an Integer or not even
   def hash_string(content, length: 32)
     unless length.is_a?(Integer)
-      raise ArgumentError, "GET HASHED KEY ERR: len must be an integer"
+      raise HashUtilError, "GET HASHED KEY ERR: len must be an integer"
     end
     if length.odd?
-      raise ArgumentError, "GET HASHED KEY ERR: len should be an even integer"
+      raise HashUtilError, "GET HASHED KEY ERR: len should be an even integer"
     end
 
     content_str = content.to_s
@@ -103,7 +106,7 @@ module HashUtilConcern
   # @yieldreturn [Object] new value
   # @return [Hash]
   def map_nested_hash(nested_hash, &block)
-    raise ArgumentError, "block is required" unless block_given?
+    raise HashUtilError, "block is required" unless block_given?
 
     mapper = lambda do |current_hash, path|
       current_hash.each do |k, v|
@@ -126,7 +129,7 @@ module HashUtilConcern
   # @param chunk_size [Integer]
   # @return [Array<Hash>]
   def split_large_hash(original_hash, chunk_size: 100)
-    raise ArgumentError, "chunk_size must be greater than 0" if chunk_size <= 0
+    raise HashUtilError, "chunk_size must be greater than 0" if chunk_size <= 0
 
     items = original_hash.to_a # Ruby Hash preserves insertion order
     chunks = []
