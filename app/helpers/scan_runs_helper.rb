@@ -1,0 +1,2 @@
+module ScanRunsHelper
+end
