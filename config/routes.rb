@@ -50,12 +50,12 @@ Rails.application.routes.draw do
   # Repository files are individual files within the repository.
   #
   # NOTE:
-  # The resource name "repositorys" is intentionally left as-is
+  # The resource name "repositories" is intentionally left as-is
   # here, but in idiomatic Rails it should be "repositories".
   # ------------------------------------------------------------
-  resources :repositorys do
+  resources :repositories do
     # Nested routes for managing files within a repository
-    resources :repository_files, only: [:index, :new, :create]
+    resources :repository_files, only: [:index, :new, :create, :edit]
   end
 
   # File-level operations (show/edit/update/delete)
