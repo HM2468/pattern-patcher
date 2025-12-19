@@ -130,4 +130,6 @@ Rails.application.routes.draw do
   # code modifications, ensuring safety and traceability.
   # ------------------------------------------------------------
   resources :replacement_actions, only: [:index, :show]
+
+  resources :settings, only: [:index, :edit, :update, :destroy]
 end
