@@ -100,7 +100,7 @@ gem "thruster", require: false
 
 # Rails 8 RedisCacheStore is not compatible with connection_pool 3.x (keyword-only initializer)
 gem "connection_pool", "< 3.0"
-
+gem "kaminari", "~> 1.2.1"
 group :development, :test do
   # Debugger
   # https://guides.rubyonrails.org/debugging_rails_applications.html

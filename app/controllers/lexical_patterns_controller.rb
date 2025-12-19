@@ -2,7 +2,11 @@ class LexicalPatternsController < ApplicationController
   def index
     # Keep ordering predictable for operators:
     # priority asc, then newest first as a stable tie-breaker
-    @lexical_patterns = LexicalPattern.order(priority: :asc, created_at: :desc)
+    @lexical_patterns =
+      LexicalPattern
+        .order(priority: :asc, created_at: :desc)
+        .page(params[:page])
+        .per(10)
   end
 
   # Toggle enabled via a tiny PATCH request (Turbo compatible)

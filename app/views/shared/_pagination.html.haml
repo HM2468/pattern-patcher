@@ -1,0 +1,41 @@
+-# app/views/shared/_pagination.html.haml
+-# A Rails-native pagination UI (Kaminari collection compatible)
+-# locals: collection
+
+- current = collection.current_page
+- total   = collection.total_pages
+
+%nav{ class: "mt-4 flex items-center justify-center", aria: { label: "Pagination" } }
+  %div{ class: "inline-flex items-center gap-2" }
+
+    -# Prev
+    - if current <= 1
+      %span{ class: "inline-flex items-center rounded-lg border bg-gray-100 text-gray-400 border-gray-200 px-3 py-1 text-sm cursor-not-allowed" }
+        Prev
+    - else
+      = link_to "Prev", url_for(page: current - 1),
+        class: "inline-flex items-center rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
+
+    -# Pages window (compact): first, last, and neighbors
+    - window = 2
+    - pages = ([1, total] + ((current - window)..(current + window)).to_a).uniq.select { |p| p >= 1 && p <= total }.sort
+
+    - last = nil
+    - pages.each do |p|
+      - if last && p > last + 1
+        %span{ class: "inline-flex items-center px-2 text-sm text-gray-400" } …
+      - if p == current
+        %span{ class: "inline-flex items-center justify-center min-w-[2rem] rounded-lg border bg-gray-900 text-white border-gray-900 px-3 py-1 text-sm font-medium" }
+          = p
+      - else
+        = link_to p, url_for(page: p),
+          class: "inline-flex items-center justify-center min-w-[2rem] rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
+      - last = p
+
+    -# Next
+    - if current >= total
+      %span{ class: "inline-flex items-center rounded-lg border bg-gray-100 text-gray-400 border-gray-200 px-3 py-1 text-sm cursor-not-allowed" }
+        Next
+    - else
+      = link_to "Next", url_for(page: current + 1),
+        class: "inline-flex items-center rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
