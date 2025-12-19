@@ -9,6 +9,29 @@ class LexicalPatternsController < ApplicationController
         .per(10)
   end
 
+  def destroy
+    @lexical_pattern = LexicalPattern.find(params[:id])
+    @lexical_pattern.destroy!
+
+    # Re-load current page after delete. This is what enables "fill the gap".
+    @lexical_patterns =
+      LexicalPattern
+        .order(priority: :asc, created_at: :desc)
+        .page(params[:page])
+        .per(10)
+
+    # If we just deleted the last record on this page, go back one page.
+    if @lexical_patterns.empty? && params[:page].to_i > 1
+      redirect_to lexical_patterns_path(page: params[:page].to_i - 1)
+      return
+    end
+
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to lexical_patterns_path(page: params[:page]) }
+    end
+  end
+
   # Toggle enabled via a tiny PATCH request (Turbo compatible)
   def toggle_enabled
     @lexical_pattern = LexicalPattern.find(params[:id])

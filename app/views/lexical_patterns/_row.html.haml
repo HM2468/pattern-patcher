@@ -1,0 +1,40 @@
+-# app/views/lexical_patterns/_row.html.haml
+-# locals: pattern
+
+%tr{ id: dom_id(pattern), class: "hover:bg-gray-50/50" }
+  -# Name (truncate + hover title)
+  %td{ class: "px-4 py-3 align-top" }
+    %div{ class: "max-w-[260px] truncate font-medium text-gray-900", title: pattern.name.to_s }
+      = pattern.name
+
+  -# Type (truncate + hover title)
+  %td{ class: "px-4 py-3 align-top" }
+    %div{ class: "max-w-[220px] truncate font-mono text-xs text-gray-900", title: pattern.pattern_type.to_s }
+      = pattern.pattern_type
+
+  -# Enabled toggle
+  %td{ class: "px-4 py-3 align-top" }
+    = render "enabled_toggle", lexical_pattern: pattern
+
+  -# Priority
+  %td{ class: "px-4 py-3 align-top" }
+    %span{ class: "inline-flex items-center rounded-lg border bg-gray-50 text-gray-700 border-gray-200 px-2 py-1 text-xs font-mono" }
+      = pattern.priority
+
+  -# Actions
+  %td{ class: "px-4 py-3 align-top" }
+    %div{ class: "flex flex-wrap gap-2" }
+      = link_to test_lexical_pattern_path(pattern), class: "inline-flex items-center" do
+        %span{ class: "inline-flex items-center rounded-lg border bg-green-50 text-green-700 border-green-200 px-2 py-1 text-xs" } test
+
+      = link_to edit_lexical_pattern_path(pattern), class: "inline-flex items-center" do
+        %span{ class: "inline-flex items-center rounded-lg border bg-amber-50 text-amber-700 border-amber-200 px-2 py-1 text-xs" } edit
+
+      -# Turbo delete:
+      -# Keep current page in the request so server can re-render the same page after deletion.
+      = button_to lexical_pattern_path(pattern),
+        method: :delete,
+        params: { page: params[:page] },
+        data: { turbo_confirm: "Delete this pattern? This cannot be undone." },
+        form: { class: "inline-flex" } do
+        %span{ class: "inline-flex items-center rounded-lg border bg-red-50 text-red-700 border-red-200 px-2 py-1 text-xs" } delete

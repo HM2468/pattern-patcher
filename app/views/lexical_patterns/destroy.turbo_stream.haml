@@ -1,0 +1,24 @@
+-# app/views/lexical_patterns/destroy.turbo_stream.haml
+
+-# 1) Remove the deleted row immediately (optional but nice)
+= turbo_stream.remove dom_id(@lexical_pattern)
+
+-# 2) Replace tbody with the current page collection (fills the gap if possible)
+= turbo_stream.replace "lexical_patterns_tbody" do
+  %tbody{ id: "lexical_patterns_tbody", class: "divide-y" }
+    - @lexical_patterns.each do |pattern|
+      = render "row", pattern: pattern
+
+-# 3) Empty state (in case list becomes empty)
+= turbo_stream.replace "lexical_patterns_empty_state" do
+  %div{ id: "lexical_patterns_empty_state" }
+    - if @lexical_patterns.empty?
+      .rounded-2xl.border.bg-white.p-8.shadow-sm
+        %div{ class: "text-sm text-gray-600" }
+          No patterns yet. Create your first pattern to start scanning.
+
+-# 4) Pagination may change (total pages / current page)
+= turbo_stream.replace "lexical_patterns_pagination" do
+  %div{ id: "lexical_patterns_pagination" }
+    - if @lexical_patterns.any? && @lexical_patterns.total_pages > 1
+      = render "shared/pagination", collection: @lexical_patterns
