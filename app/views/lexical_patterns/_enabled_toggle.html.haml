@@ -1,0 +1,21 @@
+-# Enabled toggle button (Turbo-friendly)
+-# Click toggles enabled via PATCH /lexical_patterns/:id/toggle_enabled
+-# Replaces only this block using dom_id(pattern, :enabled_toggle)
+
+%div{ id: dom_id(lexical_pattern, :enabled_toggle) }
+  - enabled = lexical_pattern.enabled?
+
+  = button_to toggle_enabled_lexical_pattern_path(lexical_pattern),
+    method: :patch,
+    form: { class: "inline-block" },
+    class: "group inline-flex items-center rounded-full border px-1 py-1 transition #{enabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}" do
+
+    %span{ class: "sr-only" } Toggle enabled
+
+    -# Track
+    %span{ class: "relative inline-flex h-6 w-11 items-center rounded-full transition #{enabled ? 'bg-green-600' : 'bg-gray-300'}" }
+      -# Knob
+      %span{ class: "inline-block h-5 w-5 transform rounded-full bg-white shadow transition #{enabled ? 'translate-x-5' : 'translate-x-1'}" }
+
+  %span{ class: "ml-2 text-xs #{enabled ? 'text-green-700' : 'text-gray-600'}" }
+    = enabled ? "Enabled" : "Disabled"

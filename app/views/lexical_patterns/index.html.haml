@@ -1,3 +1,67 @@
-%div
-  %h1.font-bold.text-4xl LexicalPatterns#index
-  %p Find me in app/views/lexical_patterns/index.html.haml
+-# Lexical Patterns index
+-# Shows: Name / Type / Enabled toggle / Priority / Actions
+
+%main{ class: "mx-auto max-w-6xl px-6 py-8 space-y-6" }
+  %div{ class: "flex items-start justify-between gap-4" }
+    %div
+      %h2{ class: "text-2xl font-semibold tracking-tight" } Lexical Patterns
+      %p{ class: "mt-1 text-sm text-gray-600" }
+        Patterns are executed in priority order. Lower priority number runs first.
+
+    %div{ class: "flex gap-2" }
+      = link_to "New Pattern", new_lexical_pattern_path,
+        class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black"
+      = link_to "Global Test", "#",
+        class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
+
+  .rounded-2xl.border.bg-white.shadow-sm.overflow-hidden
+    %table{ class: "w-full text-sm" }
+      %thead{ class: "bg-gray-50 text-gray-600" }
+        %tr
+          %th{ class: "px-4 py-3 text-left font-medium" } Name
+          %th{ class: "px-4 py-3 text-left font-medium" } Type
+          %th{ class: "px-4 py-3 text-left font-medium" } Enabled
+          %th{ class: "px-4 py-3 text-left font-medium" } Priority
+          %th{ class: "px-4 py-3 text-left font-medium" } Actions
+
+      %tbody{ class: "divide-y" }
+        - @lexical_patterns.each do |pattern|
+          %tr{ class: "hover:bg-gray-50/50" }
+            -# Name (truncate + hover title)
+            %td{ class: "px-4 py-3 align-top" }
+              %div{ class: "max-w-[260px] truncate font-medium text-gray-900", title: pattern.name.to_s }
+                = pattern.name
+
+            -# Type (truncate + hover title)
+            %td{ class: "px-4 py-3 align-top" }
+              %div{ class: "max-w-[220px] truncate font-mono text-xs text-gray-900", title: pattern.pattern_type.to_s }
+                = pattern.pattern_type
+
+            -# Enabled toggle (Turbo replace only this cell)
+            %td{ class: "px-4 py-3 align-top" }
+              = render "enabled_toggle", lexical_pattern: pattern
+
+            -# Priority
+            %td{ class: "px-4 py-3 align-top" }
+              %span{ class: "inline-flex items-center rounded-lg border bg-gray-50 text-gray-700 border-gray-200 px-2 py-1 text-xs font-mono" }
+                = pattern.priority
+
+            -# Actions: test / edit / delete (badges)
+            %td{ class: "px-4 py-3 align-top" }
+              %div{ class: "flex flex-wrap gap-2" }
+                = link_to test_lexical_pattern_path(pattern), class: "inline-flex items-center" do
+                  %span{ class: "inline-flex items-center rounded-lg border bg-green-50 text-green-700 border-green-200 px-2 py-1 text-xs" } test
+
+                = link_to edit_lexical_pattern_path(pattern), class: "inline-flex items-center" do
+                  %span{ class: "inline-flex items-center rounded-lg border bg-amber-50 text-amber-700 border-amber-200 px-2 py-1 text-xs" } edit
+
+                = button_to lexical_pattern_path(pattern),
+                  method: :delete,
+                  data: { turbo_confirm: "Delete this pattern? This cannot be undone." },
+                  form: { class: "inline-flex" } do
+                  %span{ class: "inline-flex items-center rounded-lg border bg-red-50 text-red-700 border-red-200 px-2 py-1 text-xs" } delete
+
+  - if @lexical_patterns.empty?
+    .rounded-2xl.border.bg-white.p-8.shadow-sm
+      %div{ class: "text-sm text-gray-600" }
+        No patterns yet. Create your first pattern to start scanning.

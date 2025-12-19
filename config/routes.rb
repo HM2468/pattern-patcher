@@ -40,6 +40,7 @@ Rails.application.routes.draw do
     member do
       get  :test
       post :run_test
+      patch :toggle_enabled
     end
   end
 
