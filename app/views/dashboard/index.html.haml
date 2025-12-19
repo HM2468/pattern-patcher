@@ -1,192 +1,163 @@
--# Dashboard (static v1)
--# Goal: show the workflow at a glance and provide obvious next actions.
 
-%div{ class: "min-h-screen w-full bg-gray-50" }
-  / Top bar
-  %header{ class: "sticky top-0 z-20 border-b bg-white/80 backdrop-blur" }
-    %div{ class: "mx-auto max-w-6xl px-6 py-4 flex items-center justify-between" }
-      %div{ class: "flex items-center gap-3" }
-        %div{ class: "h-9 w-9 rounded-xl bg-gray-900 text-white flex items-center justify-center font-semibold" }
-          PP
-        %div
-          %h1{ class: "text-lg font-semibold leading-tight" } PatternPatcher
-          %div{ class: "text-sm text-gray-500" } PatternPatcher Console
+/ Intro
+%section{ class: "space-y-2" }
+  %h2{ class: "text-2xl font-semibold tracking-tight" } Controlled, interruptible scans for legacy codebases
+  %p{ class: "text-gray-600 max-w-3xl" }
+    PatternPatcher does not run a one-shot full scan. It executes patterns in priority order, producing auditable occurrences that can be reviewed and applied safely.
 
-      %nav{ class: "hidden md:flex items-center gap-2 text-sm" }
-        %a{ href: "#", class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Repositories
-        %a{ href: "#", class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Patterns
-        %a{ href: "#", class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Processing
-        %a{ href: "#", class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Review
-        %a{ href: "#", class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Settings
+/ KPI cards
+%section{ class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" }
+  -# Replace these numbers with real counts later.
+  .rounded-2xl.border.bg-white.p-5.shadow-sm
+    .text-xs.font-medium.text-gray-500 Enabled patterns
+    .mt-2.flex.items-end.justify-between
+      .text-3xl.font-semibold 12
+      .text-xs.text-gray-500 Priority-ordered
 
-      %div{ class: "flex items-center gap-2" }
-        %button{ type: "button", class: "hidden sm:inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm bg-white hover:bg-gray-50" }
-          %span{ class: "h-2 w-2 rounded-full bg-green-500 inline-block" }
-          %span System Ready
-        %button{ type: "button", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" }
-          New Scan
+  .rounded-2xl.border.bg-white.p-5.shadow-sm
+    .text-xs.font-medium.text-gray-500 Active repositories
+    .mt-2.flex.items-end.justify-between
+      .text-3xl.font-semibold 3
+      .text-xs.text-gray-500 Local paths
 
-  / Main
-  %main{ class: "mx-auto max-w-6xl px-6 py-8 space-y-8" }
-    / Intro
-    %section{ class: "space-y-2" }
-      %h2{ class: "text-2xl font-semibold tracking-tight" } Controlled, interruptible scans for legacy codebases
-      %p{ class: "text-gray-600 max-w-3xl" }
-        PatternPatcher does not run a one-shot full scan. It executes patterns in priority order, producing auditable occurrences that can be reviewed and applied safely.
+  .rounded-2xl.border.bg-white.p-5.shadow-sm
+    .text-xs.font-medium.text-gray-500 Unreviewed occurrences
+    .mt-2.flex.items-end.justify-between
+      .text-3xl.font-semibold 148
+      .text-xs.text-amber-700.bg-amber-50.border.border-amber-200.px-2.py-1.rounded-lg Needs review
 
-    / KPI cards
-    %section{ class: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" }
-      -# Replace these numbers with real counts later.
-      .rounded-2xl.border.bg-white.p-5.shadow-sm
-        .text-xs.font-medium.text-gray-500 Enabled patterns
-        .mt-2.flex.items-end.justify-between
-          .text-3xl.font-semibold 12
-          .text-xs.text-gray-500 Priority-ordered
+  .rounded-2xl.border.bg-white.p-5.shadow-sm
+    .text-xs.font-medium.text-gray-500 Applied actions (7d)
+    .mt-2.flex.items-end.justify-between
+      .text-3xl.font-semibold 27
+      .text-xs.text-green-700.bg-green-50.border.border-green-200.px-2.py-1.rounded-lg Safe changes
 
-      .rounded-2xl.border.bg-white.p-5.shadow-sm
-        .text-xs.font-medium.text-gray-500 Active repositories
-        .mt-2.flex.items-end.justify-between
-          .text-3xl.font-semibold 3
-          .text-xs.text-gray-500 Local paths
+/ Primary workflow cards
+%section{ class: "grid grid-cols-1 lg:grid-cols-3 gap-4" }
+  .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
+    %div{ class: "flex items-start justify-between" }
+      %div
+        %h3{ class: "text-lg font-semibold" } 1) Define patterns
+        %p{ class: "text-sm text-gray-600" }
+          Add regex-based lexical patterns with language, type, and priority.
+      %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Setup
 
-      .rounded-2xl.border.bg-white.p-5.shadow-sm
-        .text-xs.font-medium.text-gray-500 Unreviewed occurrences
-        .mt-2.flex.items-end.justify-between
-          .text-3xl.font-semibold 148
-          .text-xs.text-amber-700.bg-amber-50.border.border-amber-200.px-2.py-1.rounded-lg Needs review
+    %ul{ class: "text-sm text-gray-700 space-y-2" }
+      %li.flex.gap-2
+        %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
+        %span Name + language (ruby/erb/haml/js/tsx)
+      %li.flex.gap-2
+        %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
+        %span Pattern type (code/comment/string/template)
+      %li.flex.gap-2
+        %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
+        %span Priority controls scan order
 
-      .rounded-2xl.border.bg-white.p-5.shadow-sm
-        .text-xs.font-medium.text-gray-500 Applied actions (7d)
-        .mt-2.flex.items-end.justify-between
-          .text-3xl.font-semibold 27
-          .text-xs.text-green-700.bg-green-50.border.border-green-200.px-2.py-1.rounded-lg Safe changes
+    %div{ class: "flex gap-2" }
+      %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Add Pattern
+      %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Test Regex
 
-    / Primary workflow cards
-    %section{ class: "grid grid-cols-1 lg:grid-cols-3 gap-4" }
-      .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
-        %div{ class: "flex items-start justify-between" }
+  .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
+    %div{ class: "flex items-start justify-between" }
+      %div
+        %h3{ class: "text-lg font-semibold" } 2) Register repositories
+        %p{ class: "text-sm text-gray-600" }
+          Track files, hashes, and scan progress per repository.
+      %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Inventory
+
+    %div{ class: "rounded-xl border bg-gray-50 p-4 text-sm" }
+      %div{ class: "text-xs text-gray-500" } Example root path
+      %div{ class: "mt-1 font-mono text-gray-900 break-all" } /Users/you/work/legacy-repo
+
+    %div{ class: "flex gap-2" }
+      %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Add Repository
+      %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Index Files
+
+  .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
+    %div{ class: "flex items-start justify-between" }
+      %div
+        %h3{ class: "text-lg font-semibold" } 3) Scan → Review → Apply
+        %p{ class: "text-sm text-gray-600" }
+          One pattern + one file per run. Produce occurrences as the smallest auditable unit.
+      %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Execution
+
+    %ol{ class: "text-sm text-gray-700 space-y-2 list-decimal list-inside" }
+      %li Enqueue scan (Sidekiq)
+      %li Generate lexemes + occurrences
+      %li Process lexemes (LLM / rules)
+      %li Review diffs (human)
+      %li Apply and write locale keys
+
+    %div{ class: "flex gap-2" }
+      %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Start Scan
+      %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Review Queue
+
+/ Two-column section: Recent activity + Queue
+%section{ class: "grid grid-cols-1 lg:grid-cols-2 gap-4" }
+  .rounded-2xl.border.bg-white.p-6.shadow-sm
+    %div{ class: "flex items-center justify-between" }
+      %h3{ class: "text-lg font-semibold" } Recent scan runs
+      %a{ href: "#", class: "text-sm text-gray-600 hover:text-gray-900" } View all
+
+    %div{ class: "mt-4 overflow-hidden rounded-xl border" }
+      %table{ class: "w-full text-sm" }
+        %thead{ class: "bg-gray-50 text-gray-600" }
+          %tr
+            %th{ class: "px-4 py-3 text-left font-medium" } Status
+            %th{ class: "px-4 py-3 text-left font-medium" } Pattern
+            %th{ class: "px-4 py-3 text-left font-medium" } File
+            %th{ class: "px-4 py-3 text-left font-medium" } Started
+        %tbody{ class: "divide-y" }
+          -# Static sample rows
+          %tr
+            %td{ class: "px-4 py-3" }
+              %span{ class: "inline-flex items-center rounded-lg border bg-green-50 text-green-700 border-green-200 px-2 py-1 text-xs" } finished
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } zh_strings_in_haml
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/views/projects/show.html.haml
+            %td{ class: "px-4 py-3 text-gray-600" } 2m ago
+          %tr
+            %td{ class: "px-4 py-3" }
+              %span{ class: "inline-flex items-center rounded-lg border bg-amber-50 text-amber-700 border-amber-200 px-2 py-1 text-xs" } running
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } hardcoded_errors
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/models/project.rb
+            %td{ class: "px-4 py-3 text-gray-600" } just now
+          %tr
+            %td{ class: "px-4 py-3" }
+              %span{ class: "inline-flex items-center rounded-lg border bg-red-50 text-red-700 border-red-200 px-2 py-1 text-xs" } failed
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } erb_interpolations
+            %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/views/shared/_form.html.erb
+            %td{ class: "px-4 py-3 text-gray-600" } 1h ago
+
+  .rounded-2xl.border.bg-white.p-6.shadow-sm
+    %div{ class: "flex items-center justify-between" }
+      %h3{ class: "text-lg font-semibold" } Review queue
+      %a{ href: "#", class: "text-sm text-gray-600 hover:text-gray-900" } Go to Review
+
+    %div{ class: "mt-4 space-y-3" }
+      -# Static sample items
+      .rounded-xl.border.bg-gray-50.p-4
+        .flex.items-start.justify-between.gap-3
           %div
-            %h3{ class: "text-lg font-semibold" } 1) Define patterns
-            %p{ class: "text-sm text-gray-600" }
-              Add regex-based lexical patterns with language, type, and priority.
-          %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Setup
+            %div{ class: "text-sm font-medium text-gray-900" } Unreviewed occurrence
+            %div{ class: "mt-1 text-xs text-gray-600 font-mono break-all" } app/views/projects/show.html.haml:88
+          %span{ class: "text-xs px-2 py-1 rounded-lg border bg-white text-gray-700" } unreviewed
+        %div{ class: "mt-3 text-xs text-gray-700" }
+          %span{ class: "font-mono bg-white border rounded-lg px-2 py-1" } "项目名称不能为空"
+          %span{ class: "text-gray-500" } → propose i18n key
 
-        %ul{ class: "text-sm text-gray-700 space-y-2" }
-          %li.flex.gap-2
-            %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
-            %span Name + language (ruby/erb/haml/js/tsx)
-          %li.flex.gap-2
-            %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
-            %span Pattern type (code/comment/string/template)
-          %li.flex.gap-2
-            %span{ class: "mt-1 h-2 w-2 rounded-full bg-gray-300 inline-block" }
-            %span Priority controls scan order
-
-        %div{ class: "flex gap-2" }
-          %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Add Pattern
-          %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Test Regex
-
-      .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
-        %div{ class: "flex items-start justify-between" }
+      .rounded-xl.border.bg-gray-50.p-4
+        .flex.items-start.justify-between.gap-3
           %div
-            %h3{ class: "text-lg font-semibold" } 2) Register repositories
-            %p{ class: "text-sm text-gray-600" }
-              Track files, hashes, and scan progress per repository.
-          %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Inventory
+            %div{ class: "text-sm font-medium text-gray-900" } Pending apply
+            %div{ class: "mt-1 text-xs text-gray-600 font-mono break-all" } app/models/project.rb:41
+          %span{ class: "text-xs px-2 py-1 rounded-lg border bg-white text-gray-700" } approved
+        %div{ class: "mt-3 text-xs text-gray-700" }
+          %span{ class: "font-mono bg-white border rounded-lg px-2 py-1" } "创建失败"
+          %span{ class: "text-gray-500" } → I18n.t("errors.project_create_failed")
 
-        %div{ class: "rounded-xl border bg-gray-50 p-4 text-sm" }
-          %div{ class: "text-xs text-gray-500" } Example root path
-          %div{ class: "mt-1 font-mono text-gray-900 break-all" } /Users/you/work/legacy-repo
-
-        %div{ class: "flex gap-2" }
-          %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Add Repository
-          %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Index Files
-
-      .rounded-2xl.border.bg-white.p-6.shadow-sm.space-y-4
-        %div{ class: "flex items-start justify-between" }
-          %div
-            %h3{ class: "text-lg font-semibold" } 3) Scan → Review → Apply
-            %p{ class: "text-sm text-gray-600" }
-              One pattern + one file per run. Produce occurrences as the smallest auditable unit.
-          %span{ class: "text-xs px-2 py-1 rounded-lg border bg-gray-50 text-gray-700" } Execution
-
-        %ol{ class: "text-sm text-gray-700 space-y-2 list-decimal list-inside" }
-          %li Enqueue scan (Sidekiq)
-          %li Generate lexemes + occurrences
-          %li Process lexemes (LLM / rules)
-          %li Review diffs (human)
-          %li Apply and write locale keys
-
-        %div{ class: "flex gap-2" }
-          %a{ href: "#", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" } Start Scan
-          %a{ href: "#", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Review Queue
-
-    / Two-column section: Recent activity + Queue
-    %section{ class: "grid grid-cols-1 lg:grid-cols-2 gap-4" }
-      .rounded-2xl.border.bg-white.p-6.shadow-sm
-        %div{ class: "flex items-center justify-between" }
-          %h3{ class: "text-lg font-semibold" } Recent scan runs
-          %a{ href: "#", class: "text-sm text-gray-600 hover:text-gray-900" } View all
-
-        %div{ class: "mt-4 overflow-hidden rounded-xl border" }
-          %table{ class: "w-full text-sm" }
-            %thead{ class: "bg-gray-50 text-gray-600" }
-              %tr
-                %th{ class: "px-4 py-3 text-left font-medium" } Status
-                %th{ class: "px-4 py-3 text-left font-medium" } Pattern
-                %th{ class: "px-4 py-3 text-left font-medium" } File
-                %th{ class: "px-4 py-3 text-left font-medium" } Started
-            %tbody{ class: "divide-y" }
-              -# Static sample rows
-              %tr
-                %td{ class: "px-4 py-3" }
-                  %span{ class: "inline-flex items-center rounded-lg border bg-green-50 text-green-700 border-green-200 px-2 py-1 text-xs" } finished
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } zh_strings_in_haml
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/views/projects/show.html.haml
-                %td{ class: "px-4 py-3 text-gray-600" } 2m ago
-              %tr
-                %td{ class: "px-4 py-3" }
-                  %span{ class: "inline-flex items-center rounded-lg border bg-amber-50 text-amber-700 border-amber-200 px-2 py-1 text-xs" } running
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } hardcoded_errors
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/models/project.rb
-                %td{ class: "px-4 py-3 text-gray-600" } just now
-              %tr
-                %td{ class: "px-4 py-3" }
-                  %span{ class: "inline-flex items-center rounded-lg border bg-red-50 text-red-700 border-red-200 px-2 py-1 text-xs" } failed
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } erb_interpolations
-                %td{ class: "px-4 py-3 font-mono text-xs text-gray-900" } app/views/shared/_form.html.erb
-                %td{ class: "px-4 py-3 text-gray-600" } 1h ago
-
-      .rounded-2xl.border.bg-white.p-6.shadow-sm
-        %div{ class: "flex items-center justify-between" }
-          %h3{ class: "text-lg font-semibold" } Review queue
-          %a{ href: "#", class: "text-sm text-gray-600 hover:text-gray-900" } Go to Review
-
-        %div{ class: "mt-4 space-y-3" }
-          -# Static sample items
-          .rounded-xl.border.bg-gray-50.p-4
-            .flex.items-start.justify-between.gap-3
-              %div
-                %div{ class: "text-sm font-medium text-gray-900" } Unreviewed occurrence
-                %div{ class: "mt-1 text-xs text-gray-600 font-mono break-all" } app/views/projects/show.html.haml:88
-              %span{ class: "text-xs px-2 py-1 rounded-lg border bg-white text-gray-700" } unreviewed
-            %div{ class: "mt-3 text-xs text-gray-700" }
-              %span{ class: "font-mono bg-white border rounded-lg px-2 py-1" } "项目名称不能为空"
-              %span{ class: "text-gray-500" } → propose i18n key
-
-          .rounded-xl.border.bg-gray-50.p-4
-            .flex.items-start.justify-between.gap-3
-              %div
-                %div{ class: "text-sm font-medium text-gray-900" } Pending apply
-                %div{ class: "mt-1 text-xs text-gray-600 font-mono break-all" } app/models/project.rb:41
-              %span{ class: "text-xs px-2 py-1 rounded-lg border bg-white text-gray-700" } approved
-            %div{ class: "mt-3 text-xs text-gray-700" }
-              %span{ class: "font-mono bg-white border rounded-lg px-2 py-1" } "创建失败"
-              %span{ class: "text-gray-500" } → I18n.t("errors.project_create_failed")
-
-    / Footer note
-    %section{ class: "rounded-2xl border bg-white p-6 shadow-sm" }
-      %h3{ class: "text-lg font-semibold" } Safety model
-      %p{ class: "mt-2 text-sm text-gray-600 max-w-4xl" }
-        Every replacement is audited and reversible. Occurrence is the smallest unit of review. Apply actions record the original fragment,
-        patched fragment, and base file hash to detect drift and support rollback.
+-# / Footer note
+%section{ class: "rounded-2xl border bg-white p-6 shadow-sm" }
+  %h3{ class: "text-lg font-semibold" } Safety model
+  %p{ class: "mt-2 text-sm text-gray-600 max-w-4xl" }
+    Every replacement is audited and reversible. Occurrence is the smallest unit of review. Apply actions record the original fragment,
+    patched fragment, and base file hash to detect drift and support rollback.
