@@ -1,4 +1,4 @@
-class RepositorysController < ApplicationController
+class RepositoriesController < ApplicationController
   def index
   end
 
