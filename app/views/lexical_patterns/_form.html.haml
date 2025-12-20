@@ -1,7 +1,6 @@
 -# app/views/lexical_patterns/_form.html.haml
--# 通用表单，用于 new 和 edit 操作
 
-= form_with(model: @lexical_pattern, class: "space-y-6") do |form|
+= form_with(model: @lexical_pattern, class: "space-y-6", data: { turbo: false }) do |form|
   - if @lexical_pattern.errors.any?
     %div{ class: "rounded-2xl border border-red-200 bg-red-50 p-4" }
       %h3{ class: "text-sm font-semibold text-red-800" }
@@ -13,7 +12,7 @@
             %span{ class: "h-1.5 w-1.5 mt-1.5 flex-shrink-0 rounded-full bg-red-500" }
             %span= error.full_message
 
-  %div{ class: "rounded-2xl border bg-white p-6 shadow-sm" }
+  %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm" }
     %div{ class: "space-y-4" }
       %div
         %label{ for: "lexical_pattern_pattern", class: "block text-sm font-medium text-gray-700 mb-1" }
@@ -57,7 +56,10 @@
           = form.number_field :priority, id: "lexical_pattern_priority",
             class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
             min: 1,
+            max: 1000,
             required: true
+          %p{ class: "mt-1 text-xs text-gray-500" }
+            Must be between 1 and 1000 (inclusive)
 
       %div{ class: "flex items-center gap-2" }
         %div
