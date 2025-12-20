@@ -1,0 +1,37 @@
+-# app/views/shared/_confirm_log.html.haml
+-# 通用确认弹窗（全局复用，纯 JS 控制显示/隐藏）
+-# 默认按钮文案 Cancel / Confirm，可被 JS 覆盖
+
+%div{
+  id: "app_confirm_log",
+  class: "fixed inset-0 z-50 hidden",
+  aria: { hidden: "true" }
+}
+  -# 背景遮罩
+  %div{
+    class: "absolute inset-0 bg-black/30",
+    onclick: "PopConfirmLog.cancel()"
+  }
+
+  -# 弹窗本体：垂直/水平居中
+  %div{ class: "absolute inset-0 flex items-center justify-center px-4" }
+    %div{ class: "w-full max-w-md rounded-2xl border bg-white p-0 shadow-xl" }
+
+      %div{ class: "p-6 space-y-3" }
+        %h3{ id: "app_confirm_log_title", class: "text-lg font-semibold text-gray-900" } Confirm
+        %p{ id: "app_confirm_log_message", class: "text-sm text-gray-600" } Are you sure?
+
+      %div{ class: "flex items-center rounded-2xl justify-end gap-2 bg-gray-50 px-6 py-4" }
+        %button{
+          type: "button",
+          id: "app_confirm_log_cancel",
+          class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-white",
+          onclick: "PopConfirmLog.cancel()"
+        } Cancel
+
+        %button{
+          type: "button",
+          id: "app_confirm_log_confirm",
+          class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black",
+          onclick: "PopConfirmLog.confirm()"
+        } Confirm

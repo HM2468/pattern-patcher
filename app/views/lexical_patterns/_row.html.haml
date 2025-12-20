@@ -35,6 +35,7 @@
       = button_to lexical_pattern_path(pattern),
         method: :delete,
         params: { page: params[:page] },
-        data: { turbo_confirm: "Delete this pattern? This cannot be undone." },
-        form: { class: "inline-flex" } do
+        form: { class: "inline-flex" },
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: { confirm_title: "Delete pattern", confirm_message: "Delete this pattern? This cannot be undone." } do
         %span{ class: "inline-flex items-center rounded-lg border bg-red-50 text-red-700 border-red-200 px-2 py-1 text-xs" } delete
