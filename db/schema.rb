@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_18_060126) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_20_124343) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -118,11 +118,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_18_060126) do
   create_table "repositories", force: :cascade do |t|
     t.string "name"
     t.string "root_path"
-    t.string "repo_uid"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["repo_uid"], name: "index_repositories_on_repo_uid", unique: true
+    t.string "permitted_ext"
     t.index ["root_path"], name: "index_repositories_on_root_path", unique: true
     t.index ["status"], name: "index_repositories_on_status"
   end
