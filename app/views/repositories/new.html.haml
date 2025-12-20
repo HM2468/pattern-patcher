@@ -1,3 +1,37 @@
-%div
-  %h1.font-bold.text-4xl Repositories#new
-  %p Find me in app/views/repositories/new.html.haml
+-# app/views/repositories/new.html.haml
+%div{ class: "max-w-3xl mx-auto p-6" }
+  %div{ class: "mb-4" }
+    %h1{ class: "text-xl font-semibold" } New repository
+    %div{ class: "text-sm text-gray-600 mt-1" }
+      Paste an absolute folder path as root_path (local tool).
+
+  = form_with model: @repository, local: true do |f|
+    - if @repository.errors.any?
+      %div{ class: "border rounded-lg p-4 bg-red-50 text-red-800 mb-4" }
+        %div{ class: "font-semibold mb-2" } Validation errors
+        %ul{ class: "list-disc pl-5 text-sm" }
+          - @repository.errors.full_messages.each do |msg|
+            %li= msg
+
+    %div{ class: "space-y-4 border rounded-lg p-4 bg-white" }
+      %div
+        = f.label :name, class: "block text-sm font-semibold mb-1"
+        = f.text_field :name, class: "w-full border rounded-lg px-3 py-2", placeholder: "My repo"
+
+      %div
+        = f.label :root_path, class: "block text-sm font-semibold mb-1"
+        = f.text_field :root_path, class: "w-full border rounded-lg px-3 py-2",
+          placeholder: "/Users/you/projects/my_repo"
+
+      %div
+        = f.label :permitted_ext, "Permitted extensions (comma-separated)", class: "block text-sm font-semibold mb-1"
+        = f.text_field :permitted_ext, class: "w-full border rounded-lg px-3 py-2",
+          placeholder: "rb,haml,erb,js"
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Example: <span class="font-mono">rb,haml</span> (no dots required; dots also accepted)
+
+      = f.hidden_field :status, value: "active"
+
+      %div{ class: "flex gap-2" }
+        = f.submit "Create", class: "px-3 py-2 rounded-lg border bg-blue-600 text-white"
+        = link_to "Back", repositories_path, class: "px-3 py-2 rounded-lg border bg-white hover:bg-gray-50"

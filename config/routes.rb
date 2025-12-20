@@ -57,6 +57,9 @@ Rails.application.routes.draw do
   resources :repositories do
     # Nested routes for managing files within a repository
     resources :repository_files, only: [:index, :new, :create, :edit]
+    member do
+      get :import
+    end
   end
 
   # File-level operations (show/edit/update/delete)
