@@ -1,4 +1,6 @@
 class LexicalPatternsController < ApplicationController
+  before_action :set_lexical_pattern, only: [:test, :run_test, :toggle_enabled, :edit, :update, :destroy]
+
   def index
     # Keep ordering predictable for operators:
     # priority asc, then newest first as a stable tie-breaker
@@ -27,7 +29,6 @@ class LexicalPatternsController < ApplicationController
   end
 
   def destroy
-    @lexical_pattern = LexicalPattern.find(params[:id])
     @lexical_pattern.destroy!
 
     # Re-load current page after delete. This is what enables "fill the gap".
@@ -51,7 +52,6 @@ class LexicalPatternsController < ApplicationController
 
   # Toggle enabled via a tiny PATCH request (Turbo compatible)
   def toggle_enabled
-    @lexical_pattern = LexicalPattern.find(params[:id])
     @lexical_pattern.update!(enabled: !@lexical_pattern.enabled)
 
     respond_to do |format|
@@ -66,18 +66,25 @@ class LexicalPatternsController < ApplicationController
     end
   end
 
-  # Placeholder for your future regex test page
+
   def test
-    @lexical_pattern = LexicalPattern.find(params[:id])
+  end
+
+  # POST /lexical_patterns/:id/test
+  # params: { test_content: "..." }
+  # returns: { st: [...] }
+  def run_test
+    content = params[:test_content].to_s
+    raw = @lexical_pattern.scan(content)
+    render json: { st: raw }
+  rescue RegexpError => e
+    render json: { st: [], error: "invalid regex: #{e.message}" }, status: :unprocessable_entity
   end
 
   def edit
-    @lexical_pattern = LexicalPattern.find(params[:id])
   end
 
   def update
-    @lexical_pattern = LexicalPattern.find(params[:id])
-
     if @lexical_pattern.update(lexical_pattern_params)
       respond_to do |format|
         format.turbo_stream
@@ -89,6 +96,10 @@ class LexicalPatternsController < ApplicationController
   end
 
   private
+
+  def set_lexical_pattern
+    @lexical_pattern = LexicalPattern.find(params[:id])
+  end
 
   def lexical_pattern_params
     params.require(:lexical_pattern).permit(:name, :pattern, :language, :pattern_type, :priority, :enabled)
