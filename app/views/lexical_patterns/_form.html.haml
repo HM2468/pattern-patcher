@@ -1,0 +1,73 @@
+-# app/views/lexical_patterns/_form.html.haml
+-# 通用表单，用于 new 和 edit 操作
+
+= form_with(model: @lexical_pattern, class: "space-y-6") do |form|
+  - if @lexical_pattern.errors.any?
+    %div{ class: "rounded-2xl border border-red-200 bg-red-50 p-4" }
+      %h3{ class: "text-sm font-semibold text-red-800" }
+        = pluralize(@lexical_pattern.errors.count, "error")
+        prohibited this pattern from being saved:
+      %ul{ class: "mt-2 space-y-1 text-sm text-red-700" }
+        - @lexical_pattern.errors.each do |error|
+          %li{ class: "flex items-start gap-2" }
+            %span{ class: "h-1.5 w-1.5 mt-1.5 flex-shrink-0 rounded-full bg-red-500" }
+            %span= error.full_message
+
+  %div{ class: "rounded-2xl border bg-white p-6 shadow-sm" }
+    %div{ class: "space-y-4" }
+      %div
+        %label{ for: "lexical_pattern_pattern", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Pattern (Regex)
+        = form.text_area :pattern, id: "lexical_pattern_pattern",
+          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm font-mono focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+          rows: 3,
+          placeholder: "e.g., /\"[^\"]+\"/",
+          required: true
+
+      %div{ class: "grid grid-cols-1 md:grid-cols-2 gap-4" }
+        %div
+          %label{ for: "lexical_pattern_name", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Name
+          = form.text_field :name, id: "lexical_pattern_name",
+            class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+            placeholder: "e.g., hardcoded_strings",
+            required: true
+
+        %div
+          %label{ for: "lexical_pattern_language", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Language
+          = form.text_field :language, id: "lexical_pattern_language",
+            class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+            placeholder: "e.g., ruby/erb/haml/js/tsx",
+            required: true
+
+      %div{ class: "grid grid-cols-1 md:grid-cols-2 gap-4" }
+        %div
+          %label{ for: "lexical_pattern_pattern_type", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Pattern Type
+          = form.select :pattern_type, LexicalPattern::PATTERN_TYPES,
+            { selected: @lexical_pattern.pattern_type || "string_literal" },
+            id: "lexical_pattern_pattern_type",
+            class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+            required: true
+
+        %div
+          %label{ for: "lexical_pattern_priority", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Priority
+          = form.number_field :priority, id: "lexical_pattern_priority",
+            class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+            min: 1,
+            required: true
+
+      %div{ class: "flex items-center gap-2" }
+        %div
+          = form.check_box :enabled, id: "lexical_pattern_enabled",
+            class: "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+        %label{ for: "lexical_pattern_enabled", class: "text-sm font-medium text-gray-700" }
+          Enabled
+
+  %div{ class: "flex items-center justify-between gap-4" }
+    = link_to "Cancel", lexical_patterns_path,
+      class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
+
+    = form.submit "Save", class: "inline-flex items-center rounded-xl bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-black"

@@ -9,6 +9,23 @@ class LexicalPatternsController < ApplicationController
         .per(10)
   end
 
+  def new
+    @lexical_pattern = LexicalPattern.new(enabled: true, priority: 100, pattern_type: "string_literal")
+  end
+
+  def create
+    @lexical_pattern = LexicalPattern.new(lexical_pattern_params)
+
+    if @lexical_pattern.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to lexical_patterns_path, notice: "Pattern created successfully." }
+      end
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     @lexical_pattern = LexicalPattern.find(params[:id])
     @lexical_pattern.destroy!
@@ -52,5 +69,28 @@ class LexicalPatternsController < ApplicationController
   # Placeholder for your future regex test page
   def test
     @lexical_pattern = LexicalPattern.find(params[:id])
+  end
+
+  def edit
+    @lexical_pattern = LexicalPattern.find(params[:id])
+  end
+
+  def update
+    @lexical_pattern = LexicalPattern.find(params[:id])
+
+    if @lexical_pattern.update(lexical_pattern_params)
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to lexical_patterns_path, notice: "Pattern updated successfully." }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def lexical_pattern_params
+    params.require(:lexical_pattern).permit(:name, :pattern, :language, :pattern_type, :priority, :enabled)
   end
 end
