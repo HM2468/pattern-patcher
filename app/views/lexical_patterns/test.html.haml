@@ -5,7 +5,7 @@
     %div{ class: "mt-2 font-mono text-xs bg-gray-50 border rounded p-3 break-all" }= @lexical_pattern.pattern
 
   %div{ class: "mt-6" }
-    %div{ class: "text-sm font-semibold mb-2" } Input (paste text)
+    %div{ class: "text-sm font-semibold mb-2" } Scan based on the pattern above line by line
 
     -# Rich text input (contenteditable)
     %div#test_editor{
@@ -14,13 +14,17 @@
       data: { placeholder: "Paste your text here..." }
     }
 
-    %div{ class: "mt-4 flex items-center gap-2" }
-      %button#scan_btn{ type: "button", class: "px-3 py-2 rounded-lg border bg-blue-600 text-white" } Scan
-      %button#prev_btn{ type: "button", class: "px-3 py-2 rounded-lg border", disabled: true } Prev
-      %button#next_btn{ type: "button", class: "px-3 py-2 rounded-lg border", disabled: true } Next
-      %div#match_stat{ class: "ml-auto text-sm text-gray-700" }
+    %div{ class: "mt-2 text-center" }
+      %div#match_stat{ class: "text-sm text-gray-700 inline-block" }
+      %div#scan_error{ class: "mt-1 text-sm text-red-700 hidden" }
 
-    %div#scan_error{ class: "mt-2 text-sm text-red-700 hidden" }
+    %div{ class: "mt-4 flex items-center justify-between gap-2" }
+      %div{ class: "flex items-center gap-2" }
+        %button#scan_btn{ type: "button", class: "inline-flex items-center rounded-xl bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-black" } Scan
+        %button#prev_btn{ type: "button", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50", disabled: true } Prev
+        %button#next_btn{ type: "button", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50", disabled: true } Next
+      %div{ class: "flex items-center gap-2" }
+        %a{ href: "javascript:history.back()", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Back
 
 :javascript
   window.RegexTestPage = {
