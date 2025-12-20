@@ -1,3 +1,28 @@
-%div
-  %h1.font-bold.text-4xl LexicalPatterns#test
-  %p Find me in app/views/lexical_patterns/test.html.haml
+-# app/views/lexical_patterns/test.html.haml
+%div{ class: "max-w-5xl mx-auto p-6" }
+  %div{ class: "mb-4" }
+    %div{ class: "text-lg font-semibold" }= @lexical_pattern.name
+    %div{ class: "mt-2 font-mono text-xs bg-gray-50 border rounded p-3 break-all" }= @lexical_pattern.pattern
+
+  %div{ class: "mt-6" }
+    %div{ class: "text-sm font-semibold mb-2" } Input (paste text)
+
+    -# Rich text input (contenteditable)
+    %div#test_editor{
+      contenteditable: "true",
+      class: "border rounded-lg p-3 h-[420px] overflow-auto bg-white whitespace-pre-wrap font-mono text-sm outline-none",
+      data: { placeholder: "Paste your text here..." }
+    }
+
+    %div{ class: "mt-4 flex items-center gap-2" }
+      %button#scan_btn{ type: "button", class: "px-3 py-2 rounded-lg border bg-blue-600 text-white" } Scan
+      %button#prev_btn{ type: "button", class: "px-3 py-2 rounded-lg border", disabled: true } Prev
+      %button#next_btn{ type: "button", class: "px-3 py-2 rounded-lg border", disabled: true } Next
+      %div#match_stat{ class: "ml-auto text-sm text-gray-700" }
+
+    %div#scan_error{ class: "mt-2 text-sm text-red-700 hidden" }
+
+:javascript
+  window.RegexTestPage = {
+    runTestUrl: "#{run_test_lexical_pattern_path(@lexical_pattern)}"
+  };
