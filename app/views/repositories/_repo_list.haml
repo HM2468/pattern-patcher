@@ -1,10 +1,11 @@
 -# app/views/repositories/_repo_list.html.haml
 
-%div{ class: "p-3" }
-  %h1{ class: "text-xl font-semibold" } Repositories
-  %div{ class: "mt-1" }
-    = link_to "New repository", new_repository_path,
-      class: "px-3 py-2 rounded-lg border bg-white hover:bg-gray-50 text-sm"
+%div{ class: "bg-indigo-100 p-3 flex items-center justify-between" }
+  %div
+    %h1{ class: "text-xl font-semibold" } Repositories
+  %div
+    = link_to "New", new_repository_path,
+      class: "button-primary"
 
 - if @repositories.empty?
   %div{ class: "p-3" }
