@@ -1,14 +1,12 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
-  PER_PAGE = 200
-
   def index
     # 仓库数量不多，不用翻页
     @repositories = Repository.order(created_at: :desc)
     repository_id = params[:repository_id] || @repositories.first&.id
     if repository_id
-      @repository = Repository.find(repository_id)
-      @repository_files = @repository.repository_files.order(path: :desc).page(params[:page]).per(200)
+      @current_repo = Repository.find(repository_id)
+      @repository_files = @current_repo.repository_files.order(path: :asc).page(params[:page]).per(200)
     end
   end
 
