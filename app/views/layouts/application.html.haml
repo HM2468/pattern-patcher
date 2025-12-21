@@ -13,7 +13,7 @@
     %link{:href => "/icon.svg", :rel => "icon", :type => "image/svg+xml"}/
     %link{:href => "/icon.png", :rel => "apple-touch-icon"}/
     = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
-    = stylesheet_link_tag "application", "data-turbo-track": "reload"
+    = stylesheet_link_tag_all
     = javascript_importmap_tags
   %body
     %div{ class: "mx-auto max-w-6xl flex flex-col gap-[16px]" }

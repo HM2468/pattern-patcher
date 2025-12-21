@@ -1,0 +1,63 @@
+/* Custom Button Styles */
+
+.button-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* 6px */
+  border-radius: 0.625rem; /* 10px */
+  padding: 0.375rem 0.75rem; /* 6px 12px */
+  font-size: 0.8125rem; /* 13px */
+  font-weight: 500;
+  color: #eef2ff; /* indigo-50 */
+  background-color: #4338ca; /* indigo-700 */
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button-primary:hover {
+  background-color: #3730a3; /* indigo-800 */
+}
+
+.button-primary:active {
+  background-color: #312e81; /* indigo-900 */
+}
+
+.button-primary:active {
+  background-color: #0f172a; /* slate-900 */
+}
+
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 0.625rem;
+  border: 1px solid #c7d2fe; /* indigo-200 */
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #3730a3; /* indigo-800 */
+  background-color: #eef2ff; /* indigo-50 */
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.button-secondary:hover {
+  background-color: #e0e7ff; /* indigo-100 */
+  border-color: #a5b4fc;     /* indigo-300 */
+}
+
+.button-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 0.625rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #7f1d1d;            /* red-900 */
+  background-color: #fef2f2; /* red-50 */
+  border: 1px solid #fecaca; /* red-200 */
+  transition: background-color 0.15s ease;
+}
+
+.button-danger:hover {
+  background-color: #fee2e2; /* red-100 */
+}

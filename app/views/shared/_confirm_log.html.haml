@@ -15,23 +15,23 @@
 
   -# 弹窗本体：垂直/水平居中
   %div{ class: "absolute inset-0 flex items-center justify-center px-4" }
-    %div{ class: "w-full max-w-md rounded-2xl border bg-white p-0 shadow-xl" }
+    %div{ class: "w-full max-w-md rounded-2xl bg-white p-0 shadow-xl" }
 
       %div{ class: "p-6 space-y-3" }
         %h3{ id: "app_confirm_log_title", class: "text-lg font-semibold text-gray-900" } Confirm
         %p{ id: "app_confirm_log_message", class: "text-sm text-gray-600" } Are you sure?
 
-      %div{ class: "flex items-center rounded-2xl justify-end gap-2 bg-gray-50 px-6 py-4" }
+      %div{ class: "flex items-center rounded-2xl justify-end gap-2 bg-white px-3 py-3" }
         %button{
           type: "button",
           id: "app_confirm_log_cancel",
-          class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-white",
+          class: "button-secondary",
           onclick: "PopConfirmLog.cancel()"
         } Cancel
 
         %button{
           type: "button",
           id: "app_confirm_log_confirm",
-          class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black",
+          class: "button-danger",
           onclick: "PopConfirmLog.confirm()"
         } Confirm

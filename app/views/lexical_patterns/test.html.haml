@@ -20,11 +20,11 @@
 
     %div{ class: "mt-4 flex items-center justify-between gap-2" }
       %div{ class: "flex items-center gap-2" }
-        %button#scan_btn{ type: "button", class: "inline-flex items-center rounded-xl bg-gray-900 px-6 py-2 text-sm font-medium text-white hover:bg-black" } Scan
-        %button#prev_btn{ type: "button", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50", disabled: true } Prev
-        %button#next_btn{ type: "button", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50", disabled: true } Next
+        %button#scan_btn{ type: "button", class: "button-primary" } Scan
+        %button#prev_btn{ type: "button", class: "button-secondary", disabled: true } Prev
+        %button#next_btn{ type: "button", class: "button-secondary", disabled: true } Next
       %div{ class: "flex items-center gap-2" }
-        %a{ href: "javascript:history.back()", class: "inline-flex items-center rounded-xl border px-4 py-2 text-sm hover:bg-gray-50" } Back
+        %a{ href: "javascript:history.back()", class: "button-secondary" } Back
 
 :javascript
   window.RegexTestPage = {
