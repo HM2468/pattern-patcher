@@ -1,6 +1,6 @@
 // app/javascript/lexical_pattern_test_page.js
 (function () {
-  function qs(sel) { return document.querySelector(sel); }
+  function byId(id) { return document.getElementById(id); }
 
   function escapeHtml(s) {
     return String(s)
@@ -94,14 +94,16 @@
   async function run() {
     injectStyleOnce();
 
-    const editor = qs("#test_editor");
-    const scanBtn = qs("#scan_btn");
-    const prevBtn = qs("#prev_btn");
-    const nextBtn = qs("#next_btn");
-    const stat = qs("#match_stat");
-    const errBox = qs("#scan_error");
+    // Always locate by id (robust against class changes)
+    const editor  = byId("test_editor");
+    const scanBtn = byId("scan_btn");
+    const prevBtn = byId("prev_btn");
+    const nextBtn = byId("next_btn");
+    const stat    = byId("match_stat");
+    const errBox  = byId("scan_error");
 
-    if (!editor || !scanBtn || !window.RegexTestPage?.runTestUrl) return;
+    if (!editor || !scanBtn || !prevBtn || !nextBtn || !stat || !errBox) return;
+    if (!window.RegexTestPage || !window.RegexTestPage.runTestUrl) return;
 
     let currentIndex = 0;
     let matchEls = [];
@@ -116,12 +118,11 @@
       errBox.classList.add("hidden");
     }
 
-    scanBtn.addEventListener("click", async () => {
+    async function handleScan() {
       clearError();
       stat.textContent = "Scanning...";
       setNavEnabled(prevBtn, nextBtn, false);
 
-      // Grab plain text from editor to ensure backend scan and frontend highlight share the same text
       const text = (editor.innerText || "").replace(/\r\n/g, "\n");
       const url = window.RegexTestPage.runTestUrl;
 
@@ -148,7 +149,6 @@
         const st = Array.isArray(data.st) ? data.st : [];
 
         if (st.length === 0) {
-          // No matches: remove old highlights, keep plain text
           editor.textContent = text;
           matchEls = [];
           currentIndex = 0;
@@ -156,10 +156,7 @@
           return;
         }
 
-        // Replace editor content with plain text + highlight spans
-        // Note: this will drop any rich formatting from paste/edit (acceptable for this first version)
         editor.innerHTML = buildHighlightedHtml(text, st);
-
         matchEls = Array.from(editor.querySelectorAll(".lp-match"));
 
         if (matchEls.length === 0) {
@@ -177,23 +174,28 @@
         showError(`Network error: ${e.message || String(e)}`);
         stat.textContent = "Scan failed";
       }
-    });
+    }
 
-    prevBtn.addEventListener("click", () => {
+    function handlePrev() {
       if (!matchEls.length) return;
       currentIndex = (currentIndex - 1 + matchEls.length) % matchEls.length;
       stat.textContent = `Match ${currentIndex + 1} / ${matchEls.length}`;
       focusMatch(editor, matchEls, currentIndex);
-    });
+    }
 
-    nextBtn.addEventListener("click", () => {
+    function handleNext() {
       if (!matchEls.length) return;
       currentIndex = (currentIndex + 1) % matchEls.length;
       stat.textContent = `Match ${currentIndex + 1} / ${matchEls.length}`;
       focusMatch(editor, matchEls, currentIndex);
-    });
+    }
 
-    // Optional UX: click on a highlighted match to jump to it
+    // ✅ bind events by id
+    scanBtn.addEventListener("click", handleScan);
+    prevBtn.addEventListener("click", handlePrev);
+    nextBtn.addEventListener("click", handleNext);
+
+    // Optional: click on highlight to jump
     editor.addEventListener("click", (ev) => {
       const hit = ev.target.closest(".lp-match");
       if (!hit) return;
@@ -204,6 +206,14 @@
       currentIndex = idx;
       stat.textContent = `Match ${currentIndex + 1} / ${matchEls.length}`;
       focusMatch(editor, matchEls, currentIndex);
+    });
+
+    // Optional: Ctrl/Cmd+Enter triggers scan
+    editor.addEventListener("keydown", (ev) => {
+      if ((ev.ctrlKey || ev.metaKey) && ev.key === "Enter") {
+        ev.preventDefault();
+        handleScan();
+      }
     });
   }
 
