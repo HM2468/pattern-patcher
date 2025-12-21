@@ -1,1 +1,60 @@
 @import "tailwindcss";
+
+/* ------------------------------------------------------------
+ * Bottom Pagination Module
+ * Usage:
+ *   <div class="bottom-pagination">
+ *     = render "shared/pagination", collection: @repository_files
+ *   </div>
+ * ------------------------------------------------------------ */
+
+.bottom-pagination {
+  /* Container (bottom bar) */
+  margin-top: auto;
+  flex-shrink: 0;
+
+  height: 3rem;                 /* h-12 (48px) */
+  padding: 0 0.75rem;           /* px-3 */
+  display: flex;
+  align-items: center;
+
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb; /* gray-200 */
+  overflow: hidden;
+}
+
+.bottom-pagination .pagination,
+.bottom-pagination nav {
+  width: 100%;
+}
+
+/* Make inner layout compact and stable */
+.bottom-pagination * {
+  line-height: 1;
+}
+
+/* Buttons / links */
+.bottom-pagination a,
+.bottom-pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 28px;
+  min-width: 28px;
+  padding: 0 10px;
+
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+/* Non-clickable items (current page / gaps / disabled) */
+.bottom-pagination span,
+.bottom-pagination .gap,
+.bottom-pagination .disabled {
+  display: inline-flex;
+  align-items: center;
+
+  height: 28px;
+  font-size: 12px;
+}
