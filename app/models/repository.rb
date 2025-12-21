@@ -31,6 +31,6 @@ class Repository < ApplicationRecord
   end
 
   def enqueue_import_job
-    RepositoryImportJob.perform_now(id)
+    RepositoryImportJob.perform_later(id)
   end
 end

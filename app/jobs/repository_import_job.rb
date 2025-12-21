@@ -8,7 +8,6 @@ class RepositoryImportJob < ApplicationJob
   def perform(repository_id)
     repo = Repository.find_by(id: repository_id)
     return if repo.nil?
-    return unless repo.status == "active"
 
     root = repo.root_path.to_s
     return if root.blank?

@@ -32,7 +32,7 @@ class RepositoriesController < ApplicationController
 
   def import
     repo = Repository.find(params[:id])
-    RepositoryImportJob.perform_now(repo.id)
+    RepositoryImportJob.perform_later(repo.id)
     redirect_to repositories_path(repository_id: repo.id), notice: "Re-import job enqueued."
   end
 

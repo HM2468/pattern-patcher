@@ -2,6 +2,8 @@
 
 - if @repositories.empty?
   %div{ class: "p-6 text-gray-700" } No repositories found.
+- elsif @repository_files.empty?
+  %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
 - else
   %div{ class: "p-3 border-b flex items-center justify-between" }
     %div
