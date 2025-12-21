@@ -1,23 +1,23 @@
 -# app/views/repositories/index.html.haml
 %div{ class: "max-w-7xl mx-auto p-6" }
-  %div{ class: "flex items-center justify-between mb-4" }
-    %h1{ class: "text-xl font-semibold" } Repositories
-    = link_to "New repository", new_repository_path,
-      class: "px-3 py-2 rounded-lg border bg-white hover:bg-gray-50"
+  %div{ class: "flex gap-4 h-[70vh]" }
+    -# Left: repositories (30%)
+    %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
+      %div{ class: "p-3 border-b" }
+        %h1{ class: "text-xl font-semibold" } Repositories
+        %div{ class: "mt-1" }
+          = link_to "New repository", new_repository_path,
+            class: "px-3 py-2 rounded-lg border bg-white hover:bg-gray-50 text-sm"
 
-  - if @repositories.empty?
-    %div{ class: "border rounded-lg p-6 bg-gray-50" }
-      %div{ class: "font-semibold mb-2" } No repositories yet
-      %div{ class: "text-sm text-gray-700 mb-4" }
-        Create one to import files from a local folder.
-      = link_to "Create your first repository", new_repository_path,
-        class: "inline-flex px-3 py-2 rounded-lg border bg-white hover:bg-gray-50"
-  - else
-    %div{ class: "flex gap-4" }
-      -# Left: repositories (30%)
-      %div{ class: "w-[30%] border rounded-lg bg-white overflow-hidden" }
-        %div{ class: "p-3 border-b font-semibold text-sm" } Repositories
-        %div{ class: "divide-y" }
+      - if @repositories.empty?
+        %div{ class: "p-3" }
+          %div{ class: "font-semibold mb-2" } No repositories yet
+          %div{ class: "text-sm text-gray-700 mb-4" }
+            Create one to import files from a local folder.
+          = link_to "Create your first repository", new_repository_path,
+            class: "inline-flex px-3 py-2 rounded-lg border bg-white hover:bg-gray-50 text-sm"
+      - else
+        %div{ class: "divide-y flex-grow overflow-y-auto" }
           - @repositories.each do |repo|
             - active = (@selected_repo && repo.id == @selected_repo.id)
             = link_to repositories_path(repository_id: repo.id),
@@ -42,65 +42,65 @@
                     class: "text-xs px-2 py-1 rounded border bg-white hover:bg-gray-50"
 
       -# Right: files (70%)
-      %div{ class: "w-[70%] border rounded-lg bg-white overflow-hidden" }
-        - if @selected_repo.nil?
-          %div{ class: "p-6 text-gray-700" } Select a repository on the left.
-        - else
-          %div{ class: "p-3 border-b flex items-center justify-between" }
-            %div
-              %div{ class: "font-semibold text-sm" } Files
-              %div{ class: "text-xs text-gray-600" }
-                Repository:
-                %span{ class: "font-mono" }= @selected_repo.name
-                · Total:
-                %span{ class: "font-mono" }= @total_files
-                · Page:
-                %span{ class: "font-mono" }= @page
+    %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
+      - if @selected_repo.nil?
+        %div{ class: "p-6 text-gray-700" } Select a repository on the left.
+      - else
+        %div{ class: "p-3 border-b flex items-center justify-between" }
+          %div
+            %div{ class: "font-semibold text-sm" } Files
             %div{ class: "text-xs text-gray-600" }
-              Showing up to #{RepositoriesController::PER_PAGE} per page
+              Repository:
+              %span{ class: "font-mono" }= @selected_repo.name
+              · Total:
+              %span{ class: "font-mono" }= @total_files
+              · Page:
+              %span{ class: "font-mono" }= @page
+          %div{ class: "text-xs text-gray-600" }
+            Showing up to #{RepositoriesController::PER_PAGE} per page
 
-          %div{ class: "p-3 border-b flex items-center gap-3" }
-            %select#bulk_action{ class: "text-sm border rounded px-2 py-1" }
-              %option{ value: "" } Bulk actions...
-              %option{ value: "noop" } (placeholder) No-op
+        %div{ class: "p-3 border-b flex items-center gap-3" }
+          %select#bulk_action{ class: "text-sm border rounded px-2 py-1" }
+            %option{ value: "" } Bulk actions...
+            %option{ value: "noop" } (placeholder) No-op
 
-            %button#bulk_apply{ type: "button", class: "text-sm border rounded px-2 py-1 bg-white hover:bg-gray-50" } Apply
-            %div#bulk_hint{ class: "text-xs text-gray-600 ml-auto" } Select files to enable bulk ops.
+          %button#bulk_apply{ type: "button", class: "text-sm border rounded px-2 py-1 bg-white hover:bg-gray-50" } Apply
+          %div#bulk_hint{ class: "text-xs text-gray-600 ml-auto" } Select files to enable bulk ops.
 
-          %div{ class: "overflow-auto" }
-            %table{ class: "w-full text-sm" }
-              %thead{ class: "bg-gray-50 border-b" }
-                %tr
-                  %th{ class: "w-10 px-3 py-2 text-left" }
-                    %input#check_all{ type: "checkbox" }
-                  %th{ class: "px-3 py-2 text-left font-semibold" } Path
-              %tbody{ class: "divide-y" }
-                - @files.each do |f|
-                  %tr{ class: "hover:bg-gray-50" }
-                    %td{ class: "px-3 py-2 align-top" }
-                      %input.file_check{ type: "checkbox", value: f.id }
-                    %td{ class: "px-3 py-2 align-top" }
-                      %div{ class: "truncate max-w-[56rem]" }= f.path
+        %div{ class: "overflow-auto" }
+          %table{ class: "w-full text-sm" }
+            %thead{ class: "bg-gray-50 border-b" }
+              %tr
+                %th{ class: "w-10 px-3 py-2 text-left" }
+                  %input#check_all{ type: "checkbox" }
+                %th{ class: "px-3 py-2 text-left font-semibold" } Path
+            %tbody{ class: "divide-y" }
+              - @files.each do |f|
+                %tr{ class: "hover:bg-gray-50" }
+                  %td{ class: "px-3 py-2 align-top" }
+                    %input.file_check{ type: "checkbox", value: f.id }
+                  %td{ class: "px-3 py-2 align-top" }
+                    %div{ class: "truncate max-w-[56rem]" }= f.path
 
-          -# simple pagination
-          - total_pages = (@total_files.to_f / RepositoriesController::PER_PAGE).ceil
-          %div{ class: "p-3 border-t flex items-center justify-between text-sm" }
-            %div{ class: "text-gray-600" }
-              Pages:
-              %span{ class: "font-mono" }= total_pages
+        -# simple pagination
+        - total_pages = (@total_files.to_f / RepositoriesController::PER_PAGE).ceil
+        %div{ class: "p-3 border-t flex items-center justify-between text-sm" }
+          %div{ class: "text-gray-600" }
+            Pages:
+            %span{ class: "font-mono" }= total_pages
 
-            %div{ class: "flex gap-2" }
-              - prev_page = @page - 1
-              - next_page = @page + 1
-              - base_params = { repository_id: @selected_repo.id }
+          %div{ class: "flex gap-2" }
+            - prev_page = @page - 1
+            - next_page = @page + 1
+            - base_params = { repository_id: @selected_repo.id }
 
-              = link_to "Prev",
-                repositories_path(base_params.merge(page: prev_page)),
-                class: "px-3 py-1 rounded border bg-white hover:bg-gray-50 #{prev_page < 1 ? 'pointer-events-none opacity-50' : ''}"
+            = link_to "Prev",
+              repositories_path(base_params.merge(page: prev_page)),
+              class: "px-3 py-1 rounded border bg-white hover:bg-gray-50 #{prev_page < 1 ? 'pointer-events-none opacity-50' : ''}"
 
-              = link_to "Next",
-                repositories_path(base_params.merge(page: next_page)),
-                class: "px-3 py-1 rounded border bg-white hover:bg-gray-50 #{next_page > total_pages ? 'pointer-events-none opacity-50' : ''}"
+            = link_to "Next",
+              repositories_path(base_params.merge(page: next_page)),
+              class: "px-3 py-1 rounded border bg-white hover:bg-gray-50 #{next_page > total_pages ? 'pointer-events-none opacity-50' : ''}"
 
 :javascript
   (function(){

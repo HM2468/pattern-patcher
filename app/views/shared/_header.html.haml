@@ -1,22 +1,39 @@
-%header{ class: "sticky top-0 z-20 bg-gray-100 backdrop-blur" }
-  %div{ class: "mx-auto max-w-6xl px-6 py-4 flex items-center justify-between" }
+%header{ class: "sticky top-0 z-20 h-[65px] bg-white/80 backdrop-blur border-b border-gray-200" }
+  %div{ class: "mx-auto max-w-6xl px-6 h-full flex items-center justify-between" }
+
+    -# Brand
     %div{ class: "flex items-center gap-3" }
-      %div{ class: "h-9 w-9 rounded-xl bg-gray-900 text-white flex items-center justify-center font-semibold" }
+      %div{ class: "h-9 w-9 rounded-xl bg-gray-900 text-white flex items-center justify-center font-semibold shadow-sm" }
         PP
-      %div
-        %h1{ class: "text-lg font-semibold leading-tight" } PatternPatcher
-        %div{ class: "text-sm text-gray-500" } Web Console
+      %div{ class: "leading-tight" }
+        %div{ class: "text-sm font-semibold text-gray-900" } PatternPatcher
+        %div{ class: "text-xs text-gray-500" } Web Console
 
-    %nav{ class: "hidden md:flex items-center gap-2 text-sm" }
-      %a{ href: root_path, class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Dashboard
-      %a{ href: repositories_path, class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Repositories
-      %a{ href: lexical_patterns_path, class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Patterns
-      %a{ href: replacement_targets_path, class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Processing
-      %a{ href: occurrences_path, class: "px-3 py-2 rounded-xl text-gray-700 hover:bg-gray-100" } Review
+    -# Nav
+    %nav{ class: "hidden md:flex items-center gap-1 text-sm bg-gray-50 border border-gray-200 rounded-2xl p-1" }
+      -# 你可以用 current_page? 做 active 高亮
+      - dash_active = current_page?(root_path)
+      - repo_active = request.path.start_with?(repositories_path)
+      - pat_active  = request.path.start_with?(lexical_patterns_path)
+      - proc_active = request.path.start_with?(replacement_targets_path)
+      - rev_active  = request.path.start_with?(occurrences_path)
 
+      = link_to "Dashboard", root_path,
+        class: "px-3 py-2 rounded-xl #{dash_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+
+      = link_to "Repositories", repositories_path,
+        class: "px-3 py-2 rounded-xl #{repo_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+
+      = link_to "Patterns", lexical_patterns_path,
+        class: "px-3 py-2 rounded-xl #{pat_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+
+      = link_to "Processing", replacement_targets_path,
+        class: "px-3 py-2 rounded-xl #{proc_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+
+      = link_to "Review", occurrences_path,
+        class: "px-3 py-2 rounded-xl #{rev_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+
+    -# Right actions (optional)
     %div{ class: "flex items-center gap-2" }
-      %button{ type: "button", class: "hidden sm:inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm bg-white hover:bg-gray-50" }
-
-        %span Settings
-      %button{ type: "button", class: "inline-flex items-center rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black" }
-        New Scan
+      %div{ class: "hidden md:block text-xs text-gray-500" }
+        %span{ class: "font-mono" }= Time.current.strftime("%Y-%m-%d")

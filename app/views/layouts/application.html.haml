@@ -16,7 +16,8 @@
     = stylesheet_link_tag "application", "data-turbo-track": "reload"
     = javascript_importmap_tags
   %body
-    %main{ class: "mx-auto max-w-6xl px-6 py-8 space-y-8" }
+    %div{ class: "mx-auto max-w-6xl flex flex-col gap-[16px]" }
       = render "shared/header"
-      = yield
-      = render "shared/confirm_log"
+      %main{ class: "px-6" }
+        = yield
+        = render "shared/confirm_log"
