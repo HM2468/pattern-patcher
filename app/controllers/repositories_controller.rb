@@ -3,26 +3,12 @@ class RepositoriesController < ApplicationController
   PER_PAGE = 200
 
   def index
-    @repositories = Repository.order(created_at: :desc).to_a
-
-    @selected_repo =
-      if params[:id].present?
-        @repositories.find { |r| r.id == params[:id].to_i }
-      elsif params[:repository_id].present?
-        @repositories.find { |r| r.id == params[:repository_id].to_i }
-      else
-        @repositories.first
-      end
-
-    @page = [params[:page].to_i, 1].max
-
-    if @selected_repo
-      scope = @selected_repo.repository_files.order(path: :asc)
-      @total_files = scope.count
-      @files = scope.offset((@page - 1) * PER_PAGE).limit(PER_PAGE)
-    else
-      @total_files = 0
-      @files = []
+    # 仓库数量不多，不用翻页
+    @repositories = Repository.order(created_at: :desc)
+    repository_id = params[:repository_id] || @repositories.first&.id
+    if repository_id
+      @repository = Repository.find(repository_id)
+      @repository_files = @repository.repository_files.order(path: :desc).page(params[:page]).per(200)
     end
   end
 

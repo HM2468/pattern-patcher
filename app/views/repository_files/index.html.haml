@@ -1,3 +1,6 @@
-%div
-  %h1.font-bold.text-4xl RepositoryFiles#index
-  %p Find me in app/views/repository_files/index.html.haml
+-# app/views/repository_files/index.html.haml
+-# This is the main view for the repository_files#index action
+
+%div{ class: "max-w-7xl mx-auto p-6" }
+  %h1{ class: "text-xl font-semibold mb-4" } Files for Repository
+  = render "index"

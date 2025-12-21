@@ -13,6 +13,7 @@ class RepositoryFile < ApplicationRecord
 
   scope :recently_scanned, -> { order(last_scanned_at: :desc) }
   scope :by_path, -> { order(path: :asc) }
+  scope :with_repo, ->(repo_id) { where(repository_id: repo_id) }
 
   def absolute_path
     File.join(repository.root_path, path)
