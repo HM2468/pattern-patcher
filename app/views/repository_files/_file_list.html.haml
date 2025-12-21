@@ -5,7 +5,7 @@
 - elsif @repository_files.empty?
   %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
 - else
-  %div{ class: "p-3 border-b flex items-center justify-between" }
+  %div{ class: "p-3 flex items-center justify-between" }
     %div
       %div{ class: "font-semibold text-sm" } Files
       %div{ class: "text-xs text-gray-600" }
@@ -14,7 +14,7 @@
     %div{ class: "text-xs text-gray-600" }
       Showing up to 200 per page
 
-  %div{ class: "p-3 border-b flex items-center gap-3" }
+  %div{ class: "p-3 flex items-center gap-3" }
     %select#bulk_action{ class: "text-sm border rounded px-2 py-1" }
       %option{ value: "" } Bulk actions...
       %option{ value: "noop" } (placeholder) No-op
@@ -22,19 +22,19 @@
     %button#bulk_apply{ type: "button", class: "text-sm border rounded px-2 py-1 bg-white hover:bg-gray-50" } Apply
     %div#bulk_hint{ class: "text-xs text-gray-600 ml-auto" } Select files to enable bulk ops.
 
-  %div{ class: "overflow-auto flex-grow" }
+  %div{ class: "overflow-auto flex-grow rounded-2xl bg-white shadow-sm" }
     %table{ class: "w-full text-sm" }
-      %thead{ class: "bg-gray-50 border-b" }
+      %thead{ class: "bg-indigo-100 text-gray-600" }
         %tr
-          %th{ class: "w-10 px-3 py-2 text-left" }
+          %th{ class: "w-10 px-4 py-3 text-left" }
             %input#check_all{ type: "checkbox" }
-          %th{ class: "px-3 py-2 text-left font-semibold" } Path
-      %tbody{ class: "divide-y" }
+          %th{ class: "px-4 py-3 text-left font-semibold" } Path
+      %tbody{ class: "divide-y divide-gray-300" }
         - @repository_files.each do |f|
-          %tr{ class: "hover:bg-gray-50" }
-            %td{ class: "px-3 py-2 align-top" }
+          %tr{ class: "hover:bg-indigo-50/60" }
+            %td{ class: "px-4 py-3 align-top" }
               %input.file_check{ type: "checkbox", value: f.id }
-            %td{ class: "px-3 py-2 align-top" }
+            %td{ class: "px-4 py-3 align-top" }
               %div{ class: "truncate max-w-[56rem]" }= f.path
 
   %div{ class: "p-3 border-t" }
