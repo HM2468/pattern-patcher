@@ -55,16 +55,17 @@ Rails.application.routes.draw do
   # here, but in idiomatic Rails it should be "repositories".
   # ------------------------------------------------------------
   resources :repositories do
-    # Nested routes for managing files within a repository
-    resources :repository_files, only: [:index, :new, :create, :edit]
     member do
       get :import
     end
   end
 
-  # File-level operations (show/edit/update/delete)
-  resources :repository_files, only: [:show, :edit, :update, :destroy]
-
+  # Bulk operations for repository files
+  resources :repository_files, only: [] do
+    collection do
+      post :bulk_delete
+    end
+  end
   # ------------------------------------------------------------
   # Scan runs
   #
@@ -76,7 +77,11 @@ Rails.application.routes.draw do
   # - Multiple lexeme records (deduplicated by fingerprint)
   # - Multiple occurrence records (per match)
   # ------------------------------------------------------------
-  resources :scan_runs, only: [:index, :show, :create]
+  resources :scan_runs, only: [:index, :show, :create] do
+    collection do
+      post :batch_scan
+    end
+  end
 
   # ------------------------------------------------------------
   # Occurrence review & replacement

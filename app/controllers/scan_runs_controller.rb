@@ -4,4 +4,7 @@ class ScanRunsController < ApplicationController
 
   def show
   end
+
+  def batch_scan
+  end
 end
