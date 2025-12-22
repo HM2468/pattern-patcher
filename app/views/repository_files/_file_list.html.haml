@@ -14,7 +14,7 @@
           %th{ class: "px-4 py-3 font-semibold" }
             %div#repo_files_toolbar{ class: "flex items-center gap-3" }
               %div{ class: "flex items-start gap-2 shrink-0" }
-                %input#check_all{ type: "checkbox", class: "mt-1" }
+                %input#check_all{ type: "checkbox", class: "mt-1  scale-150" }
 
                 %div{ class: "flex flex-col items-start text-left leading-tight" }
                   %span{ class: "text-sm" } Select All
@@ -44,7 +44,7 @@
                   type: "checkbox",
                   value: f.id,
                   data: { file_check: "1" },
-                  class: "mt-1"
+                  class: "mt-1  scale-150"
                 }
                 %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
                   %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
