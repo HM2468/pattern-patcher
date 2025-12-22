@@ -50,15 +50,28 @@
                   %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
                     = f.path
 
-  = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
-    html: { id: "bulk_delete_form", class: "hidden" } do
-    = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_delete_repository_id"
-    %div#bulk_delete_file_ids
-
   = form_with url: batch_scan_scan_runs_path, method: :post, local: true,
     html: { id: "bulk_scan_form", class: "hidden" } do
     = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
     %div#bulk_scan_file_ids
+
+  %div{ class: "hidden" }
+    = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
+      html: { id: "bulk_delete_form", class: "inline-flex" } do
+      = hidden_field_tag :repository_id, @current_repo.id
+
+      %div#bulk_delete_file_ids
+      %button#bulk_delete_trigger{
+        type: "submit",
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: {
+          confirm_title: "Delete files",
+          confirm_message: "Delete selected files? This cannot be undone.",
+          confirm_confirm_label: "Delete",
+          confirm_cancel_label: "Cancel"
+        },
+        class: "button-danger"
+      } Delete
 
 %div#repo_files_pagination{ class: "bottom-pagination" }
   = render "shared/pagination",
@@ -72,7 +85,6 @@
       const panel = document.getElementById("repo_files_panel");
       if (!panel) return;
 
-      // ✅ 防重复：每次 turbo:load / DOMContentLoaded 只初始化一次
       if (panel.dataset.initialized === "1") return;
       panel.dataset.initialized = "1";
 
@@ -84,14 +96,14 @@
       const bulkDeleteBtn = document.getElementById("bulk_delete");
       const bulkScanBtn   = document.getElementById("bulk_scan");
 
-      const deleteForm = document.getElementById("bulk_delete_form");
-      const scanForm   = document.getElementById("bulk_scan_form");
       const deleteIdsBox = document.getElementById("bulk_delete_file_ids");
-      const scanIdsBox   = document.getElementById("bulk_scan_file_ids");
+      const deleteTrigger = document.getElementById("bulk_delete_trigger");
+
+      const scanForm   = document.getElementById("bulk_scan_form");
+      const scanIdsBox = document.getElementById("bulk_scan_file_ids");
 
       const searchInput = document.getElementById("path_filter_input");
 
-      // ✅ 统一从 data attribute 找 checkbox，避免 class 被覆盖
       const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
 
       function selectedIds() {
@@ -105,9 +117,7 @@
 
       function updateHintAndButtons() {
         const count = selectedIds().length;
-        if (hint) {
-          hint.textContent = count > 0 ? `Selected: ${count}` : "200 files at most";
-        }
+        if (hint) hint.textContent = count > 0 ? `Selected: ${count}` : "200 files at most";
         setButtonsEnabled(count > 0);
       }
 
@@ -129,20 +139,7 @@
         });
       }
 
-      function confirmAndSubmit(form, idsBox, actionLabel) {
-        if (!form || !idsBox) return;
-
-        const ids = selectedIds();
-        if (ids.length === 0) return;
-
-        const ok = window.confirm(`${actionLabel} ${ids.length} file(s)?`);
-        if (!ok) return;
-
-        fillHiddenIds(idsBox, ids);
-        form.submit();
-      }
-
-      // --- Select All ---
+      // Select All
       if (checkAll) {
         checkAll.addEventListener("change", () => {
           checks().forEach(c => { c.checked = checkAll.checked; });
@@ -150,8 +147,7 @@
         });
       }
 
-      // --- Single checkbox toggle (delegate) ---
-      // ✅ 绑定在 panel 上，避免全局 document 重复监听
+      // Single checkbox toggle
       panel.addEventListener("change", (e) => {
         if (e.target && e.target.matches && e.target.matches('input[data-file-check="1"]')) {
           syncCheckAllState();
@@ -159,23 +155,38 @@
         }
       });
 
-      // --- Buttons ---
+      // Init
       setButtonsEnabled(false);
       updateHintAndButtons();
 
+      // ✅ Delete：写入 file_ids[] -> 点击隐藏 submit（它会 PopConfirmLog.open 并最终 submit 原 form）
       if (bulkDeleteBtn) {
         bulkDeleteBtn.addEventListener("click", () => {
-          confirmAndSubmit(deleteForm, deleteIdsBox, "Delete");
+          const ids = selectedIds();
+          if (ids.length === 0) return;
+
+          fillHiddenIds(deleteIdsBox, ids);
+
+          if (!deleteTrigger) {
+            console.warn("[repo_files] bulk_delete_trigger not found");
+            return;
+          }
+          deleteTrigger.click();
         });
       }
 
-      if (bulkScanBtn) {
+      // Scan：直接 submit
+      if (bulkScanBtn && scanForm) {
         bulkScanBtn.addEventListener("click", () => {
-          confirmAndSubmit(scanForm, scanIdsBox, "Scan");
+          const ids = selectedIds();
+          if (ids.length === 0) return;
+
+          fillHiddenIds(scanIdsBox, ids);
+          scanForm.submit();
         });
       }
 
-      // --- Live search (debounced) ---
+      // Live search
       if (searchInput) {
         let timer = null;
 
@@ -186,7 +197,6 @@
           if (repoId) params.set("repository_id", repoId);
           if (value.length > 0) params.set("path_filter", value);
 
-          // 搜索时回到第一页：不设置 page
           const url = `${window.location.pathname}?${params.toString()}`;
           window.location.assign(url);
         }
