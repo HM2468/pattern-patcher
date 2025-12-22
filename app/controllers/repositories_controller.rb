@@ -1,5 +1,6 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
+
   def index
     @repositories = Repository.order(name: :asc)
 
@@ -34,6 +35,10 @@ class RepositoriesController < ApplicationController
     else
       render :new, status: :unprocessable_entity
     end
+  end
+
+  def edit
+    @repository = Repository.find(params[:id])
   end
 
   def show

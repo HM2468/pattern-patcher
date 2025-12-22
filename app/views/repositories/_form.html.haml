@@ -1,0 +1,44 @@
+= form_with(model: @repository, class: "space-y-6", data: { turbo: false }) do |form|
+  - if @repository.errors.any?
+    %div{ class: "rounded-2xl border border-red-200 bg-red-50 p-4" }
+      %h3{ class: "text-sm font-semibold text-red-800" }
+        = pluralize(@repository.errors.count, "error")
+        prohibited this repository from being saved:
+      %ul{ class: "mt-2 space-y-1 text-sm text-red-700" }
+        - @repository.errors.each do |error|
+          %li{ class: "flex items-start gap-2" }
+            %span{ class: "h-1.5 w-1.5 mt-1.5 flex-shrink-0 rounded-full bg-red-500" }
+            %span= error.full_message
+
+  %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm" }
+    %div{ class: "space-y-4" }
+      %div
+        %label{ for: "repository_name", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Name
+        = form.text_field :name, id: "repository_name",
+          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+          placeholder: "My repo"
+
+      %div
+        %label{ for: "repository_root_path", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Root Path
+        = form.text_field :root_path, id: "repository_root_path",
+          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+          placeholder: "/Users/you/projects/my_repo"
+
+      %div
+        %label{ for: "repository_permitted_ext", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Permitted extensions (comma-separated)
+        = form.text_field :permitted_ext, id: "repository_permitted_ext",
+          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+          placeholder: "rb,haml,erb,js"
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Example: <span class="font-mono">rb,haml</span> (no dots required; dots also accepted)
+
+      = form.hidden_field :status, value: "active"
+
+  %div{ class: "flex items-center justify-end gap-4" }
+    %a{ href: "javascript:history.back()", class: "button-secondary" } Back
+
+    = form.submit "Save",
+      class: "button-primary"

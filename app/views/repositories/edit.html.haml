@@ -1,3 +1,7 @@
-%div
-  %h1.font-bold.text-4xl Repositories#edit
-  %p Find me in app/views/repositories/edit.html.haml
+-# app/views/repositories/new.html.haml
+%div{ class: "max-w-3xl mx-auto p-6" }
+  %div{ class: "mb-4" }
+    %h1{ class: "text-xl font-semibold" } Edit repository
+    %div{ class: "text-sm text-gray-600 mt-1" }
+      Paste an absolute folder path as root_path (local tool).
+    = render "repositories/form"
