@@ -17,8 +17,9 @@ class RepositoryFile < ApplicationRecord
   scope :path_starts_with, ->(prefix) {
     next all if prefix.blank?
 
-    escaped = ActiveRecord::Base.sanitize_sql_like(prefix.to_s)
-    where("path LIKE ?", "#{escaped}%")
+    escape = "!"
+    escaped = ActiveRecord::Base.sanitize_sql_like(prefix.to_s, escape)
+    where("path LIKE ? ESCAPE '!'", "#{escaped}%")
   }
 
   def absolute_path
