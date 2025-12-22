@@ -1,5 +1,4 @@
 -# app/views/repository_files/_file_list.html.haml
-
 - if @repositories.empty?
   %div{ class: "p-6 text-gray-700" } No repositories found.
 - elsif @current_repo.nil?
@@ -14,7 +13,7 @@
           %th{ class: "px-4 py-3 font-semibold" }
             %div#repo_files_toolbar{ class: "flex items-center gap-3" }
               %div{ class: "flex items-start gap-2 shrink-0" }
-                %input#check_all{ type: "checkbox", class: "mt-1  scale-150" }
+                %input#check_all{ type: "checkbox", class: "mt-1 scale-150" }
 
                 %div{ class: "flex flex-col items-start text-left leading-tight" }
                   %span{ class: "text-sm" } Select All
@@ -31,6 +30,7 @@
                 }
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
+                -# UI buttons: trigger hidden submit buttons
                 %button#bulk_delete{ type: "button", class: "button-danger" } Delete
                 %button#bulk_scan{ type: "button", class: "button-primary" } Scan
 
@@ -44,22 +44,35 @@
                   type: "checkbox",
                   value: f.id,
                   data: { file_check: "1" },
-                  class: "mt-1  scale-150"
+                  class: "mt-1 scale-150"
                 }
                 %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
                   %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
                     = f.path
 
-  = form_with url: batch_scan_scan_runs_path, method: :post, local: true,
-    html: { id: "bulk_scan_form", class: "hidden" } do
-    = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
-    %div#bulk_scan_file_ids
+  -# ✅ Scan form (hidden). JS fills file_ids[] then clicks hidden submit button (with PopConfirmLog)
+  %div{ class: "hidden" }
+    = form_with url: batch_scan_scan_runs_path, method: :post, local: true,
+      html: { id: "bulk_scan_form", class: "inline-flex" } do
+      = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
+      %div#bulk_scan_file_ids
+      %button#bulk_scan_trigger{
+        type: "submit",
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: {
+          confirm_title: "Scan files",
+          confirm_message_html: "Scan selected files with pattern: <strong>#{@current_pattern.name}</strong>? Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>.",
+          confirm_confirm_label: "Scan",
+          confirm_cancel_label: "Cancel"
+        },
+        class: "button-primary"
+      } Scan
 
+  -# ✅ Delete form (hidden). JS fills file_ids[] then clicks hidden submit button (with PopConfirmLog)
   %div{ class: "hidden" }
     = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
       html: { id: "bulk_delete_form", class: "inline-flex" } do
       = hidden_field_tag :repository_id, @current_repo.id
-
       %div#bulk_delete_file_ids
       %button#bulk_delete_trigger{
         type: "submit",
@@ -99,8 +112,8 @@
       const deleteIdsBox = document.getElementById("bulk_delete_file_ids");
       const deleteTrigger = document.getElementById("bulk_delete_trigger");
 
-      const scanForm   = document.getElementById("bulk_scan_form");
       const scanIdsBox = document.getElementById("bulk_scan_file_ids");
+      const scanTrigger = document.getElementById("bulk_scan_trigger");
 
       const searchInput = document.getElementById("path_filter_input");
 
@@ -159,7 +172,7 @@
       setButtonsEnabled(false);
       updateHintAndButtons();
 
-      // ✅ Delete：写入 file_ids[] -> 点击隐藏 submit（它会 PopConfirmLog.open 并最终 submit 原 form）
+      // Delete: fill file_ids[] -> click hidden submit (PopConfirmLog)
       if (bulkDeleteBtn) {
         bulkDeleteBtn.addEventListener("click", () => {
           const ids = selectedIds();
@@ -175,14 +188,19 @@
         });
       }
 
-      // Scan：直接 submit
-      if (bulkScanBtn && scanForm) {
+      // Scan: fill file_ids[] -> click hidden submit (PopConfirmLog)
+      if (bulkScanBtn) {
         bulkScanBtn.addEventListener("click", () => {
           const ids = selectedIds();
           if (ids.length === 0) return;
 
           fillHiddenIds(scanIdsBox, ids);
-          scanForm.submit();
+
+          if (!scanTrigger) {
+            console.warn("[repo_files] bulk_scan_trigger not found");
+            return;
+          }
+          scanTrigger.click();
         });
       }
 

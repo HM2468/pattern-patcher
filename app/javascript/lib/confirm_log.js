@@ -1,5 +1,9 @@
 // app/javascript/lib/pop_confirm_log.js
-// 纯 JS：不依赖 turbo_stream，只负责 show/hide + 执行动作（提交原 form）
+// Plain JS confirm modal: no turbo_stream dependency.
+// Responsibilities:
+// - show/hide modal
+// - render title/message
+// - submit the original form on confirm
 
 const PopConfirmLog = {
   pendingForm: null,
@@ -15,7 +19,7 @@ const PopConfirmLog = {
   },
 
   open(event, btnOrOptions) {
-    // 让 button_to 的默认提交停下来
+    // Prevent default submit (e.g. button_to) and open our modal instead.
     if (event) event.preventDefault();
 
     const { root, title, message, cancel, confirm } = this._els();
@@ -24,23 +28,31 @@ const PopConfirmLog = {
       return false;
     }
 
-    // 支持两种调用方式：
-    // 1) PopConfirmLog(event, this) 通过 button 的 dataset 传参
-    // 2) PopConfirmLog(event, { message: "...", title: "...", confirmLabel: "..." })
+    // Supports two calling styles:
+    // 1) PopConfirmLog.open(event, this) -> read options from button dataset
+    // 2) PopConfirmLog.open(event, { ...options }) -> pass options directly
     let options = {};
     let btn = null;
 
     if (btnOrOptions && btnOrOptions.tagName) {
       btn = btnOrOptions;
+
+      // Dataset keys map:
+      // data-confirm-title              -> dataset.confirmTitle
+      // data-confirm-message            -> dataset.confirmMessage
+      // data-confirm-message-html       -> dataset.confirmMessageHtml
+      // data-confirm-confirm-label      -> dataset.confirmConfirmLabel
+      // data-confirm-cancel-label       -> dataset.confirmCancelLabel
       options.title = btn.dataset.confirmTitle;
       options.message = btn.dataset.confirmMessage;
-      options.confirmLabel = btn.dataset.confirmConfirmLabel; // 可选
-      options.cancelLabel = btn.dataset.confirmCancelLabel;   // 可选
+      options.message_html = btn.dataset.confirmMessageHtml;
+      options.confirmLabel = btn.dataset.confirmConfirmLabel; // optional
+      options.cancelLabel = btn.dataset.confirmCancelLabel;   // optional
     } else if (btnOrOptions && typeof btnOrOptions === "object") {
       options = btnOrOptions;
     }
 
-    // 找到触发按钮所属的 form，稍后 Confirm 时提交它
+    // Find the trigger button's form; confirm() will submit it later.
     const form = btn ? btn.closest("form") : (event?.currentTarget?.closest?.("form") || null);
     if (!form) {
       console.warn("[PopConfirmLog] trigger form not found.");
@@ -48,16 +60,26 @@ const PopConfirmLog = {
     }
     this.pendingForm = form;
 
-    // 文案（默认 Cancel/Confirm）
+    // Copy labels with sane defaults.
     title.textContent = options.title || "Confirm";
-    message.textContent = options.message || "Are you sure?";
     cancel.textContent = options.cancelLabel || "Cancel";
     confirm.textContent = options.confirmLabel || "Confirm";
 
-    // show
+    // Message rendering:
+    // - Prefer message_html (explicit HTML) when present
+    // - Otherwise fallback to plain text message
+    if (options.message_html && options.message_html.length > 0) {
+      message.innerHTML = options.message_html;
+    } else {
+      message.textContent = options.message || "Are you sure?";
+    }
+
+    // Show modal
     root.classList.remove("hidden");
     root.setAttribute("aria-hidden", "false");
-    return false; // ✅ 让 onclick="return PopConfirmLog(...)" 阻止默认行为
+
+    // Make onclick="return PopConfirmLog.open(...)" stop default behavior.
+    return false;
   },
 
   cancel() {
@@ -74,7 +96,7 @@ const PopConfirmLog = {
     if (!root) return;
 
     if (this.pendingForm) {
-      // ✅ 执行“弹窗弹出之前的动作”：提交原 form（也就是 delete）
+      // Submit the original form that triggered the modal.
       this.pendingForm.requestSubmit();
     }
 
