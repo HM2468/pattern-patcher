@@ -1,9 +1,14 @@
 -# app/views/shared/_pagination.html.haml
--# A Rails-native pagination UI (Kaminari collection compatible)
--# locals: collection
+-# locals:
+-#   collection
+-#   options: Hash (optional) - extra query params to include in pagination links
+-# Behavior:
+-#   - if options is blank/nil: URL only contains page param
+-#   - if options present: URL contains page + given options
 
 - current = collection.current_page
 - total   = collection.total_pages
+- extra   = (local_assigns[:options].presence || {}).to_h
 
 %nav{ class: "mt-4 flex items-center justify-center", aria: { label: "Pagination" } }
   %div{ class: "inline-flex items-center gap-2" }
@@ -13,7 +18,7 @@
       %span{ class: "inline-flex items-center rounded-lg border bg-gray-100 text-gray-400 border-gray-200 px-3 py-1 text-sm cursor-not-allowed" }
         Prev
     - else
-      = link_to "Prev", url_for(page: current - 1),
+      = link_to "Prev", url_for(extra.merge(page: current - 1)),
         class: "inline-flex items-center rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
 
     -# Pages window (compact): first, last, and neighbors
@@ -28,7 +33,7 @@
         %span{ class: "inline-flex items-center justify-center min-w-[2rem] rounded-lg border bg-gray-900 text-white border-gray-900 px-3 py-1 text-sm font-medium" }
           = p
       - else
-        = link_to p, url_for(page: p),
+        = link_to p, url_for(extra.merge(page: p)),
           class: "inline-flex items-center justify-center min-w-[2rem] rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
       - last = p
 
@@ -37,5 +42,5 @@
       %span{ class: "inline-flex items-center rounded-lg border bg-gray-100 text-gray-400 border-gray-200 px-3 py-1 text-sm cursor-not-allowed" }
         Next
     - else
-      = link_to "Next", url_for(page: current + 1),
+      = link_to "Next", url_for(extra.merge(page: current + 1)),
         class: "inline-flex items-center rounded-lg border bg-white text-gray-700 border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"

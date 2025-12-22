@@ -3,6 +3,6 @@ class RepositoryFilesController < ApplicationController
     @repository = Repository.find(params[:repository_id])
     @repository_files = @repository.repository_files.where(id: params[:file_ids])
     @repository_files.destroy_all
-    head :no_content
+    redirect_to repositories_path(repository_id: @repository.id), notice: "Files deleted successfully."
   end
 end
