@@ -21,6 +21,14 @@ class RepositoriesController < ApplicationController
                   .by_path                        # 建议保持稳定排序
                   .page(params[:page])
                   .per(200)
+    @current_pattern = LexicalPattern.current_pattern
+    @scan_hint_message = if @current_pattern.nil?
+                           "No enabled pattern found. Please set up one in
+                            <a href='#{lexical_patterns_path}' class='underline'>Lexical Patterns</a> page."
+                         else
+                           "Scan selected files with pattern: <strong>#{@current_pattern.name}</strong>?
+                            Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>."
+                         end.html_safe
   end
 
   def new

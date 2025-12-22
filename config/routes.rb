@@ -79,7 +79,7 @@ Rails.application.routes.draw do
   # ------------------------------------------------------------
   resources :scan_runs, only: [:index, :show, :create] do
     collection do
-      post :batch_scan
+      post :bulk_scan
     end
   end
 

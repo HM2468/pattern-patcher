@@ -5,6 +5,9 @@ class ScanRunsController < ApplicationController
   def show
   end
 
-  def batch_scan
+  def bulk_scan
+    if LexicalPattern.current_pattern.nil?
+      redirect_to repositories_path(repository_id: params[:repository_id]), alert: "No enabled pattern found. Please set up one in Lexical Patterns page."
+    end
   end
 end
