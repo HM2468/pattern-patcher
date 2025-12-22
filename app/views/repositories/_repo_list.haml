@@ -4,7 +4,7 @@
   %div
     %h1{ class: "text-xl font-semibold" } Repositories
   %div
-    = link_to "New", new_repository_path, class: "button-primary"
+    = link_to "New Repo", new_repository_path, class: "button-primary"
 
 - if @repositories.empty?
   %div{ class: "p-3" }
@@ -45,4 +45,4 @@
 
             -# Column 2: edit button area (independent click target)
             %td{ class: "px-3 py-3 w-24 text-right align-middle" }
-              = link_to "Edit", edit_repository_path(repo), class: "button-secondary"
+              = link_to "Setting", edit_repository_path(repo), class: "button-secondary"
