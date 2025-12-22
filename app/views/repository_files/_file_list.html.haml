@@ -7,18 +7,16 @@
 - elsif @repository_files.empty?
   %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
 - else
-  %div{ class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm" }
-    %table{ class: "w-full text-sm table-fixed" }
+  %div#repo_files_panel{ class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm", data: { repo_id: @current_repo.id } }
+    %table#repo_files_table{ class: "w-full text-sm table-fixed" }
       %thead{ class: "bg-indigo-100 text-gray-600 sticky top-0 z-10" }
         %tr
           %th{ class: "px-4 py-3 font-semibold" }
-            %div{ class: "flex items-center gap-3" }
-              -# 1) Left: Select All
+            %div#repo_files_toolbar{ class: "flex items-center gap-3" }
               %div{ class: "flex items-center gap-2 shrink-0" }
                 %input#check_all{ type: "checkbox" }
                 %span Select All
 
-              -# 2) Middle: Search input (prefix match)
               %div{ class: "flex-1 px-2" }
                 %input#path_filter_input{
                   type: "text",
@@ -30,167 +28,172 @@
                 %div#bulk_hint{ class: "text-xs text-gray-500 mt-1" }
                   Select files to enable bulk ops.
 
-              -# 3) Right: Buttons
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
-                %button#bulk_delete{
-                  type: "button",
-                  class: "button-danger"
-                } Delete
-                %button#bulk_scan{
-                  type: "button",
-                  class: "button-primary"
-                } Scan
+                %button#bulk_delete{ type: "button", class: "button-danger" } Delete
+                %button#bulk_scan{ type: "button", class: "button-primary" } Scan
 
-      %tbody{ class: "divide-y divide-gray-300" }
+      %tbody#repo_files_tbody{ class: "divide-y divide-gray-300" }
         - @repository_files.each do |f|
-          %tr{ class: "hover:bg-indigo-50/60 transition" }
+          %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
             %td{ class: "px-4 py-3" }
               %div{ class: "flex items-start gap-3" }
-                %input.file_check{ type: "checkbox", value: f.id, class: "mt-1" }
-                %div{ class: "flex-1 min-w-0" }
+                %input{
+                  id: "file_check_#{f.id}",
+                  type: "checkbox",
+                  value: f.id,
+                  data: { file_check: "1" },
+                  class: "mt-1"
+                }
+                %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
                   %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
                     = f.path
 
-  -# Bulk action forms (POST). JS 会把选中的 file_ids[] 填进去再 submit。
-  = form_with url: bulk_delete_repository_files_path, method: :post, local: true, html: { id: "bulk_delete_form", class: "hidden" } do
-    = hidden_field_tag :repository_id, @current_repo.id
+  = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
+    html: { id: "bulk_delete_form", class: "hidden" } do
+    = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_delete_repository_id"
     %div#bulk_delete_file_ids
 
-  = form_with url: batch_scan_scan_runs_path, method: :post, local: true, html: { id: "bulk_scan_form", class: "hidden" } do
-    = hidden_field_tag :repository_id, @current_repo.id
+  = form_with url: batch_scan_scan_runs_path, method: :post, local: true,
+    html: { id: "bulk_scan_form", class: "hidden" } do
+    = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
     %div#bulk_scan_file_ids
 
-%div{ class: "bottom-pagination" }
+%div#repo_files_pagination{ class: "bottom-pagination" }
   = render "shared/pagination",
     collection: @repository_files,
     options: { repository_id: @current_repo.id }
 
+
 :javascript
-  document.addEventListener('DOMContentLoaded', function() {
-    const checkAll = document.getElementById("check_all");
-    const checks = () => Array.from(document.querySelectorAll(".file_check"));
-    const hint = document.getElementById("bulk_hint");
+  (function() {
+    function initRepoFilesPage() {
+      const panel = document.getElementById("repo_files_panel");
+      if (!panel) return;
 
-    const bulkDeleteBtn = document.getElementById("bulk_delete");
-    const bulkScanBtn   = document.getElementById("bulk_scan");
+      // 防止 turbo 重复触发导致重复绑定
+      if (panel.dataset.initialized === "1") return;
+      panel.dataset.initialized = "1";
 
-    const deleteForm = document.getElementById("bulk_delete_form");
-    const scanForm   = document.getElementById("bulk_scan_form");
-    const deleteIdsBox = document.getElementById("bulk_delete_file_ids");
-    const scanIdsBox   = document.getElementById("bulk_scan_file_ids");
+      const repoId = panel.dataset.repoId;
 
-    const searchInput = document.getElementById("path_filter_input");
+      const checkAll = document.getElementById("check_all");
+      const hint = document.getElementById("bulk_hint");
 
-    function selectedIds() {
-      return checks().filter(x => x.checked).map(x => x.value);
-    }
+      const bulkDeleteBtn = document.getElementById("bulk_delete");
+      const bulkScanBtn   = document.getElementById("bulk_scan");
 
-    function setButtonsEnabled(enabled) {
-      if (!bulkDeleteBtn || !bulkScanBtn) return;
-      bulkDeleteBtn.disabled = !enabled;
-      bulkScanBtn.disabled = !enabled;
-    }
+      const deleteForm = document.getElementById("bulk_delete_form");
+      const scanForm   = document.getElementById("bulk_scan_form");
+      const deleteIdsBox = document.getElementById("bulk_delete_file_ids");
+      const scanIdsBox   = document.getElementById("bulk_scan_file_ids");
 
-    function updateHintAndButtons() {
-      const count = selectedIds().length;
-      if (hint) {
-        hint.textContent = count > 0 ? `Selected: ${count}` : "Select files to enable bulk ops.";
+      const searchInput = document.getElementById("path_filter_input");
+
+      const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
+
+      function selectedIds() {
+        return checks().filter(x => x.checked).map(x => x.value);
       }
-      setButtonsEnabled(count > 0);
-    }
 
-    function syncCheckAllState() {
-      if (!checkAll) return;
-      const all = checks();
-      const allChecked = all.length > 0 && all.every(x => x.checked);
-      checkAll.checked = allChecked;
-    }
-
-    function fillHiddenIds(container, ids) {
-      if (!container) return;
-      container.innerHTML = "";
-      ids.forEach(id => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = "file_ids[]";
-        input.value = id;
-        container.appendChild(input);
-      });
-    }
-
-    function confirmAndSubmit(form, idsBox, actionLabel) {
-      const ids = selectedIds();
-      if (ids.length === 0) return;
-
-      const ok = window.confirm(`${actionLabel} ${ids.length} file(s)?`);
-      if (!ok) return;
-
-      fillHiddenIds(idsBox, ids);
-      form.submit();
-    }
-
-    // Select all on current page
-    if (checkAll) {
-      checkAll.addEventListener("change", () => {
-        checks().forEach(c => { c.checked = checkAll.checked; });
-        updateHintAndButtons();
-      });
-    }
-
-    // Individual check toggles
-    document.addEventListener("change", (e) => {
-      if (e.target && e.target.classList && e.target.classList.contains("file_check")) {
-        syncCheckAllState();
-        updateHintAndButtons();
+      function setButtonsEnabled(enabled) {
+        if (bulkDeleteBtn) bulkDeleteBtn.disabled = !enabled;
+        if (bulkScanBtn) bulkScanBtn.disabled = !enabled;
       }
-    });
 
-    // Init buttons state
-    setButtonsEnabled(false);
-    updateHintAndButtons();
+      function updateHintAndButtons() {
+        const count = selectedIds().length;
+        if (hint) hint.textContent = count > 0 ? `Selected: ${count}` : "Select files to enable bulk ops.";
+        setButtonsEnabled(count > 0);
+      }
 
-    // Bulk actions
-    if (bulkDeleteBtn && deleteForm) {
-      bulkDeleteBtn.addEventListener("click", () => {
-        confirmAndSubmit(deleteForm, deleteIdsBox, "Delete");
+      function syncCheckAllState() {
+        if (!checkAll) return;
+        const all = checks();
+        checkAll.checked = (all.length > 0 && all.every(x => x.checked));
+      }
+
+      function fillHiddenIds(container, ids) {
+        if (!container) return;
+        container.innerHTML = "";
+        ids.forEach(id => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = "file_ids[]";
+          input.value = id;
+          container.appendChild(input);
+        });
+      }
+
+      function confirmAndSubmit(form, idsBox, actionLabel) {
+        if (!form || !idsBox) return;
+        const ids = selectedIds();
+        if (ids.length === 0) return;
+
+        const ok = window.confirm(`${actionLabel} ${ids.length} file(s)?`);
+        if (!ok) return;
+
+        fillHiddenIds(idsBox, ids);
+        form.submit();
+      }
+
+      // Select all
+      if (checkAll) {
+        checkAll.addEventListener("change", () => {
+          checks().forEach(c => { c.checked = checkAll.checked; });
+          updateHintAndButtons();
+        });
+      }
+
+      // checkbox change (delegate)
+      document.addEventListener("change", (e) => {
+        if (e.target && e.target.matches && e.target.matches('input[data-file-check="1"]')) {
+          syncCheckAllState();
+          updateHintAndButtons();
+        }
       });
-    }
 
-    if (bulkScanBtn && scanForm) {
-      bulkScanBtn.addEventListener("click", () => {
-        confirmAndSubmit(scanForm, scanIdsBox, "Scan");
-      });
-    }
+      // buttons
+      setButtonsEnabled(false);
+      updateHintAndButtons();
 
-    // Live search (debounced) -> GET /repositories?repository_id=...&path_filter=...
-    if (searchInput) {
-      let timer = null;
+      if (bulkDeleteBtn) {
+        bulkDeleteBtn.addEventListener("click", () => {
+          confirmAndSubmit(deleteForm, deleteIdsBox, "Delete");
+        });
+      }
 
-      const currentRepoId = "#{@current_repo&.id}".toString();
+      if (bulkScanBtn) {
+        bulkScanBtn.addEventListener("click", () => {
+          confirmAndSubmit(scanForm, scanIdsBox, "Scan");
+        });
+      }
 
-      function runSearch() {
-        const value = (searchInput.value || "").trim();
-        const params = new URLSearchParams(window.location.search);
+      // live search
+      if (searchInput) {
+        let timer = null;
 
-        if (currentRepoId) params.set("repository_id", currentRepoId);
+        function runSearch() {
+          const value = (searchInput.value || "").trim();
+          const params = new URLSearchParams();
 
-        if (value.length > 0) {
-          // URLSearchParams 会做 encode；路径里的 / 不需要你手工转义
-          params.set("path_filter", value);
-        } else {
-          params.delete("path_filter");
+          if (repoId) params.set("repository_id", repoId);
+          if (value.length > 0) params.set("path_filter", value);
+
+          // 只改 query，不改 path
+          const url = `${window.location.pathname}?${params.toString()}`;
+          window.location.assign(url);
         }
 
-        // 搜索时回到第一页
-        params.delete("page");
-
-        const url = `${window.location.pathname}?${params.toString()}`;
-        window.location.assign(url);
+        searchInput.addEventListener("input", () => {
+          if (timer) clearTimeout(timer);
+          timer = setTimeout(runSearch, 250);
+        });
       }
-
-      searchInput.addEventListener("input", () => {
-        if (timer) clearTimeout(timer);
-        timer = setTimeout(runSearch, 250);
-      });
     }
-  });
+
+    // Turbo 环境：页面访问/切换时触发
+    document.addEventListener("turbo:load", initRepoFilesPage);
+
+    // 兜底：非 Turbo 或首次硬刷新
+    document.addEventListener("DOMContentLoaded", initRepoFilesPage);
+  })();
