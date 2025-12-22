@@ -15,7 +15,17 @@ class LexicalPattern < ApplicationRecord
   validate :pattern_must_be_valid_regex
 
   scope :enabled, -> { where(enabled: true) }
-  scope :by_priority, -> { order(priority: :asc, id: :asc) }
+  scope :by_priority, -> { order(priority: :asc, name: :asc) }
+
+  class << self
+    def pattern_types_for_select
+      PATTERN_TYPES.map { |pt| [pt.humanize, pt] }
+    end
+
+    def current_pattern
+      enabled.by_priority.first
+    end
+  end
 
   # Compile stored regex literal string (e.g. "/abc/i") to Ruby Regexp
   def compiled_regex
