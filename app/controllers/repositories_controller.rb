@@ -1,30 +1,25 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
   def index
-    # 仓库数量不多，不分页
-    @repositories = Repository.order(name: :asc).all
+    @repositories = Repository.order(name: :asc)
 
-    # 如果没有任何仓库，提前返回（这是 @current_repo 唯一可能为空的情况）
     if @repositories.empty?
       @current_repo = nil
-      @repository_files = RepositoryFile.none.page(params[:page]).per(200)
       @path_filter = ""
+      @repository_files = RepositoryFile.none.page(params[:page]).per(200)
       return
     end
 
-    # 默认选中第一个仓库
     repository_id = params[:repository_id].presence || @repositories.first.id
-    @current_repo = Repository.find(repository_id)
-    @path_filter = params[:path_filter].to_s
-    scope = @current_repo.repository_files.order(path: :asc)
+    @current_repo = Repository.find_by(id: repository_id) || @repositories.first
+    @path_filter = params[:path_filter].to_s.strip
 
-    # 前缀匹配搜索
-    if @path_filter.present?
-      escaped = ActiveRecord::Base.sanitize_sql_like(@path_filter)
-      scope = scope.where("path LIKE ?", "#{escaped}%")
-    end
-
-    @repository_files = scope.page(params[:page]).per(200)
+    @repository_files =
+      @current_repo.repository_files
+                  .path_starts_with(@path_filter) # scope 已经处理 blank => all
+                  .by_path                        # 建议保持稳定排序
+                  .page(params[:page])
+                  .per(200)
   end
 
   def new
