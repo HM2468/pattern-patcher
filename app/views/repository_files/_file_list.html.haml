@@ -13,20 +13,22 @@
         %tr
           %th{ class: "px-4 py-3 font-semibold" }
             %div#repo_files_toolbar{ class: "flex items-center gap-3" }
-              %div{ class: "flex items-center gap-2 shrink-0" }
-                %input#check_all{ type: "checkbox" }
-                %span Select All
+              %div{ class: "flex items-start gap-2 shrink-0" }
+                %input#check_all{ type: "checkbox", class: "mt-1" }
+
+                %div{ class: "flex flex-col items-start text-left leading-tight" }
+                  %span{ class: "text-sm" } Select All
+                  %div#bulk_hint{ class: "text-xs text-gray-500" }
+                    200 files at most
 
               %div{ class: "flex-1 px-2" }
                 %input#path_filter_input{
                   type: "text",
                   value: @path_filter,
-                  placeholder: "Search by path prefix... e.g. app/models/",
+                  placeholder: "prefix matching filter (live search)",
                   class: "w-full text-sm rounded px-3 py-2 bg-white",
                   autocomplete: "off"
                 }
-                %div#bulk_hint{ class: "text-xs text-gray-500 mt-1" }
-                  Select files to enable bulk ops.
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
                 %button#bulk_delete{ type: "button", class: "button-danger" } Delete
@@ -104,7 +106,7 @@
       function updateHintAndButtons() {
         const count = selectedIds().length;
         if (hint) {
-          hint.textContent = count > 0 ? `Selected: ${count}` : "Select files to enable bulk ops.";
+          hint.textContent = count > 0 ? `Selected: ${count}` : "200 files at most";
         }
         setButtonsEnabled(count > 0);
       }
