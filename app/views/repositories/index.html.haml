@@ -4,44 +4,10 @@
   -# Left: repositories (30%)
   %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
     = render "repositories/repo_list"
+
   -# Divider
   %div{ class: "w-px bg-gray-300 mx-4" }
+
   -# Right: files (70%)
   %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
     = render "repository_files/file_list"
-
-:javascript
-  document.addEventListener('DOMContentLoaded', function() {
-    const checkAll = document.getElementById("check_all");
-    const checks = () => Array.from(document.querySelectorAll(".file_check"));
-    const hint = document.getElementById("bulk_hint");
-    const bulkApply = document.getElementById("bulk_apply");
-
-    function updateHint() {
-      const selected = checks().filter(x => x.checked).length;
-      hint.textContent = selected > 0 ? `Selected: ${selected}` : "Select files to enable bulk ops.";
-      bulkApply.disabled = selected === 0;
-      bulkApply.classList.toggle("opacity-50", selected === 0);
-    }
-
-    if (checkAll) {
-      checkAll.addEventListener("change", () => {
-        checks().forEach(c => c.checked = checkAll.checked);
-        updateHint();
-      });
-    }
-
-    document.addEventListener("change", (e) => {
-      if (e.target && e.target.classList && e.target.classList.contains("file_check")) {
-        const all = checks();
-        const allChecked = all.length > 0 && all.every(x => x.checked);
-        if (checkAll) checkAll.checked = allChecked;
-        updateHint();
-      }
-    });
-
-    if (bulkApply) {
-      bulkApply.disabled = true;
-      bulkApply.classList.add("opacity-50");
-    }
-  });

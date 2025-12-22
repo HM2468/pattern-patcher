@@ -22,7 +22,7 @@
                   type: "text",
                   value: @path_filter,
                   placeholder: "Search by path prefix... e.g. app/models/",
-                  class: "w-full text-sm border rounded px-3 py-2 bg-white",
+                  class: "w-full text-sm rounded px-3 py-2 bg-white",
                   autocomplete: "off"
                 }
                 %div#bulk_hint{ class: "text-xs text-gray-500 mt-1" }
@@ -70,7 +70,7 @@
       const panel = document.getElementById("repo_files_panel");
       if (!panel) return;
 
-      // 防止 turbo 重复触发导致重复绑定
+      // ✅ 防重复：每次 turbo:load / DOMContentLoaded 只初始化一次
       if (panel.dataset.initialized === "1") return;
       panel.dataset.initialized = "1";
 
@@ -89,6 +89,7 @@
 
       const searchInput = document.getElementById("path_filter_input");
 
+      // ✅ 统一从 data attribute 找 checkbox，避免 class 被覆盖
       const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
 
       function selectedIds() {
@@ -102,7 +103,9 @@
 
       function updateHintAndButtons() {
         const count = selectedIds().length;
-        if (hint) hint.textContent = count > 0 ? `Selected: ${count}` : "Select files to enable bulk ops.";
+        if (hint) {
+          hint.textContent = count > 0 ? `Selected: ${count}` : "Select files to enable bulk ops.";
+        }
         setButtonsEnabled(count > 0);
       }
 
@@ -126,6 +129,7 @@
 
       function confirmAndSubmit(form, idsBox, actionLabel) {
         if (!form || !idsBox) return;
+
         const ids = selectedIds();
         if (ids.length === 0) return;
 
@@ -136,7 +140,7 @@
         form.submit();
       }
 
-      // Select all
+      // --- Select All ---
       if (checkAll) {
         checkAll.addEventListener("change", () => {
           checks().forEach(c => { c.checked = checkAll.checked; });
@@ -144,15 +148,16 @@
         });
       }
 
-      // checkbox change (delegate)
-      document.addEventListener("change", (e) => {
+      // --- Single checkbox toggle (delegate) ---
+      // ✅ 绑定在 panel 上，避免全局 document 重复监听
+      panel.addEventListener("change", (e) => {
         if (e.target && e.target.matches && e.target.matches('input[data-file-check="1"]')) {
           syncCheckAllState();
           updateHintAndButtons();
         }
       });
 
-      // buttons
+      // --- Buttons ---
       setButtonsEnabled(false);
       updateHintAndButtons();
 
@@ -168,7 +173,7 @@
         });
       }
 
-      // live search
+      // --- Live search (debounced) ---
       if (searchInput) {
         let timer = null;
 
@@ -179,7 +184,7 @@
           if (repoId) params.set("repository_id", repoId);
           if (value.length > 0) params.set("path_filter", value);
 
-          // 只改 query，不改 path
+          // 搜索时回到第一页：不设置 page
           const url = `${window.location.pathname}?${params.toString()}`;
           window.location.assign(url);
         }
@@ -191,9 +196,6 @@
       }
     }
 
-    // Turbo 环境：页面访问/切换时触发
     document.addEventListener("turbo:load", initRepoFilesPage);
-
-    // 兜底：非 Turbo 或首次硬刷新
     document.addEventListener("DOMContentLoaded", initRepoFilesPage);
   })();
