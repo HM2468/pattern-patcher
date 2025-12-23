@@ -6,14 +6,29 @@
     = render "repositories/form"
 
     %div{ class: "font-semibold" } Reimport files
+    %br
     %div{ class: "text-sm text-gray-600 mt-1" }
       Reimport all permmited files from the repository root path. Existing files will be updated; new files will be added.
     %div{ class: "flex items-center justify-end gap-4" }
-      %a{ href: "", class: "button-danger" } Import
+      = button_to "Import",
+        import_repository_path(@repository),
+        method: :get,
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: @confirm_message[:import],
+        class: "button-secondary"
 
     %div{ class: "font-semibold" } Delete repository
+    %br
     %div{ class: "text-sm text-gray-600 mt-1" }
       Delete this repository and all its files as well as lexems and reviews associated with them from the system.
       This action is irreversible.
     %div{ class: "flex items-center justify-end gap-4" }
-      %a{ href: "", class: "button-danger" } Delete
+      = button_to "Delete",
+        repository_path(@repository),
+        method: :delete,
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: @confirm_message[:delete],
+        class: "button-danger"
+
+  %div{ class: "flex items-center justify-left gap-4" }
+    %a{ href: "javascript:history.back()", class: "button-secondary" } Back

@@ -48,6 +48,18 @@ class RepositoriesController < ApplicationController
 
   def edit
     @repository = Repository.find(params[:id])
+    @confirm_message = {
+      delete: {
+        confirm_title: "Delete repository",
+        confirm_confirm_label: "Delete",
+        confirm_message: "Delete this repository? This cannot be undone."
+      },
+      import: {
+        confirm_title: "Import files",
+        confirm_confirm_label: "Import",
+        confirm_message: "Import files from this repository?"
+      }
+    }
   end
 
   def update
@@ -60,15 +72,17 @@ class RepositoriesController < ApplicationController
     end
   end
 
-  def show
-    redirect_to repositories_path(repository_id: params[:id])
+  def destroy
+    Repository.find(params[:id]).destroy
+    flash[:success] = "Repository deleted successfully."
+    redirect_to repositories_path
   end
 
   def import
     repo = Repository.find(params[:id])
     RepositoryImportJob.perform_later(repo.id)
     flash[:success] = "File importing job enqueued."
-    redirect_to repositories_path(repository_id: repo.id)
+    redirect_to repositories_path(repository_id: @repository.id)
   end
 
   private
