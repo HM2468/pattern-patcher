@@ -12,6 +12,10 @@ class Repository < ApplicationRecord
   before_validation :normalize_inputs
   after_commit :enqueue_import_job, on: :create
 
+  def git_cli
+    @git_cli ||= GitCli.new(self)
+  end
+
   def permitted_extensions
     permitted_ext.to_s
       .split(",")
