@@ -39,7 +39,8 @@ class RepositoriesController < ApplicationController
     @repository = Repository.new(repository_params)
 
     if @repository.save
-      redirect_to repositories_path(repository_id: @repository.id), notice: "Repository created. Import job enqueued."
+      flash[:success] = "Repository created successfully. File importing job enqueued."
+      redirect_to repositories_path(repository_id: @repository.id)
     else
       render :new, status: :unprocessable_entity
     end
@@ -49,6 +50,16 @@ class RepositoriesController < ApplicationController
     @repository = Repository.find(params[:id])
   end
 
+  def update
+    @repository = Repository.find(params[:id])
+    if @repository.update(repository_params)
+      flash[:success] = "Repository updated successfully."
+      redirect_to repositories_path(repository_id: @repository.id)
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
   def show
     redirect_to repositories_path(repository_id: params[:id])
   end
@@ -56,12 +67,13 @@ class RepositoriesController < ApplicationController
   def import
     repo = Repository.find(params[:id])
     RepositoryImportJob.perform_later(repo.id)
-    redirect_to repositories_path(repository_id: repo.id), notice: "Re-import job enqueued."
+    flash[:success] = "File importing job enqueued."
+    redirect_to repositories_path(repository_id: repo.id)
   end
 
   private
 
   def repository_params
-    params.require(:repository).permit(:name, :root_path, :permitted_ext, :status)
+    params.require(:repository).permit(:name, :root_path, :permitted_ext)
   end
 end

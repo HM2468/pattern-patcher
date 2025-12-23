@@ -1,7 +1,19 @@
 -# app/views/repositories/new.html.haml
 %div{ class: "max-w-3xl mx-auto p-6" }
   %div{ class: "mb-4" }
-    %h1{ class: "text-xl font-semibold" } Edit repository
     %div{ class: "text-sm text-gray-600 mt-1" }
-      Paste an absolute folder path as root_path (local tool).
+    %div{ class: "font-semibold" } Edit repository
     = render "repositories/form"
+
+    %div{ class: "font-semibold" } Reimport files
+    %div{ class: "text-sm text-gray-600 mt-1" }
+      Reimport all permmited files from the repository root path. Existing files will be updated; new files will be added.
+    %div{ class: "flex items-center justify-end gap-4" }
+      %a{ href: "", class: "button-danger" } Import
+
+    %div{ class: "font-semibold" } Delete repository
+    %div{ class: "text-sm text-gray-600 mt-1" }
+      Delete this repository and all its files as well as lexems and reviews associated with them from the system.
+      This action is irreversible.
+    %div{ class: "flex items-center justify-end gap-4" }
+      %a{ href: "", class: "button-danger" } Delete
