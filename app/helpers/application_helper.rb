@@ -1,4 +1,20 @@
+# app/helpers/application_helper.rb
+
 module ApplicationHelper
+
+  FLASH_CLASSES = {
+    "notice"  => "border-blue-200 bg-blue-50 text-blue-800",
+    "info"    => "border-blue-200 bg-blue-50 text-blue-800",
+    "success" => "border-green-200 bg-green-50 text-green-800",
+    "alert"   => "border-yellow-200 bg-yellow-50 text-yellow-800",
+    "warning" => "border-yellow-200 bg-yellow-50 text-yellow-800",
+    "error"   => "border-red-200 bg-red-50 text-red-800"
+  }.freeze
+
+  def flash_css_class(type)
+    FLASH_CLASSES[type.to_s] || "border-gray-200 bg-gray-50 text-gray-800"
+  end
+
   def stylesheet_link_tag_all
     # Get all CSS files from the stylesheets directory
     css_files = Dir.glob(Rails.root.join('app', 'assets', 'stylesheets', '*.css')).map do |file|
