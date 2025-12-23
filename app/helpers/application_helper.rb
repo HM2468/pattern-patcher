@@ -26,4 +26,12 @@ module ApplicationHelper
       stylesheet_link_tag(file_name, 'data-turbo-track': 'reload')
     end.join.html_safe
   end
+
+  def new_action?
+    action_name == "new"
+  end
+
+  def edit_action?
+    action_name == "edit"
+  end
 end

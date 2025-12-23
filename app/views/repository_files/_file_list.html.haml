@@ -31,8 +31,8 @@
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
                 -# UI buttons: trigger hidden submit buttons
-                %button#bulk_delete{ type: "button", class: "button-danger" } Delete
                 %button#bulk_scan{ type: "button", class: "button-primary" } Scan
+                %button#bulk_delete{ type: "button", class: "button-danger" } Delete
 
       %tbody#repo_files_tbody{ class: "divide-y divide-gray-300" }
         - @repository_files.each do |f|
