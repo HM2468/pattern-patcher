@@ -1,0 +1,28 @@
+-# app/views/shared/_flash.html.haml
+-# Flash messages (plain JS, no Stimulus):
+-# - auto dismiss after 3s
+-# - manual dismiss via close button
+-# - keep lower z-index than confirm_log (confirm_log uses z-50)
+-# - wrapper uses pointer-events-none so it won't block modal backdrop clicks
+
+- if flash.present?
+  %div{ class: "fixed top-4 left-1/2 z-40 w-full max-w-3xl -translate-x-1/2 px-4 pointer-events-none" }
+    - flash.each do |type, message|
+      - next if message.blank?
+
+      %div{
+        class: "relative mb-3 rounded-xl px-5 py-4 shadow-sm #{flash_css_class(type)} pointer-events-auto",
+        role: "status",
+        data: { flash: "1", flash_timeout: 3000 }
+      }
+        -# Close button: always stays at top-right, never steals a line
+        %button{
+          type: "button",
+          class: "absolute right-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-base opacity-70 hover:opacity-100 hover:bg-black/5 focus:outline-none focus:ring-2 focus:ring-black/10",
+          aria: { label: "Dismiss" },
+          data: { flash_dismiss: "1" }
+        } ×
+
+        -# Message: bigger, more prominent, with right padding so it won't overlap the close button
+        %div{ class: "pr-10 text-base font-semibold leading-relaxed whitespace-pre-line break-words" }
+          = message

@@ -3,5 +3,8 @@
 import { application } from "controllers/application"
 import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 import PopConfirmLog from "lib/confirm_log";
+import initFlash from "lib/flash";
+
+initFlash();
 window.PopConfirmLog = PopConfirmLog;
 eagerLoadControllersFrom("controllers", application)

@@ -1,4 +1,4 @@
-// app/javascript/lib/pop_confirm_log.js
+// app/javascript/lib/confirm_log.js
 // Plain JS confirm modal: no turbo_stream dependency.
 // Responsibilities:
 // - show/hide modal
