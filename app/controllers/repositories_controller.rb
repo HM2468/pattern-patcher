@@ -73,9 +73,21 @@ class RepositoriesController < ApplicationController
   end
 
   def destroy
-    Repository.find(params[:id]).destroy
-    flash[:success] = "Repository deleted successfully."
-    redirect_to repositories_path
+    repo = Repository.find_by(id: params[:id])
+
+    unless repo
+      redirect_to repositories_path, flash: { error: "Repository not found." }
+      return
+    end
+
+    if repo.destroy
+      RepositoryCleanJob.perform_later(repo.id)
+      flash[:success] = "Repository deleted successfully. Cleaning up associated files."
+      redirect_to repositories_path
+    else
+      flash[:error] = repo.errors.full_messages.to_sentence.presence || "Failed to delete repository."
+      redirect_to repositories_path
+    end
   end
 
   def import
