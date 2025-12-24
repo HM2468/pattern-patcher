@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_24_023219) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_24_053243) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -128,13 +128,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_023219) do
     t.integer "repository_id", null: false
     t.string "path"
     t.string "blob_sha"
-    t.integer "size_bytes"
     t.datetime "last_scanned_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["blob_sha"], name: "index_repository_files_on_blob_sha"
     t.index ["path"], name: "index_repository_files_on_path"
-    t.index ["repository_id", "blob_sha"], name: "index_repository_files_repo_blob_unique", unique: true
+    t.index ["repository_id", "blob_sha", "path"], name: "index_repository_files_on_repo_blob_path_unique", unique: true
     t.index ["repository_id"], name: "index_repository_files_on_repository_id"
   end
 
