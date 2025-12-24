@@ -1,4 +1,6 @@
+-# frozen_string_literal: true
 -# app/views/repository_files/_file_list.html.haml
+
 - if @repositories.empty?
   %div{ class: "p-6 text-gray-700" } No repositories found.
 - elsif @current_repo.nil?
@@ -6,7 +8,15 @@
 - elsif @repository_files.empty?
   %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
 - else
-  %div#repo_files_panel{ class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm", data: { repo_id: @current_repo.id } }
+  -# pass two confirm messages to JS via data- attrs
+  %div#repo_files_panel{
+    class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm",
+    data: {
+      repo_id: @current_repo.id,
+      scan_hint_empty: @scan_all_hint,    # file_ids empty => use this
+      scan_hint_all: @scan_hint_message   # file_ids non-empty => use this
+    }
+  }
     %table#repo_files_table{ class: "w-full text-sm table-fixed" }
       %thead{ class: "bg-indigo-100 text-gray-600 sticky top-0 z-10" }
         %tr
@@ -30,8 +40,9 @@
                 }
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
-                -# UI buttons: trigger hidden submit buttons
+                -# Scan is ALWAYS enabled (even when nothing selected)
                 %button#bulk_scan{ type: "button", class: "button-primary" } Scan
+                -# Delete is disabled until something selected
                 %button#bulk_delete{ type: "button", class: "button-danger" } Delete
 
       %tbody#repo_files_tbody{ class: "divide-y divide-gray-300" }
@@ -61,7 +72,7 @@
         onclick: "return window.PopConfirmLog.open(event, this)",
         data: {
           confirm_title: "Scan files",
-          confirm_message_html: @scan_hint_message,
+          confirm_message_html: @scan_hint_message, # JS will override before click
           confirm_confirm_label: "Scan",
           confirm_cancel_label: "Cancel"
         },
@@ -91,7 +102,6 @@
     collection: @repository_files,
     options: { repository_id: @current_repo&.id, path_filter: @path_filter }.compact
 
-
 :javascript
   (function() {
     function initRepoFilesPage() {
@@ -109,13 +119,13 @@
       const bulkDeleteBtn = document.getElementById("bulk_delete");
       const bulkScanBtn   = document.getElementById("bulk_scan");
 
-      const deleteIdsBox = document.getElementById("bulk_delete_file_ids");
+      const deleteIdsBox  = document.getElementById("bulk_delete_file_ids");
       const deleteTrigger = document.getElementById("bulk_delete_trigger");
 
-      const scanIdsBox = document.getElementById("bulk_scan_file_ids");
-      const scanTrigger = document.getElementById("bulk_scan_trigger");
+      const scanIdsBox    = document.getElementById("bulk_scan_file_ids");
+      const scanTrigger   = document.getElementById("bulk_scan_trigger");
 
-      const searchInput = document.getElementById("path_filter_input");
+      const searchInput   = document.getElementById("path_filter_input");
 
       const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
 
@@ -123,15 +133,17 @@
         return checks().filter(x => x.checked).map(x => x.value);
       }
 
-      function setButtonsEnabled(enabled) {
-        if (bulkDeleteBtn) bulkDeleteBtn.disabled = !enabled;
-        if (bulkScanBtn) bulkScanBtn.disabled = !enabled;
+      // Scan always enabled; Delete requires selection.
+      function setButtonsEnabled() {
+        const count = selectedIds().length;
+        if (bulkScanBtn) bulkScanBtn.disabled = false;
+        if (bulkDeleteBtn) bulkDeleteBtn.disabled = (count === 0);
       }
 
       function updateHintAndButtons() {
         const count = selectedIds().length;
         if (hint) hint.textContent = count > 0 ? `Selected: ${count}` : "200/page";
-        setButtonsEnabled(count > 0);
+        setButtonsEnabled();
       }
 
       function syncCheckAllState() {
@@ -152,6 +164,22 @@
         });
       }
 
+      function setScanConfirmMessage(idsCount) {
+        if (!scanTrigger) return;
+
+        const msgEmpty = panel.dataset.scanHintEmpty || "";
+        const msgAll   = panel.dataset.scanHintAll || "";
+
+        // Per requirement:
+        // - ids empty => confirm_message_html = @scan_hint_message
+        // - ids non-empty => confirm_message_html = @scan_all_hint
+        const useMsg = (idsCount === 0 ? msgEmpty : msgAll);
+
+        if (useMsg.length > 0) {
+          scanTrigger.dataset.confirmMessageHtml = useMsg;
+        }
+      }
+
       // Select All
       if (checkAll) {
         checkAll.addEventListener("change", () => {
@@ -169,10 +197,9 @@
       });
 
       // Init
-      setButtonsEnabled(false);
       updateHintAndButtons();
 
-      // Delete: fill file_ids[] -> click hidden submit (PopConfirmLog)
+      // Delete: unchanged behavior (must have selection)
       if (bulkDeleteBtn) {
         bulkDeleteBtn.addEventListener("click", () => {
           const ids = selectedIds();
@@ -188,18 +215,20 @@
         });
       }
 
-      // Scan: fill file_ids[] -> click hidden submit (PopConfirmLog)
+      // Scan: can run with empty selection; file_ids[] becomes empty (no hidden inputs added)
       if (bulkScanBtn) {
         bulkScanBtn.addEventListener("click", () => {
           const ids = selectedIds();
-          if (ids.length === 0) return;
 
+          // Always fill (empty => clears container => controller receives no file_ids[] => treat as [])
           fillHiddenIds(scanIdsBox, ids);
 
           if (!scanTrigger) {
             console.warn("[repo_files] bulk_scan_trigger not found");
             return;
           }
+
+          setScanConfirmMessage(ids.length);
           scanTrigger.click();
         });
       }

@@ -1,5 +1,7 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
+  include RepositoriesHelper
+
   before_action :get_repository, only: %i[edit update destroy import]
 
   def index
@@ -22,14 +24,7 @@ class RepositoriesController < ApplicationController
                   .by_path                        # 建议保持稳定排序
                   .page(params[:page])
                   .per(200)
-    @current_pattern = LexicalPattern.current_pattern
-    @scan_hint_message = if @current_pattern.nil?
-                           "No enabled pattern found. Please set up one in
-                            <a href='#{lexical_patterns_path}' class='underline'>Lexical Patterns</a> page."
-                         else
-                           "Scan selected files with pattern: <strong>#{@current_pattern.name}</strong>?
-                            Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>."
-                         end.html_safe
+    init_scan_hint_message
   end
 
   def new
@@ -94,7 +89,7 @@ class RepositoriesController < ApplicationController
     @repository = Repository.find_by(id: params[:id])
     unless @repository
       redirect_to repositories_path, flash: { error: "Repository not found." }
-      return
+      nil
     end
   end
 
