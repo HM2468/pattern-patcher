@@ -19,7 +19,6 @@ class Repository < ApplicationRecord
       .split(",")
       .map(&:strip)
       .reject(&:blank?)
-      .map { |e| e.start_with?(".") ? e.downcase : ".#{e.downcase}" }
       .uniq
   end
 
