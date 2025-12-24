@@ -1,16 +1,8 @@
 # frozen_string_literal: true
-
+# app/models/git_cli.rb
 class GitCli
   include ActiveModel::Model
 
-  # include GitRepo::Command
-  # include GitRepo::Checks
-  # include GitRepo::Refs
-  # include GitRepo::Tree
-  # include GitRepo::Blobs
-  # include GitRepo::Worktree
-  # include GitRepo::Parsing
-  # attr_reader :repository, :timeout_seconds, :logger
   validates :repository, presence: true
 
   def initialize(repository, timeout_seconds: 20, logger: nil)
@@ -24,5 +16,4 @@ class GitCli
       errors.add(:repository, "must be a Repository instance")
     end
   end
-
 end
