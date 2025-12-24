@@ -1,6 +1,5 @@
 # app/models/scan_run.rb
 class ScanRun < ApplicationRecord
-  belongs_to :repository_file, foreign_key: :file_id
   belongs_to :lexical_pattern, foreign_key: :pattern_id
 
   has_many :occurrences, dependent: :destroy

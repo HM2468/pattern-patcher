@@ -47,7 +47,7 @@ class Repository < ApplicationRecord
   end
 
   def create_snapshot
-    commit_sha = git_cli.current_commit_sha
+    commit_sha = git_cli.current_snapshot
     return if commit_sha.nil?
 
     repository_snapshots.create!(commit_sha: commit_sha, metadata: {})
