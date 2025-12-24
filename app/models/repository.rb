@@ -1,6 +1,7 @@
 # app/models/repository.rb
 class Repository < ApplicationRecord
   has_many :repository_files, dependent: :delete_all
+  has_many :repository_snapshots, dependent: :delete_all
 
   validates :name, presence: true
   validates :root_path, presence: true, uniqueness: true
@@ -20,6 +21,10 @@ class Repository < ApplicationRecord
       .reject(&:blank?)
       .map { |e| e.start_with?(".") ? e.downcase : ".#{e.downcase}" }
       .uniq
+  end
+
+  def current_snapshot
+    repository_snapshots.order(created_at: :desc).first
   end
 
   private
