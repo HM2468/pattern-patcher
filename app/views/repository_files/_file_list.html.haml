@@ -89,7 +89,7 @@
 %div#repo_files_pagination{ class: "bottom-pagination" }
   = render "shared/pagination",
     collection: @repository_files,
-    options: { repository_id: @current_repo.id, path_filter: @path_filter }.compact
+    options: { repository_id: @current_repo&.id, path_filter: @path_filter }.compact
 
 
 :javascript

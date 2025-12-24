@@ -1,5 +1,6 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
+  before_action :get_repository, only: %i[edit update destroy import]
 
   def index
     @repositories = Repository.order(name: :asc)
@@ -47,7 +48,6 @@ class RepositoriesController < ApplicationController
   end
 
   def edit
-    @repository = Repository.find(params[:id])
     @confirm_message = {
       delete: {
         confirm_title: "Delete repository",
@@ -63,7 +63,6 @@ class RepositoriesController < ApplicationController
   end
 
   def update
-    @repository = Repository.find(params[:id])
     if @repository.update(repository_params)
       flash[:success] = "Repository updated successfully."
       redirect_to repositories_path(repository_id: @repository.id)
@@ -73,31 +72,31 @@ class RepositoriesController < ApplicationController
   end
 
   def destroy
-    repo = Repository.find_by(id: params[:id])
-
-    unless repo
-      redirect_to repositories_path, flash: { error: "Repository not found." }
-      return
-    end
-
-    if repo.destroy
-      RepositoryCleanJob.perform_later(repo.id)
+    if @repository.destroy
+      RepositoryCleanJob.perform_later(@repository.id)
       flash[:success] = "Repository deleted successfully. Cleaning up associated files."
       redirect_to repositories_path
     else
-      flash[:error] = repo.errors.full_messages.to_sentence.presence || "Failed to delete repository."
-      redirect_to repositories_path
+      flash[:error] = @repository.errors.full_messages.to_sentence.presence || "Failed to delete repository."
+      redirect_to repositories_path(repository_id: @repository.id)
     end
   end
 
   def import
-    repo = Repository.find(params[:id])
-    RepositoryImportJob.perform_later(repo.id)
+    RepositoryImportJob.perform_later(@repository.id)
     flash[:success] = "File importing job enqueued."
     redirect_to repositories_path(repository_id: @repository.id)
   end
 
   private
+
+  def get_repository
+    @repository = Repository.find_by(id: params[:id])
+    unless @repository
+      redirect_to repositories_path, flash: { error: "Repository not found." }
+      return
+    end
+  end
 
   def repository_params
     params.require(:repository).permit(:name, :root_path, :permitted_ext)
