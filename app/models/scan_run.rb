@@ -1,8 +1,8 @@
 # app/models/scan_run.rb
 class ScanRun < ApplicationRecord
-  belongs_to :lexical_pattern, foreign_key: :pattern_id
-
+  belongs_to :lexical_pattern
   has_many :occurrences, dependent: :destroy
+  has_many :repository_snapshots
 
   STATUSES = %w[pending running finished failed].freeze
   validates :status, presence: true, inclusion: { in: STATUSES }
@@ -11,7 +11,6 @@ class ScanRun < ApplicationRecord
   scope :finished, -> { where(status: "finished") }
 
   before_validation :default_status, on: :create
-  before_create :snapshot_pattern
 
   private
 
