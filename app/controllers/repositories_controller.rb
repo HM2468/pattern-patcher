@@ -32,7 +32,7 @@ class RepositoriesController < ApplicationController
   end
 
   def new
-    @repository = Repository.new(status: "active")
+    @repository = Repository.new
   end
 
   def create
