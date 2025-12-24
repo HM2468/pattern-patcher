@@ -1,7 +1,13 @@
 # frozen_string_literal: true
 # app/models/git_cli.rb
+
 class GitCli
   include ActiveModel::Model
+
+  require "open3"
+  require "timeout"
+
+  attr_reader :repository, :timeout_seconds, :logger, :root_path
 
   validates :repository, presence: true
 
@@ -9,11 +15,138 @@ class GitCli
     @timeout_seconds = timeout_seconds.to_i
     @logger = logger || (defined?(Rails) ? Rails.logger : nil)
 
-    if repository.is_a?(Repository)
-      @repository = repository
-    else
-      @repository = nil
+    unless repository.is_a?(Repository)
       errors.add(:repository, "must be a Repository instance")
+      return
     end
+
+    @repository = repository
+    @root_path  = File.expand_path(repository.root_path.to_s)
+
+    validate_root_path!
+  rescue => e
+    errors.add(:base, e.message)
+  end
+
+  # === awk semantic clone ===
+  #
+  # with exts:
+  #   git ls-tree -r <ref> | awk '$4 ~ /\.(rb|haml)$/ {print $3, $4}'
+  #
+  # without exts:
+  #   git ls-tree -r <ref> | awk '{print $3, $4}'
+  #
+  # @param ref  [String] branch / tag / commit
+  # @param exts [Array<String>, nil, ""] file extensions
+  # @return [Array<[String, String]>] [[blob_sha, path], ...]
+  #
+  def list_blob_paths(ref: "HEAD", exts: nil)
+    ensure_ready!
+
+    ref = ref.to_s.strip
+    raise ArgumentError, "ref cannot be blank" if ref.empty?
+
+    exts = normalize_exts(exts)
+
+    awk_script =
+      if exts.empty?
+        # no filter
+        "{print $3, $4}"
+      else
+        # /\.(rb|haml)$/
+        pattern = exts.join("|")
+        %Q{$4 ~ /\\.(#{pattern})$/ {print $3, $4}}
+      end
+
+    command = <<~SH.strip
+      git ls-tree -r #{shell_escape(ref)} | awk '#{awk_script}'
+    SH
+
+    output = shell!(command)
+    parse_awk_output(output)
+  end
+
+  def ready?
+    valid?
+  end
+
+  private
+
+  # -------------------------
+  # guards / validation
+  # -------------------------
+
+  def ensure_ready!
+    raise RuntimeError, "Invalid GitCli: #{errors.full_messages.join(', ')}" unless valid?
+  end
+
+  def validate_root_path!
+    raise ArgumentError, "repository.root_path is blank" if root_path.nil? || root_path.empty?
+    raise ArgumentError, "repository.root_path does not exist: #{root_path}" unless Dir.exist?(root_path)
+
+    git_dot = File.join(root_path, ".git")
+    return if File.directory?(git_dot) || File.file?(git_dot)
+
+    raise ArgumentError, "#{root_path} is not a git repository root (.git not found)"
+  end
+
+  # normalize extensions
+  # nil, "", [] => []
+  def normalize_exts(exts)
+    Array(exts)
+      .map { |e| e.to_s.strip.sub(/\A\./, "").downcase }
+      .reject(&:empty?)
+      .uniq
+  end
+
+  # -------------------------
+  # shell execution
+  # -------------------------
+
+  def shell!(command)
+    logger&.debug { "[GitCli] #{root_path}$ #{command}" }
+
+    stdout = +""
+    stderr = +""
+
+    Timeout.timeout(timeout_seconds) do
+      stdout, stderr, status =
+        Open3.capture3(command, chdir: root_path)
+
+      unless status.success?
+        raise RuntimeError, <<~MSG
+          command failed (exit=#{status.exitstatus})
+          cwd: #{root_path}
+          cmd: #{command}
+          stderr: #{stderr.strip}
+        MSG
+      end
+    end
+
+    stdout
+  rescue Timeout::Error
+    raise Timeout::Error, "command timeout after #{timeout_seconds}s: #{command}"
+  end
+
+  # -------------------------
+  # parsing
+  # -------------------------
+
+  # awk prints: "<sha> <path>"
+  def parse_awk_output(output)
+    output
+      .to_s
+      .lines
+      .map(&:strip)
+      .reject(&:empty?)
+      .map do |line|
+        sha, path = line.split(/\s+/, 2)
+        [sha, path]
+      end
+  end
+
+  # minimal shell escaping for ref
+  def shell_escape(str)
+    str.gsub("'", %q('\''))
   end
 end
