@@ -34,13 +34,13 @@ class AddIndexesAndConstraints < ActiveRecord::Migration[8.0]
     add_index :replacement_targets,
               [:lexeme_id, :repository_file_id, :target_type],
               unique: true,
-              name: "idx_replacement_targets_unique"
+              name: "index_replacement_targets_unique"
 
     # lexeme_processings: unique index (lexeme_id, process_type, locale)
     add_index :lexeme_processings,
               [:lexeme_id, :process_type, :locale],
               unique: true,
-              name: "idx_lexeme_processings_unique"
+              name: "index_lexeme_processings_unique"
 
     # replacement_actions: Common for audit queries
     add_index :replacement_actions, :status

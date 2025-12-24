@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_24_021908) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_24_023219) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -127,13 +127,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_021908) do
   create_table "repository_files", force: :cascade do |t|
     t.integer "repository_id", null: false
     t.string "path"
-    t.string "file_sha"
+    t.string "blob_sha"
     t.integer "size_bytes"
     t.datetime "last_scanned_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["file_sha"], name: "index_repository_files_on_file_sha"
-    t.index ["repository_id", "path"], name: "index_repository_files_on_repository_id_and_path", unique: true
+    t.index ["blob_sha"], name: "index_repository_files_on_blob_sha"
+    t.index ["path"], name: "index_repository_files_on_path"
+    t.index ["repository_id", "blob_sha"], name: "index_repository_files_repo_blob_unique", unique: true
     t.index ["repository_id"], name: "index_repository_files_on_repository_id"
   end
 
@@ -149,20 +150,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_021908) do
   end
 
   create_table "scan_runs", force: :cascade do |t|
-    t.integer "repository_file_id", null: false
     t.integer "lexical_pattern_id", null: false
     t.string "status"
     t.datetime "started_at"
     t.datetime "finished_at"
-    t.string "patterns_snapshot"
-    t.string "text"
+    t.text "pattern_snapshot"
     t.text "error"
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "repository_snapshot_id", null: false
+    t.json "cursor"
     t.index ["lexical_pattern_id"], name: "index_scan_runs_on_lexical_pattern_id"
-    t.index ["repository_file_id", "lexical_pattern_id"], name: "index_scan_runs_on_repository_file_id_and_lexical_pattern_id", unique: true
-    t.index ["repository_file_id"], name: "index_scan_runs_on_repository_file_id"
+    t.index ["repository_snapshot_id", "lexical_pattern_id"], name: "index_scan_runs_snapshot_pattern_unique", unique: true
+    t.index ["repository_snapshot_id"], name: "index_scan_runs_on_repository_snapshot_id"
     t.index ["status"], name: "index_scan_runs_on_status"
   end
 
@@ -186,5 +187,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_021908) do
   add_foreign_key "repository_files", "repositories"
   add_foreign_key "repository_snapshots", "repositories"
   add_foreign_key "scan_runs", "lexical_patterns"
-  add_foreign_key "scan_runs", "repository_files"
+  add_foreign_key "scan_runs", "repository_snapshots"
 end
