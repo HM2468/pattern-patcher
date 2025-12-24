@@ -5,7 +5,7 @@ class ScanRunsController < ApplicationController
   def show
   end
 
-  def bulk_scan
+  def create
     if LexicalPattern.current_pattern.nil?
       flash[:alert] = "No enabled pattern found. Please set up one in Lexical Patterns page."
       redirect_to repositories_path(repository_id: params[:repository_id])

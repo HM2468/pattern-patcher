@@ -52,7 +52,7 @@
 
   -# ✅ Scan form (hidden). JS fills file_ids[] then clicks hidden submit button (with PopConfirmLog)
   %div{ class: "hidden" }
-    = form_with url: bulk_scan_scan_runs_path, method: :post, local: true,
+    = form_with url: scan_runs_path, method: :post, local: true,
       html: { id: "bulk_scan_form", class: "inline-flex" } do
       = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
       %div#bulk_scan_file_ids
