@@ -66,6 +66,52 @@ class GitCli
     parse_awk_output(output)
   end
 
+  # --------------------------------------------------
+  # current_snapshot(ref: 'HEAD')
+  #
+  # shell:
+  #   git rev-parse HEAD
+  #
+  # @param ref [String]
+  # @return [String] full commit sha
+  # --------------------------------------------------
+  def current_snapshot(ref: "HEAD")
+    ensure_ready!
+
+    ref = ref.to_s.strip
+    raise ArgumentError, "ref cannot be blank" if ref.empty?
+
+    output = shell!("git rev-parse #{shell_escape(ref)}")
+    output.to_s.strip
+  end
+
+  # --------------------------------------------------
+  # current_file_blob(ref: 'HEAD', file_path:)
+  #
+  # shell:
+  #   git ls-tree HEAD app/models/repository.rb | awk '{print $3}'
+  #
+  # @param ref [String]
+  # @param file_path [String]
+  # @return [String, nil] blob sha or nil if file not found
+  # --------------------------------------------------
+  def current_file_blob(ref: "HEAD", file_path:)
+    ensure_ready!
+
+    ref = ref.to_s.strip
+    raise ArgumentError, "ref cannot be blank" if ref.empty?
+
+    file_path = file_path.to_s.strip
+    raise ArgumentError, "file_path cannot be blank" if file_path.empty?
+
+    command = <<~SH.strip
+      git ls-tree #{shell_escape(ref)} #{shell_escape(file_path)} | awk '{print $3}'
+    SH
+
+    output = shell!(command).to_s.strip
+    output.empty? ? nil : output
+  end
+
   def ready?
     valid?
   end
@@ -145,7 +191,7 @@ class GitCli
       end
   end
 
-  # minimal shell escaping for ref
+  # minimal shell escaping for ref / path
   def shell_escape(str)
     str.gsub("'", %q('\''))
   end
