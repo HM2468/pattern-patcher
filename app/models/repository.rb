@@ -8,6 +8,8 @@ class Repository < ApplicationRecord
   validates :permitted_ext, presence: true
 
   before_validation :normalize_inputs
+  before_save :check_root_path_exists
+  after_commit :create_snapshot, on: :create
   after_commit :enqueue_import_job, on: :create
 
   def git_cli
@@ -15,6 +17,8 @@ class Repository < ApplicationRecord
   end
 
   def permitted_extensions
+    return [] if permitted_ext.to_s.strip.empty?
+
     permitted_ext.to_s
       .split(",")
       .map(&:strip)
@@ -34,7 +38,18 @@ class Repository < ApplicationRecord
     self.permitted_ext = permitted_ext.to_s.strip
   end
 
+  def check_root_path_exists
+    Dir.exist?(root_path) || errors.add(:root_path, "does not exist: #{root_path}")
+  end
+
   def enqueue_import_job
-    # RepositoryImportJob.perform_later(id)
+    RepositoryImportJob.perform_later(id)
+  end
+
+  def create_snapshot
+    commit_sha = git_cli.current_commit_sha
+    return if commit_sha.nil?
+
+    repository_snapshots.create!(commit_sha: commit_sha, metadata: {})
   end
 end
