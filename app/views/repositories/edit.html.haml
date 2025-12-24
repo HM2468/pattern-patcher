@@ -2,9 +2,14 @@
 %div{ class: "max-w-3xl mx-auto p-6" }
   %div{ class: "mb-4" }
     %div{ class: "text-sm text-gray-600 mt-1" }
-    %div{ class: "font-semibold" } Edit repository
+    %div{ class: "font-semibold" } #{@repository.name}
     = render "repositories/form"
 
+    %div{ class: "font-semibold" } Last scan version
+    %br
+    %div{ class: "text-sm text-gray-600 mt-1" }
+      #{@repository.current_snapshot&.commit_sha || "N/A"}
+    %br
     %div{ class: "font-semibold" } Reimport files
     %br
     %div{ class: "text-sm text-gray-600 mt-1" }
