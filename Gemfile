@@ -12,7 +12,7 @@ gem "rails", "~> 8.0.2", ">= 8.0.2.1"
 gem "propshaft"
 
 # SQLite database for Active Record
-gem "sqlite3", ">= 2.1"
+gem "pg", "~> 1.5"
 
 # Puma web server
 # https://github.com/puma/puma
