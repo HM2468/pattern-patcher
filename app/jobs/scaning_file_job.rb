@@ -81,12 +81,12 @@ class ScaningFileJob < ApplicationJob
     raise "RepositoryFile missing for scan_run_file=#{scan_file.id}" unless repo_file
 
     # TODO: Replace with your real scanning implementation
-    # FileScanService.new(
-    #   repository: @repo,
-    #   scan_run: @scan_run,
-    #   repo_file: repo_file,
-    #   pattern: @pattern,
-    # ).execute
+    FileScanService.new(
+      repository: @repo,
+      scan_run: @scan_run,
+      repo_file: repo_file,
+      pattern: @pattern,
+    ).execute
 
     scan_file.update!(status: "finished", error: nil)
     true
