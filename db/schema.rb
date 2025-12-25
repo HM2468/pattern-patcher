@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_25_090250) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_25_095059) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -49,8 +49,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_25_090250) do
     t.boolean "enabled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "mode", default: "line", null: false
     t.index ["enabled"], name: "index_lexical_patterns_on_enabled"
     t.index ["language", "pattern_type"], name: "index_lexical_patterns_on_language_and_pattern_type"
+    t.index ["mode"], name: "index_lexical_patterns_on_mode"
     t.index ["priority"], name: "index_lexical_patterns_on_priority"
   end
 
