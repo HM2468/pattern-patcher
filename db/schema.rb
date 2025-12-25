@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_25_020859) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_25_090120) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -171,8 +171,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_25_020859) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "repository_snapshot_id", null: false
+    t.string "scan_mode", default: "line", null: false
     t.index ["lexical_pattern_id"], name: "index_scan_runs_on_lexical_pattern_id"
     t.index ["repository_snapshot_id"], name: "index_scan_runs_on_repository_snapshot_id"
+    t.index ["scan_mode"], name: "index_scan_runs_on_scan_mode"
     t.index ["status"], name: "index_scan_runs_on_status"
   end
 
