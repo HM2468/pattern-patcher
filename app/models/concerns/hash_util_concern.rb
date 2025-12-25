@@ -21,11 +21,7 @@ module HashUtilConcern
     end
 
     content_str = content.to_s
-    full_hex = Digest::SHA256.hexdigest(content_str)
-
-    # Python version: digest bytes truncated to length/2, then hex.
-    # Equivalent in Ruby: hex chars truncated to `length`.
-    full_hex[0, length]
+    full_hex = Lexeme.sha_digest(content_str)
   end
 
   # Safely dig into a nested hash.

@@ -11,13 +11,12 @@ class Lexeme < ApplicationRecord
 
   scope :unprocessed, -> { where(processed_at: nil) }
   scope :processed, -> { where.not(processed_at: nil) }
+  FINGERPRINT_LENGTH = 16
+  class << self
+    def sha_digest(text)
+      raise ArgumentError, "text must be present" if text.blank?
 
-  before_validation :normalize_and_fingerprint, on: :create
-
-  private
-
-  def normalize_and_fingerprint
-    self.normalized_text ||= source_text.to_s.strip
-    self.fingerprint ||= Digest::SHA256.hexdigest(normalized_text)
+      Digest::SHA256.hexdigest(text.to_s)[0, FINGERPRINT_LENGTH]
+    end
   end
 end
