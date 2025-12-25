@@ -7,7 +7,9 @@ class ScanRun < ApplicationRecord
   has_many :occurrences, dependent: :destroy
   has_many :scan_run_files, dependent: :delete_all
 
-  STATUSES = %w[pending running finished failed].freeze
+  STATUSES = %w[pending running finished failed finished_with_errors].freeze
+  PHASES   = %w[building_files scanning_files].freeze
+
   validates :status, presence: true, inclusion: { in: STATUSES }
 
   scope :latest,   -> { order(created_at: :desc) }
@@ -28,23 +30,20 @@ class ScanRun < ApplicationRecord
   end
 
 
-  # Payload schema builders (single source of truth)
-  #
-  # Keep keys as symbols in Ruby; Rails.cache serializer will preserve them
-  # (unless you configured JSON coder, then keys may become strings).
-  def persisting_payload(status:, total:, created_scan_run_files:, done: 0, failed: 0, phase: "building_scan_run_files", error: nil)
+  # Payload builders (single source of truth)
+  # Unified schema: {phase,status,total,done,failed,(optional)error}
+  def persisting_payload(status:, total:, done: 0, failed: 0, phase: PHASES[0], error: nil)
     base_progress_payload(
       phase: phase,
       status: status,
       total: total,
       done: done,
       failed: failed,
-      created_scan_run_files: created_scan_run_files,
       error: error
     )
   end
 
-  def scanning_payload(status:, total:, done:, failed:, phase: "scanning_files", error: nil)
+  def scanning_payload(status:, total:, done:, failed:, phase: PHASES[1], error: nil)
     base_progress_payload(
       phase: phase,
       status: status,
@@ -64,7 +63,6 @@ class ScanRun < ApplicationRecord
   def read_persisting_progress
     read_progress_cache(persisting_progress_key)
   end
-
 
   # Scanning phase progress
   def write_scanning_progress(payload, expires_in: CACHE_TTL)
@@ -98,9 +96,8 @@ class ScanRun < ApplicationRecord
     self.status ||= "pending"
   end
 
-  # Ensure a stable schema across all progress payloads.
-  # This prevents jobs/controllers from accidentally drifting the structure.
-  def base_progress_payload(phase:, status:, total:, done:, failed:, created_scan_run_files: nil, error: nil)
+  # Unified schema across all progress payloads.
+  def base_progress_payload(phase:, status:, total:, done:, failed:, error: nil)
     payload = {
       phase: phase.to_s,
       status: status.to_s,
@@ -108,9 +105,6 @@ class ScanRun < ApplicationRecord
       done: done.to_i,
       failed: failed.to_i
     }
-
-    # Only present in persisting phase
-    payload[:created_scan_run_files] = created_scan_run_files.to_i unless created_scan_run_files.nil?
 
     payload[:error] = error.to_s if error.present?
     payload

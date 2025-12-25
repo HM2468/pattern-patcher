@@ -27,8 +27,7 @@ class StartScanJob < ApplicationJob
         @repo.repository_files.where(id: ids)
       end
     persist_scan_run_files!
-    # Scanning work runs in a separate job/queue
-    ScaningFileJob.perform_later(scan_run_id: @scan_run.id)
+    ScaningFileJob.perform_now(scan_run_id: @scan_run.id)
   end
 
   private
@@ -41,7 +40,7 @@ class StartScanJob < ApplicationJob
       @scan_run.persisting_payload(
         status: "running",
         total: total,
-        created_scan_run_files: created
+        done: created
       )
     )
 
@@ -67,7 +66,7 @@ class StartScanJob < ApplicationJob
         @scan_run.persisting_payload(
           status: "running",
           total: total,
-          created_scan_run_files: created
+          done: created
         )
       )
     end
@@ -77,7 +76,7 @@ class StartScanJob < ApplicationJob
       @scan_run.persisting_payload(
         status: "ready_to_scan",
         total: total,
-        created_scan_run_files: created
+        done: created
       )
     )
   rescue => e
@@ -90,7 +89,7 @@ class StartScanJob < ApplicationJob
       @scan_run.persisting_payload(
         status: "failed",
         total: 0,
-        created_scan_run_files: 0,
+        done: 0,
         error: e.message.to_s
       )
     )
