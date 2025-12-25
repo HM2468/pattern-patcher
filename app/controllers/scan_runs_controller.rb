@@ -32,8 +32,7 @@ class ScanRunsController < ApplicationController
         repository_snapshot_id: snapshot.id,
         status: "pending",
         started_at: Time.current,
-        pattern_snapshot: scan_pattern.pattern,
-        cursor: { total: 0, done: 0, failed: 0, started_at: Time.current.iso8601 }
+        pattern_snapshot: scan_pattern.pattern
       )
 
     if @scan_run.save
