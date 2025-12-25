@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_24_085152) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_25_012604) do
   create_table "lexeme_processings", force: :cascade do |t|
     t.integer "lexeme_id", null: false
     t.string "process_type"
@@ -148,6 +148,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_085152) do
     t.index ["repository_id"], name: "index_repository_snapshots_on_repository_id"
   end
 
+  create_table "scan_run_files", force: :cascade do |t|
+    t.integer "scan_run_id", null: false
+    t.integer "repository_file_id", null: false
+    t.string "status", default: "pending", null: false
+    t.text "error"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["repository_file_id"], name: "index_scan_run_files_on_repository_file_id"
+    t.index ["scan_run_id", "repository_file_id"], name: "index_scan_run_files_on_scan_run_and_repo_file_unique", unique: true
+    t.index ["scan_run_id", "status"], name: "index_scan_run_files_on_scan_run_id_and_status"
+    t.index ["scan_run_id"], name: "index_scan_run_files_on_scan_run_id"
+  end
+
   create_table "scan_runs", force: :cascade do |t|
     t.integer "lexical_pattern_id", null: false
     t.string "status"
@@ -185,6 +198,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_24_085152) do
   add_foreign_key "replacement_targets", "repository_files"
   add_foreign_key "repository_files", "repositories"
   add_foreign_key "repository_snapshots", "repositories"
+  add_foreign_key "scan_run_files", "repository_files"
+  add_foreign_key "scan_run_files", "scan_runs"
   add_foreign_key "scan_runs", "lexical_patterns"
   add_foreign_key "scan_runs", "repository_snapshots"
 end
