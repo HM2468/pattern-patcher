@@ -4,6 +4,7 @@ class LexicalPattern < ApplicationRecord
   has_many :occurrences, dependent: :restrict_with_error
 
   PATTERN_TYPES  = %w[code comment string_literal template].freeze
+  MODE  = %w[line file].freeze
   ALLOWED_FLAGS  = %w[i m x].freeze
   PRIORITY_RANGE = (1..1000)
 
@@ -11,6 +12,7 @@ class LexicalPattern < ApplicationRecord
   validates :pattern, presence: true
   validates :language, presence: true
   validates :pattern_type, presence: true, inclusion: { in: PATTERN_TYPES }
+  validates :mode, presence: true, inclusion: { in: MODE }
   validates :priority, numericality: { only_integer: true, in: PRIORITY_RANGE }, presence: true
   validate :pattern_must_be_valid_regex
 
