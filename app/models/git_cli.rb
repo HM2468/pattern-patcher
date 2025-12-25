@@ -112,6 +112,29 @@ class GitCli
     output.empty? ? nil : output
   end
 
+  # --------------------------------------------------
+  # read_file(blob)
+  #
+  # shell:
+  #   git cat-file -p <blob_sha>
+  #
+  # @param blob [String] git blob sha
+  # @return [String] file content
+  # --------------------------------------------------
+  def read_file(blob)
+    ensure_ready!
+
+    blob = blob.to_s.strip
+    raise ArgumentError, "blob cannot be blank" if blob.empty?
+
+    # Optional sanity check: keep it simple but catch obvious junk early.
+    unless blob.match?(/\A[0-9a-f]{7,64}\z/i)
+      raise ArgumentError, "invalid blob sha format: #{blob.inspect}"
+    end
+
+    shell!("git cat-file -p #{shell_escape(blob)}")
+  end
+
   def ready?
     valid?
   end
@@ -191,7 +214,11 @@ class GitCli
       end
   end
 
-  # minimal shell escaping for ref / path
+  # minimal shell escaping for ref / path / sha
+  #
+  # NOTE: This is intentionally minimal and assumes we only pass safe-ish tokens
+  # (refs, paths, SHAs). If you later accept arbitrary strings, switch to
+  # Open3.capture3(*argv) style and avoid the shell entirely.
   def shell_escape(str)
     str.gsub("'", %q('\''))
   end
