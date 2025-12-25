@@ -3,6 +3,7 @@ class ScanRun < ApplicationRecord
   belongs_to :lexical_pattern
   has_many :occurrences, dependent: :destroy
   has_many :repository_snapshots
+  has_many :scan_run_files
 
   STATUSES = %w[pending running finished failed].freeze
   validates :status, presence: true, inclusion: { in: STATUSES }

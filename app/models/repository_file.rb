@@ -5,6 +5,7 @@ class RepositoryFile < ApplicationRecord
   has_many :occurrences, dependent: :destroy
   has_many :replacement_targets, dependent: :destroy
   has_many :replacement_actions, dependent: :destroy
+  has_many :scan_run_files, dependent: :delete_all
 
   validates :path, presence: true
   validates :path, uniqueness: { scope: :repository_id }
