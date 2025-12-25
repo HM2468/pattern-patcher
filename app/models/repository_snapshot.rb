@@ -1,5 +1,5 @@
 # app/models/repository_snapshot.rb
 class RepositorySnapshot < ApplicationRecord
   belongs_to :repository
-  belongs_to :scan_run
+  has_many :scan_runs
 end
