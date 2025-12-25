@@ -12,7 +12,7 @@ class LexicalPatternsController < ApplicationController
   end
 
   def new
-    @lexical_pattern = LexicalPattern.new(enabled: true, priority: 100, pattern_type: "string_literal")
+    @lexical_pattern = LexicalPattern.new(enabled: true, priority: 100)
   end
 
   def create
@@ -102,6 +102,6 @@ class LexicalPatternsController < ApplicationController
   end
 
   def lexical_pattern_params
-    params.require(:lexical_pattern).permit(:name, :pattern, :language, :pattern_type, :priority, :enabled)
+    params.require(:lexical_pattern).permit(:name, :pattern, :language, :mode, :priority, :enabled)
   end
 end

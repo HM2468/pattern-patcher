@@ -12,8 +12,8 @@
       = pattern.name
 
   %td{ class: "px-4 py-3 align-top" }
-    %div{ class: "max-w-[240px] truncate font-mono text-xs text-gray-700", title: pattern.pattern_type.to_s }
-      = pattern.pattern_type
+    %div{ class: "max-w-[240px] truncate font-mono text-xs text-gray-700", title: pattern.mode.to_s }
+      = pattern.mode
 
   %td{ class: "px-4 py-3 align-top" }
     = render "enabled_toggle", lexical_pattern: pattern

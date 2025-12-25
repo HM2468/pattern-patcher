@@ -12,7 +12,6 @@ patterns = [
   {
     name: "Chinese inside single quotes (single-line)",
     language: "ruby",
-    pattern_type: "string_literal",
     priority: 10,
     enabled: true,
     # Matches: '...中文...' (single-line)
@@ -21,7 +20,6 @@ patterns = [
   {
     name: "Chinese inside double quotes (single-line)",
     language: "ruby",
-    pattern_type: "string_literal",
     priority: 11,
     enabled: true,
     # Matches: \"...中文...\" (single-line)
@@ -32,7 +30,6 @@ patterns = [
   {
     name: "Chinese inside single quotes (JS/TS, single-line)",
     language: "js",
-    pattern_type: "string_literal",
     priority: 12,
     enabled: true,
     pattern: "/'[^\\n']*\\p{Han}+[^\\n']*'/"
@@ -40,7 +37,6 @@ patterns = [
   {
     name: "Chinese inside double quotes (JS/TS, single-line)",
     language: "js",
-    pattern_type: "string_literal",
     priority: 13,
     enabled: true,
     pattern: "/\\\"[^\\n\\\"]*\\p{Han}+[^\\n\\\"]*\\\"/"
@@ -52,7 +48,6 @@ patterns = [
   {
     name: "Chinese inside ERB output tags <%= ... %> (single-line)",
     language: "erb",
-    pattern_type: "template",
     priority: 20,
     enabled: true,
     pattern: "/<%=([^\\n%]|%(?!>))*\\p{Han}+([^\\n%]|%(?!>))*%>/"
@@ -60,7 +55,6 @@ patterns = [
   {
     name: "Chinese inside ERB tags <% ... %> (single-line)",
     language: "erb",
-    pattern_type: "template",
     priority: 21,
     enabled: true,
     pattern: "/<%([^\\n%]|%(?!>))*\\p{Han}+([^\\n%]|%(?!>))*%>/"
@@ -68,7 +62,6 @@ patterns = [
   {
     name: "Chinese inside moustache templates {{ ... }} (single-line)",
     language: "generic",
-    pattern_type: "template",
     priority: 22,
     enabled: true,
     pattern: "/\\{\\{[^\\n}]*\\p{Han}+[^\\n}]*\\}\\}/"
@@ -80,7 +73,6 @@ patterns = [
   {
     name: "Detect I18n.t('...') key (Ruby)",
     language: "ruby",
-    pattern_type: "code",
     priority: 40,
     enabled: true,
     pattern: "/(?:I18n\\.)?t\\(\\s*['\\\"]([A-Za-z0-9_\\-.]+)['\\\"][^\\)]*\\)/"
@@ -92,7 +84,6 @@ patterns = [
   {
     name: "Open mixed text containing Chinese or CJK punctuation (single-line)",
     language: "generic",
-    pattern_type: "code",
     priority: 80,
     enabled: true,
     # Use /.../x for readability.
@@ -109,7 +100,6 @@ patterns = [
   {
     name: "Mostly Chinese phrase with common punctuation (single-line)",
     language: "generic",
-    pattern_type: "code",
     priority: 81,
     enabled: true,
     # NOTE: '/' inside body must be escaped as '\/'
@@ -122,7 +112,6 @@ patterns = [
   {
     name: "Chinese in Ruby comments (# ... , single-line)",
     language: "ruby",
-    pattern_type: "comment",
     priority: 200,
     enabled: false,
     pattern: "/#[^\\n]*\\p{Han}+[^\\n]*$/"
@@ -130,7 +119,6 @@ patterns = [
   {
     name: "Chinese in JS/TS line comments (// ... , single-line)",
     language: "js",
-    pattern_type: "comment",
     priority: 201,
     enabled: false,
     # NOTE: '//' must be escaped to '\/\/' inside /.../
