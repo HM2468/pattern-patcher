@@ -15,10 +15,8 @@ class RepositoryImportJob < ApplicationJob
     git_cli = repo.git_cli
     # List all files in the repository
     file_paths = git_cli.list_blob_paths(exts: repo.permitted_extensions)
-
     file_paths.each do |blob_sha, path|
       rf = repo.repository_files.find_or_initialize_by(blob_sha: blob_sha, path: path)
-      rf.last_scanned_at = now
       rf.save!
     rescue => e
       Rails.logger.warn("[RepositoryImportJob] skip #{path}: #{e.class}: #{e.message}")
