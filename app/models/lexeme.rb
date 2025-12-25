@@ -7,7 +7,6 @@ class Lexeme < ApplicationRecord
   validates :source_text, presence: true
   validates :normalized_text, presence: true
   validates :fingerprint, presence: true, uniqueness: true
-  validates :locale, presence: true
 
   scope :unprocessed, -> { where(processed_at: nil) }
   scope :processed, -> { where.not(processed_at: nil) }

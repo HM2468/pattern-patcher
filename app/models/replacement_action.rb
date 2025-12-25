@@ -1,7 +1,7 @@
 # app/models/replacement_action.rb
 class ReplacementAction < ApplicationRecord
   belongs_to :occurrence
-  belongs_to :repository_file, foreign_key: :file_id
+  belongs_to :repository_file
 
   DECISIONS = %w[apply skip].freeze
   STATUSES = %w[pending applied skipped rolled_back failed].freeze

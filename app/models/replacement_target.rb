@@ -1,7 +1,7 @@
 # app/models/replacement_target.rb
 class ReplacementTarget < ApplicationRecord
   belongs_to :lexeme
-  belongs_to :repository_file, foreign_key: :file_id
+  belongs_to :repository_file
 
   TARGET_TYPES = %w[i18n_key constant method_call comment].freeze
 
