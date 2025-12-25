@@ -30,6 +30,7 @@ class ScanRunsController < ApplicationController
       ScanRun.new(
         lexical_pattern_id: scan_pattern.id,
         repository_snapshot_id: snapshot.id,
+        scan_mode: scan_pattern.mode,
         status: "pending",
         started_at: Time.current,
         pattern_snapshot: scan_pattern.pattern

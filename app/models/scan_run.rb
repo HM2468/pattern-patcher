@@ -9,10 +9,10 @@ class ScanRun < ApplicationRecord
 
   STATUSES = %w[pending running finished failed finished_with_errors].freeze
   PHASES   = %w[building_files scanning_files].freeze
-  MODE  = %w[line file].freeze
+  SCAN_MODES  = %w[line file].freeze
 
   validates :status, presence: true, inclusion: { in: STATUSES }
-  validates :mode, presence: true, inclusion: { in: MODE }
+  validates :scan_mode, presence: true, inclusion: { in: SCAN_MODES }
 
   scope :latest,   -> { order(created_at: :desc) }
   scope :finished, -> { where(status: "finished") }
