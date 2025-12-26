@@ -20,6 +20,13 @@ class ScanRun < ApplicationRecord
   before_validation :default_status, on: :create
 
   CACHE_TTL = 1.day
+  PROGRESS_COLOR = {
+    "pending" => "",
+    "running" => "bg-emerald-500",
+    "finished" => "bg-emerald-500",
+    "failed" => "",
+    "finished_with_errors" => "",
+  }
 
   # Single cache key for "latest progress" (phase is stored in payload)
   def progress_key
