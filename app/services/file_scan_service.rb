@@ -2,7 +2,6 @@
 
 # app/services/file_scan_service.rb
 class FileScanService
-  CONTEXT_RADIUS = 5
 
   def initialize(repository:, scan_run:, repo_file:, pattern:)
     @repository = repository
@@ -72,7 +71,6 @@ class FileScanService
           byte_start: byte_start,
           byte_end: byte_end,
           matched_text: raw,
-          context: build_context_text(line_no),
           status: "unreviewed"
         )
 
@@ -118,7 +116,6 @@ class FileScanService
         byte_start: byte_start,
         byte_end: byte_end,
         matched_text: raw,
-        context: build_context_text(line_no),
         status: "unreviewed"
       )
 
@@ -171,20 +168,6 @@ class FileScanService
     metadata["interpolations"] = interpolations unless interpolations.empty?
 
     [s2, metadata]
-  end
-
-
-  # Context (11 lines)
-  def build_context_text(line_no)
-    return "" if line_no.nil? || line_no <= 0
-
-    # line_no is 1-based, @lines is 0-based
-    center_idx = line_no - 1
-    from = [center_idx - CONTEXT_RADIUS, 0].max
-    to   = [center_idx + CONTEXT_RADIUS, @lines.length - 1].min
-
-    # Keep original line breaks from @lines
-    @lines[from..to].join
   end
 
   # Offsets helpers
