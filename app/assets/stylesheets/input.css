@@ -1,0 +1,94 @@
+/* app/assets/stylesheets/input.css */
+/* Custom Input Styles */
+
+/* =========================
+   Base form control
+   ========================= */
+
+.form-input,
+.form-textarea,
+.form-select {
+  display: block;
+  width: 100%;
+
+  border: 1px solid #c7d2fe; /* indigo-200 */
+  border-radius: 0.75rem;   /* rounded-xl (12px) */
+
+  padding: 0.5rem 1rem;     /* py-2 px-4 */
+  font-size: 0.875rem;      /* text-sm */
+
+  background-color: #ffffff;
+  color: #0f172a;           /* slate-900 */
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* =========================
+   Focus state
+   ========================= */
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  outline: none;
+
+  border-color: #818cf8; /* indigo-400 */
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.35); /* indigo-400 ring */
+}
+
+/* =========================
+   Textarea specifics
+   ========================= */
+
+.form-textarea {
+  resize: vertical;
+  min-height: 4rem;
+  line-height: 1.4;
+}
+
+/* =========================
+   Select specifics
+   ========================= */
+
+.form-select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6366f1 50%),
+    linear-gradient(135deg, #6366f1 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.25rem) calc(50% - 0.125rem),
+    calc(100% - 1rem) calc(50% - 0.125rem);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+}
+
+/* =========================
+   Disabled state
+   ========================= */
+
+.form-input:disabled,
+.form-textarea:disabled,
+.form-select:disabled {
+  background-color: #f8fafc; /* slate-50 */
+  color: #94a3b8;            /* slate-400 */
+  cursor: not-allowed;
+}
+
+/* =========================
+   Error state (optional)
+   ========================= */
+
+.form-input.is-invalid,
+.form-textarea.is-invalid,
+.form-select.is-invalid {
+  border-color: #f87171; /* red-400 */
+}
+
+.form-input.is-invalid:focus,
+.form-textarea.is-invalid:focus,
+.form-select.is-invalid:focus {
+  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.35);
+}
