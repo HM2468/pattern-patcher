@@ -4,7 +4,7 @@
 class ScanRun < ApplicationRecord
   belongs_to :lexical_pattern
   belongs_to :repository_snapshot
-  has_many :occurrences, dependent: :destroy
+  has_many :occurrences, dependent: :delete_all
   has_many :scan_run_files, dependent: :delete_all
 
   STATUSES   = %w[pending running finished failed finished_with_errors].freeze

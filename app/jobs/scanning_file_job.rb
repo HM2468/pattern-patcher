@@ -7,7 +7,7 @@
 # - Mark each ScanRunFile status as scanning/finished/failed.
 # - Write progress via ScanRun model (Rails.cache), without doing COUNT queries per file.
 #
-class ScaningFileJob < ApplicationJob
+class ScanningFileJob < ApplicationJob
   queue_as :scanning
 
   BATCH_SIZE = 500

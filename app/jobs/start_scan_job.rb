@@ -10,7 +10,7 @@ class StartScanJob < ApplicationJob
   # Responsibilities:
   # 1) Create ScanRunFile rows (join table) in batches.
   # 2) Write "persisting progress" into cache (via ScanRun model).
-  # 3) Enqueue ScaningFileJob right after persistence is done.
+  # 3) Enqueue ScanningFileJob right after persistence is done.
   #
   # @param scan_run_id [Integer]
   # @param repository_id [Integer]
@@ -27,7 +27,7 @@ class StartScanJob < ApplicationJob
         @repo.repository_files.where(id: ids)
       end
     persist_scan_run_files!
-    ScaningFileJob.perform_now(scan_run_id: @scan_run.id)
+    ScanningFileJob.perform_now(scan_run_id: @scan_run.id)
   end
 
   private
@@ -59,7 +59,7 @@ class StartScanJob < ApplicationJob
 
     end
 
-    # Mark persisting phase done; scanning continues in ScaningFileJob.
+    # Mark persisting phase done; scanning continues in ScanningFileJob.
     write_progress(total: total, done: created)
   rescue => e
     @scan_run.update(
