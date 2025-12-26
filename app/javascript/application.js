@@ -1,5 +1,8 @@
-//app/javascript/application.js
-// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
+// app/javascript/application.js
 import "@hotwired/turbo-rails"
+
+// Stimulus controllers auto-load
 import "controllers"
-import "lexical_pattern_test_page"
+
+// Load all global libs in one place
+import "lib/index"
