@@ -8,7 +8,7 @@ class ScanRun < ApplicationRecord
   has_many :scan_run_files, dependent: :delete_all
 
   STATUSES   = %w[pending running finished failed finished_with_errors].freeze
-  PHASES     = %w[building_files scanning_files].freeze
+  PHASES     = %w[preparing scanning].freeze
   SCAN_MODES = %w[line file].freeze
   CACHE_TTL = 1.day
   PROGRESS_COLOR = {

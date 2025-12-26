@@ -35,8 +35,7 @@ class StartScanJob < ApplicationJob
   def persist_scan_run_files!
     @scan_run.update!(status: "running", started_at: Time.current)
     total   = @files_scope.count
-    created = 0
-    write_progress(total: total, done: created)
+    write_progress(total: total)
     @files_scope.order(:id).in_batches(of: BATCH_SIZE) do |batch|
       batch_ids = batch.pluck(:id)
       next if batch_ids.empty?
@@ -54,20 +53,14 @@ class StartScanJob < ApplicationJob
 
       # Idempotent insert (unique index prevents duplicates)
       ScanRunFile.insert_all(rows, unique_by: SRF_UNIQUE_INDEX_NAME)
-      created += rows.size
-      write_progress(total: total, done: created)
-
     end
-
-    # Mark persisting phase done; scanning continues in ScanningFileJob.
-    write_progress(total: total, done: created)
   rescue => e
     @scan_run.update(
       status: "failed",
       error: e.message.to_s,
       finished_at: Time.current
     )
-    write_progress(total: 0, done: 0, error: e.message.to_s)
+    write_progress(total: 0, error: e.message.to_s)
     raise
   end
 
@@ -79,12 +72,12 @@ class StartScanJob < ApplicationJob
       .uniq
   end
 
-  def write_progress(total:, done:, error: nil)
+  def write_progress(total:, error: nil)
     @scan_run.write_progress(
       @scan_run.progress_payload(
         phase: ScanRun::PHASES[0],
         total: total,
-        done: done,
+        done: 0,
         failed: 0,
         error: error
       )
