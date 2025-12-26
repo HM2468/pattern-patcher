@@ -27,7 +27,9 @@
       = button_to "Delete",
         scan_run_path(scan_run),
         method: :delete,
-        form: { data: { turbo_confirm: "Delete this scan run and all related data?" } },
+        form: { class: "inline-flex" },
+        onclick: "return window.PopConfirmLog.open(event, this)",
+        data: { confirm_title: "Delete scan run", confirm_message: "Delete this scan run? This cannot be undone." },
         class: "button-danger"
 
   -# Progress header (phase + counters)
