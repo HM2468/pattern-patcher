@@ -1,1 +1,43 @@
-/* Application-wide styles */
+/* app/assets/stylesheets/application.css */
+/* =========================
+   Form error component
+   ========================= */
+
+.form-errors {
+  border: 1px solid #fecaca;   /* red-200 */
+  background-color: #fef2f2;   /* red-50 */
+  border-radius: 1rem;         /* rounded-2xl (16px) */
+  padding: 1rem;               /* p-4 */
+}
+
+.form-errors__title {
+  font-size: 0.875rem;         /* text-sm */
+  font-weight: 600;            /* font-semibold */
+  color: #991b1b;              /* red-800 */
+}
+
+.form-errors__list {
+  margin-top: 0.5rem;          /* mt-2 */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;                /* space-y-1 */
+  font-size: 0.875rem;         /* text-sm */
+  color: #b91c1c;              /* red-700 */
+  padding-left: 0;             /* 防止 ul 默认缩进 */
+  list-style: none;
+}
+
+.form-errors__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;                 /* gap-2 */
+}
+
+.form-errors__dot {
+  width: 0.375rem;             /* 6px */
+  height: 0.375rem;            /* 6px */
+  margin-top: 0.375rem;        /* mt-1.5 */
+  flex-shrink: 0;
+  border-radius: 9999px;       /* rounded-full */
+  background-color: #ef4444;   /* red-500 */
+}

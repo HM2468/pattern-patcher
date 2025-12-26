@@ -2,14 +2,14 @@
 
 = form_with(model: @lexical_pattern, class: "rounded-2xl bg-gray-50 p-4 shadow-sm", data: { turbo: false }) do |form|
   - if @lexical_pattern.errors.any?
-    %div{ class: "rounded-2xl border border-red-200 bg-red-50 p-4" }
-      %h3{ class: "text-sm font-semibold text-red-800" }
+    %div{ class: "form-errors" }
+      %h3{ class: "form-errors__title" }
         = pluralize(@lexical_pattern.errors.count, "error")
         prohibited this pattern from being saved:
-      %ul{ class: "mt-2 space-y-1 text-sm text-red-700" }
+      %ul{ class: "form-errors__list" }
         - @lexical_pattern.errors.each do |error|
-          %li{ class: "flex items-start gap-2" }
-            %span{ class: "h-1.5 w-1.5 mt-1.5 flex-shrink-0 rounded-full bg-red-500" }
+          %li{ class: "form-errors__item" }
+            %span{ class: "form-errors__dot" }
             %span= error.full_message
 
   %div{ class: "p-6" }
