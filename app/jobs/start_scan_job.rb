@@ -36,14 +36,7 @@ class StartScanJob < ApplicationJob
     @scan_run.update!(status: "running", started_at: Time.current)
     total   = @files_scope.count
     created = 0
-    @scan_run.write_persisting_progress(
-      @scan_run.persisting_payload(
-        status: "running",
-        total: total,
-        done: created
-      )
-    )
-
+    write_progress(total: total, done: created)
     @files_scope.order(:id).in_batches(of: BATCH_SIZE) do |batch|
       batch_ids = batch.pluck(:id)
       next if batch_ids.empty?
@@ -62,37 +55,19 @@ class StartScanJob < ApplicationJob
       # Idempotent insert (unique index prevents duplicates)
       ScanRunFile.insert_all(rows, unique_by: SRF_UNIQUE_INDEX_NAME)
       created += rows.size
-      @scan_run.write_persisting_progress(
-        @scan_run.persisting_payload(
-          status: "running",
-          total: total,
-          done: created
-        )
-      )
+      write_progress(total: total, done: created)
+
     end
 
     # Mark persisting phase done; scanning continues in ScaningFileJob.
-    @scan_run.write_persisting_progress(
-      @scan_run.persisting_payload(
-        status: "ready_to_scan",
-        total: total,
-        done: created
-      )
-    )
+    write_progress(total: total, done: created)
   rescue => e
     @scan_run.update(
       status: "failed",
       error: e.message.to_s,
       finished_at: Time.current
     )
-    @scan_run.write_persisting_progress(
-      @scan_run.persisting_payload(
-        status: "failed",
-        total: 0,
-        done: 0,
-        error: e.message.to_s
-      )
-    )
+    write_progress(total: 0, done: 0, error: e.message.to_s)
     raise
   end
 
@@ -102,5 +77,17 @@ class StartScanJob < ApplicationJob
       .reject(&:empty?)
       .map(&:to_i)
       .uniq
+  end
+
+  def write_progress(total:, done:, error: nil)
+    @scan_run.write_progress(
+      @scan_run.progress_payload(
+        phase: ScanRun::PHASES[0],
+        total: total,
+        done: done,
+        failed: 0,
+        error: error
+      )
+    )
   end
 end
