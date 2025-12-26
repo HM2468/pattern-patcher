@@ -1,3 +1,5 @@
+-# app/views/repositories/_form.html.haml
+
 = form_with(model: @repository, class: "space-y-6", data: { turbo: false }) do |form|
   - if @repository.errors.any?
     %div{ class: "rounded-2xl border border-red-200 bg-red-50 p-4" }
@@ -12,34 +14,46 @@
 
   %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm" }
     %div{ class: "space-y-4" }
+
+      / Name
       %div
         %label{ for: "repository_name", class: "block text-sm font-medium text-gray-700 mb-1" }
           Name
-        = form.text_field :name, id: "repository_name",
-          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+        = form.text_field :name,
+          id: "repository_name",
+          class: "form-input",
           placeholder: "My repo"
 
+      / Root path
       %div
         %label{ for: "repository_root_path", class: "block text-sm font-medium text-gray-700 mb-1" }
           Root Path
-        = form.text_field :root_path, id: "repository_root_path",
-          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+        = form.text_field :root_path,
+          id: "repository_root_path",
+          class: "form-input",
           placeholder: "/Users/you/projects/my_repo"
 
+      / Permitted extensions
       %div
         %label{ for: "repository_permitted_ext", class: "block text-sm font-medium text-gray-700 mb-1" }
           Permitted extensions (comma-separated)
-        = form.text_field :permitted_ext, id: "repository_permitted_ext",
-          class: "w-full rounded-xl border border-gray-300 px-4 py-2 text-sm focus:ring-2 focus:ring-gray-900 focus:border-transparent",
+        = form.text_field :permitted_ext,
+          id: "repository_permitted_ext",
+          class: "form-input",
           placeholder: "rb,haml,erb,js"
         %div{ class: "text-xs text-gray-600 mt-1" }
-          Example: <span class="font-mono">rb,haml</span> (no dots required; dots also accepted)
+          Example:
+          %span{ class: "font-mono" }
+            rb,haml
+          (no dots required; dots also accepted)
 
       = form.hidden_field :status, value: "active"
 
-  %div{ class: "flex items-center justify-end gap-4" }
-    - if new_action?
-      %a{ href: "javascript:history.back()", class: "button-secondary" } Back
+      / Actions
+      %div{ class: "flex items-center justify-end gap-4" }
+        - if new_action?
+          %a{ href: "javascript:history.back()", class: "button-secondary" }
+            Back
 
-    = form.submit "Save",
-      class: "button-primary"
+        = form.submit "Save",
+          class: "button-primary"

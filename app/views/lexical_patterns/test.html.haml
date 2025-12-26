@@ -1,30 +1,43 @@
 -# app/views/lexical_patterns/test.html.haml
-%div{ class: "max-w-5xl mx-auto p-6" }
-  %div{ class: "mb-4" }
-    %div{ class: "text-lg font-semibold" }= @lexical_pattern.name
-    %div{ class: "mt-2 font-mono text-xs bg-gray-50 border rounded p-3 break-all" }= @lexical_pattern.pattern
 
+%div{ class: "max-w-5xl mx-auto p-6" }
+  / Header
+  %div{ class: "mb-4" }
+    %div{ class: "text-lg font-semibold" }
+      = @lexical_pattern.name
+    %div{ class: "mt-2 font-mono text-xs bg-indigo-50 border border-indigo-100 rounded p-3 break-all" }
+      = @lexical_pattern.pattern
+
+  / Editor section
   %div{ class: "mt-6" }
-    %div{ class: "text-sm font-semibold mb-2" } Scan based on the pattern above line by line
+    %div{ class: "text-sm font-semibold mb-2" }
+      Scan based on the pattern above line by line
 
     -# Rich text input (contenteditable)
     %div#test_editor{
       contenteditable: "true",
-      class: "border rounded-lg p-3 h-[420px] overflow-auto bg-white whitespace-pre-wrap font-mono text-sm outline-none",
+      class: "form-editor h-[420px] overflow-auto whitespace-pre-wrap font-mono",
       data: { placeholder: "Paste your text here..." }
     }
 
+    / Status & error
     %div{ class: "mt-2 text-center" }
       %div#match_stat{ class: "text-sm text-gray-700 inline-block" }
       %div#scan_error{ class: "mt-1 text-sm text-red-700 hidden" }
 
+    / Actions
     %div{ class: "mt-4 flex items-center justify-between gap-2" }
       %div{ class: "flex items-center gap-2" }
-        %button#scan_btn{ type: "button", class: "button-primary" } Scan
-        %button#prev_btn{ type: "button", class: "button-secondary", disabled: true } Prev
-        %button#next_btn{ type: "button", class: "button-secondary", disabled: true } Next
+        %button#scan_btn{ type: "button", class: "button-primary" }
+          Scan
+        %button#prev_btn{ type: "button", class: "button-secondary", disabled: true }
+          Prev
+        %button#next_btn{ type: "button", class: "button-secondary", disabled: true }
+          Next
+
       %div{ class: "flex items-center gap-2" }
-        %a{ href: "javascript:history.back()", class: "button-secondary" } Back
+        %a{ href: "javascript:history.back()", class: "button-secondary" }
+          Back
 
 :javascript
   window.RegexTestPage = {
