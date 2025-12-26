@@ -1,0 +1,69 @@
+-# app/views/scan_runs/_scan_run.html.haml
+
+- repo_name = scan_run_repo_name(scan_run)
+- sha_short = scan_run_commit_sha_short(scan_run)
+- lp_name   = scan_run_lexical_pattern_name(scan_run)
+- occ_count = scan_run_occurrences_count(scan_run)
+- status    = scan_run_status(scan_run)
+- phase   = scan_run_progress_phase(progress)
+- total   = scan_run_progress_total(progress)
+- done    = scan_run_progress_done(progress)
+- failed  = scan_run_progress_failed(progress)
+- err_msg = scan_run_progress_error(progress)
+- pct       = scan_run_progress_percent(progress)
+- bar_class = scan_run_status_bar_class(status)
+
+%div{
+  id: "scan_run_#{scan_run.id}",
+  class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-3",
+  data: { scan_run_id: scan_run.id, scan_runs_target: "item" }
+}
+  %div{ class: "flex items-start justify-between gap-4" }
+    %div{ class: "min-w-0 space-y-1" }
+      %div{ class: "flex items-center gap-2 min-w-0" }
+        %div{ class: "font-semibold text-gray-900 truncate" }= repo_name
+        %div{ class: "text-gray-400" } ·
+        %div{ class: "font-mono text-sm text-gray-700" }= sha_short
+
+      %div{ class: "text-sm text-gray-700" }
+        %span{ class: "font-medium" } Pattern:
+        %span= lp_name
+
+      %div{ class: "text-sm text-gray-700" }
+        %span{ class: "font-medium" } Occurrences:
+        %span{ class: "font-mono" }= occ_count
+
+    %div{ class: "flex items-center gap-2 flex-shrink-0" }
+      = button_to "Delete",
+        scan_run_path(scan_run),
+        method: :delete,
+        form: { data: { turbo_confirm: "Delete this scan run and all related data?" } },
+        class: "button-danger"
+
+  -# Progress header (phase + counters)
+  %div{ class: "flex items-center justify-between text-xs text-gray-600" }
+    %div
+      %span{ class: "font-medium" } Phase:
+      %span{ class: "font-mono", data: { scan_runs_target: "phase" } }= phase
+    %div{ class: "font-mono" }
+      %span{ data: { scan_runs_target: "done" } }= done
+      %span /
+      %span{ data: { scan_runs_target: "total" } }= total
+      %span{ class: "text-gray-400" } (failed:
+      %span{ data: { scan_runs_target: "failed" } }= failed
+      %span{ class: "text-gray-400" } )
+
+  -# Progress bar
+  %div{ class: "w-full h-3 rounded-full bg-gray-200 overflow-hidden" }
+    %div{
+      class: "h-3 #{bar_class}",
+      style: "width: #{pct}%",
+      data: { scan_runs_target: "bar" }
+    }
+
+  -# Optional error message (only when present)
+  - if err_msg.present?
+    %div{ class: "text-sm text-red-700", data: { scan_runs_target: "error" } }
+      = err_msg
+  - else
+    %div{ class: "text-sm text-red-700 hidden", data: { scan_runs_target: "error" } }

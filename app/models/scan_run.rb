@@ -39,8 +39,13 @@ class ScanRun < ApplicationRecord
   end
 
   # Persist/read progress (Rails.cache)
+# app/models/scan_run.rb
   def write_progress(payload, expires_in: CACHE_TTL)
     Rails.cache.write(progress_key, payload, expires_in: expires_in)
+    ActionCable.server.broadcast(
+      "scan_runs",
+      { id: id, payload: payload }
+    )
     true
   rescue => e
     Rails.logger&.warn("[ScanRun] cache write failed key=#{progress_key}: #{e.class}: #{e.message}")

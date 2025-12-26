@@ -77,7 +77,7 @@ Rails.application.routes.draw do
   # - Multiple lexeme records (deduplicated by fingerprint)
   # - Multiple occurrence records (per match)
   # ------------------------------------------------------------
-  resources :scan_runs, only: [:index, :create]
+  resources :scan_runs, only: [:index, :create, :destroy]
 
   # ------------------------------------------------------------
   # Occurrence review & replacement

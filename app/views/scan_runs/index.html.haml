@@ -1,3 +1,21 @@
-%div
-  %h1.font-bold.text-4xl ScanRuns#index
-  %p Find me in app/views/scan_runs/index.html.haml
+-# app/views/scan_runs/index.html.haml
+
+%div{ class: "max-w-6xl mx-auto p-6 space-y-4" }
+  %div{ class: "flex items-center justify-between" }
+    %div{ class: "text-lg font-semibold" } Scan Runs
+    %div{ class: "text-sm text-gray-600" }
+      Total:
+      %span{ class: "font-mono" }= @scan_runs.total_count
+
+  %div{
+    data: {
+      controller: "scan-runs",
+      scan_runs_channel_value: "ScanRunsChannel"
+    }
+  }
+
+  %div{ class: "space-y-3" }
+    - @scan_runs.each do |sr|
+      = render partial: "scan_run", locals: { scan_run: sr, progress: @progress_by_id[sr.id] }
+
+  = render "shared/pagination", collection: @scan_runs
