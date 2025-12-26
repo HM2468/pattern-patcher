@@ -71,7 +71,14 @@ class ScanRunsController < ApplicationController
 
   def destroy
     scan_run = ScanRun.find(params[:id])
-    scan_run.destroy!
-    redirect_to scan_runs_path, notice: "Scan run deleted."
+    scan_run_id = scan_run.id
+    if scan_run.destroy!
+      flash[:success] = "Scan run deleted."
+      CleanupScanRunJob.perform_later(scan_run_id: scan_run_id)
+      redirect_to scan_runs_path
+    else
+      flash[:error] = scan_run.errors.full_messages.join(", ")
+      redirect_to scan_runs_path
+    end
   end
 end
