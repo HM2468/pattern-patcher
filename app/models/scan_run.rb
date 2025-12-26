@@ -43,7 +43,6 @@ class ScanRun < ApplicationRecord
   end
 
   # Persist/read progress (Rails.cache)
-# app/models/scan_run.rb
   def write_progress(payload, expires_in: CACHE_TTL)
     Rails.cache.write(progress_key, payload, expires_in: expires_in)
     ActionCable.server.broadcast(
