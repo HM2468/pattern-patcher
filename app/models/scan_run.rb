@@ -10,23 +10,20 @@ class ScanRun < ApplicationRecord
   STATUSES   = %w[pending running finished failed finished_with_errors].freeze
   PHASES     = %w[building_files scanning_files].freeze
   SCAN_MODES = %w[line file].freeze
+  CACHE_TTL = 1.day
+  PROGRESS_COLOR = {
+    "pending" => "bg-indigo-500",
+    "running" => "bg-emerald-500",
+    "finished" => "bg-emerald-500",
+    "failed" => "bg-red-500",
+    "finished_with_errors" => "bg-red-500"
+  }
 
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :scan_mode, presence: true, inclusion: { in: SCAN_MODES }
-
   scope :latest,   -> { order(created_at: :desc) }
   scope :finished, -> { where(status: "finished") }
-
   before_validation :default_status, on: :create
-
-  CACHE_TTL = 1.day
-  PROGRESS_COLOR = {
-    "pending" => "",
-    "running" => "bg-emerald-500",
-    "finished" => "bg-emerald-500",
-    "failed" => "",
-    "finished_with_errors" => "",
-  }
 
   # Single cache key for "latest progress" (phase is stored in payload)
   def progress_key

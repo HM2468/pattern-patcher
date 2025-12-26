@@ -15,7 +15,7 @@ module ScanRunsHelper
       sha_short: scan_run.commit_sha.to_s[0, sha_length],
       lp_name:   scan_run.lexical_pattern_name,
       occ_count: scan_run.occurrences_count.to_i,
-      bar_class: status_bar_class(status)
+      bar_class: ScanRun::PROGRESS_COLOR[status]
     }
   end
 
@@ -54,16 +54,5 @@ module ScanRunsHelper
   def fetch(obj, key)
     return nil if obj.blank?
     obj[key] || obj[key.to_s]
-  end
-
-  def status_bar_class(status)
-    case status.to_s
-    when "pending"              then "bg-gray-300"
-    when "running"              then "bg-indigo-500"
-    when "finished"             then "bg-emerald-500"
-    when "failed"               then "bg-red-500"
-    when "finished_with_errors" then "bg-amber-500"
-    else "bg-gray-300"
-    end
   end
 end
