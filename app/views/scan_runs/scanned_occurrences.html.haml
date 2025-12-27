@@ -3,12 +3,25 @@
 %div{ class: "max-w-6xl mx-auto p-6 space-y-4" }
   %div{ class: "flex items-center justify-between" }
     %div
-      %div{ class: "text-lg font-semibold" } Scanned Occurrences
+      %div{ class: "text-lg font-semibold" } Scan Matches
       %div{ class: "text-sm text-gray-600" }
         ScanRun:
         %span{ class: "font-mono" }= @scan_run.id
     %div{ class: "flex items-center gap-2" }
       = link_to "Back", scan_runs_path, class: "button-secondary"
+
+  - if @occurrences.blank?
+    %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No matches found.
+  - else
+    %div{ class: "space-y-4" }
+      - @occurrences.each do |occ|
+        %div{ class: "pp-diff" }
+          %div{ class: "pp-file-head" }= occ.repository_file&.path.to_s
+          %div{ class: "pp-row" }
+            %div{ class: "pp-lno" }= occ.line_at
+            %div{ class: "pp-code" }= occ.highlighted_origin_context.html_safe
+
+  = render "shared/pagination", collection: @occurrences
 
   :css
     /* container like GitHub diff block */
@@ -22,7 +35,7 @@
     .pp-file-head {
       background: rgb(246, 248, 250);
       border-bottom: 1px solid rgb(208, 215, 222);
-      padding: 6px 10px;
+      padding: 3px 10px;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       color: rgb(31, 35, 40);
@@ -31,7 +44,7 @@
     .pp-row {
       display: grid;
       grid-template-columns: 30px 1fr;
-      align-items: stretch; /* make both cells same height */
+      align-items: stretch;
       border-top: 1px solid rgb(240, 246, 252);
     }
     .pp-row:first-child { border-top: none; }
@@ -41,7 +54,7 @@
       color: rgb(99, 110, 123);
       text-align: right;
 
-      padding: 0 6px;
+      padding: 6px 6px;
       display: flex;
       align-items: center;
 
@@ -53,45 +66,34 @@
       border-right: 1px solid rgb(208, 215, 222);
     }
 
-    /* "added line" vibe */
+    /* code cell: no wrapping, scroll horizontally when too long */
     .pp-code {
       background: rgb(230, 255, 237);
       color: rgb(31, 35, 40);
 
-      padding: 0 10px;
-      display: flex;
-      align-items: center;
+      padding: 6px 10px;
+
+      display: block;
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: pre;
+      word-break: normal;
 
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
       line-height: 16px;
 
-      white-space: pre-wrap;
-      word-break: break-word;
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* highlight span inside pp-code (same baseline/line-height, deeper bg) */
+    /* highlight span inside pp-code */
     .ppmatchhi {
-      display: inline;              /* keep inline flow */
-      line-height: inherit;         /* same as .pp-code (16px) */
-      background: rgb(172, 242, 190); /* deeper than pp-code */
+      display: inline;
+      line-height: inherit;
+      background: rgb(172, 242, 190);
       color: rgb(0, 0, 0);
       border-radius: 4px;
       padding: 0 2px;
-      box-decoration-break: clone;  /* nicer if wraps */
+      box-decoration-break: clone;
       -webkit-box-decoration-break: clone;
     }
-
-  - if @occurrences.blank?
-    %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No occurrences found.
-  - else
-    %div{ class: "space-y-4" }
-      - @occurrences.each do |occ|
-        %div{ class: "pp-diff" }
-          %div{ class: "pp-file-head" }= occ.repository_file&.path.to_s
-
-          %div{ class: "pp-row" }
-            %div{ class: "pp-lno" }= occ.line_at
-            %div{ class: "pp-code" }= occ.highlighted_origin_context.html_safe
-
-    = render "shared/pagination", collection: @occurrences
