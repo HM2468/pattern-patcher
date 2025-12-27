@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_27_070805) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_27_080837) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -180,6 +180,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_27_070805) do
     t.datetime "updated_at", null: false
     t.integer "repository_snapshot_id", null: false
     t.string "scan_mode", default: "line", null: false
+    t.jsonb "progress_persisted", default: {}, null: false
     t.index ["lexical_pattern_id"], name: "index_scan_runs_on_lexical_pattern_id"
     t.index ["repository_snapshot_id"], name: "index_scan_runs_on_repository_snapshot_id"
     t.index ["scan_mode"], name: "index_scan_runs_on_scan_mode"
