@@ -1,6 +1,5 @@
 -# app/views/scan_runs/scanned_occurrences.html.haml
 
--# --- inline helper: escape + highlight matched_text inside context (supports multiple matches) ---
 %div{ class: "max-w-6xl mx-auto p-6 space-y-4" }
   %div{ class: "flex items-center justify-between" }
     %div
@@ -11,7 +10,6 @@
     %div{ class: "flex items-center gap-2" }
       = link_to "Back", scan_runs_path, class: "button-secondary"
 
-  -# --- GitHub-ish line styles (inline, no extra CSS file needed) ---
   :css
     /* container like GitHub diff block */
     .pp-diff {
@@ -20,6 +18,7 @@
       overflow: hidden;
       background: #fff;
     }
+
     .pp-file-head {
       background: rgb(246, 248, 250);
       border-bottom: 1px solid rgb(208, 215, 222);
@@ -28,39 +27,40 @@
       font-size: 12px;
       color: rgb(31, 35, 40);
     }
+
     .pp-row {
       display: grid;
       grid-template-columns: 30px 1fr;
-      align-items: center; /* ⭐ 关键：垂直居中 */
+      align-items: stretch; /* make both cells same height */
       border-top: 1px solid rgb(240, 246, 252);
     }
     .pp-row:first-child { border-top: none; }
+
     .pp-lno {
       background: rgb(240, 246, 252);
       color: rgb(99, 110, 123);
       text-align: right;
 
-      padding: 0 6px;           /* 只留左右 padding */
-      height: 100%;
+      padding: 0 6px;
       display: flex;
-      align-items: center;      /* ⭐ 行号垂直居中 */
+      align-items: center;
 
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
-      line-height: 16px;        /* 不要压到 12px */
+      line-height: 16px;
       user-select: none;
 
       border-right: 1px solid rgb(208, 215, 222);
     }
+
     /* "added line" vibe */
     .pp-code {
       background: rgb(230, 255, 237);
       color: rgb(31, 35, 40);
 
-      padding: 0 10px;          /* 只留左右 padding */
-      min-height: 16px;
+      padding: 0 10px;
       display: flex;
-      align-items: center;      /* ⭐ 内容垂直居中 */
+      align-items: center;
 
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
@@ -69,12 +69,17 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
-    /* highlight matched_text inside the line */
-    .pp-match-hi {
-      background: rgb(172, 242, 190); /* stronger green */
+
+    /* highlight span inside pp-code (same baseline/line-height, deeper bg) */
+    .ppmatchhi {
+      display: inline;              /* keep inline flow */
+      line-height: inherit;         /* same as .pp-code (16px) */
+      background: rgb(172, 242, 190); /* deeper than pp-code */
       color: rgb(0, 0, 0);
       border-radius: 4px;
       padding: 0 2px;
+      box-decoration-break: clone;  /* nicer if wraps */
+      -webkit-box-decoration-break: clone;
     }
 
   - if @occurrences.blank?
@@ -83,13 +88,10 @@
     %div{ class: "space-y-4" }
       - @occurrences.each do |occ|
         %div{ class: "pp-diff" }
-          %div{ class: "pp-file-head" }
-            = occ.repository_file&.path.to_s
+          %div{ class: "pp-file-head" }= occ.repository_file&.path.to_s
 
-          -# Only show the matched line (context is full line)
           %div{ class: "pp-row" }
             %div{ class: "pp-lno" }= occ.line_at
-            %div{ class: "pp-code" }
-              = occ.highlighted_origin_context.html_safe
+            %div{ class: "pp-code" }= occ.highlighted_origin_context.html_safe
 
     = render "shared/pagination", collection: @occurrences
