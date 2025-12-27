@@ -2,6 +2,8 @@
 class ScanRunsController < ApplicationController
   include ScanRunsHelper
 
+  before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
+
   def index
     @scan_runs =
       ScanRun
@@ -53,14 +55,14 @@ class ScanRunsController < ApplicationController
         scan_mode: scan_pattern.mode,
         status: "pending",
         started_at: Time.current,
-        pattern_snapshot: scan_pattern.pattern
+        pattern_snapshot: scan_pattern.pattern,
       )
     if @scan_run.save
       flash[:success] = "Scan created and started."
       StartScanJob.perform_later(
         scan_run_id: @scan_run.id,
         repository_id: @repository.id,
-        file_ids: file_ids
+        file_ids: file_ids,
       )
       redirect_to(scan_runs_path(repository_id: @repository.id))
     else
@@ -70,14 +72,32 @@ class ScanRunsController < ApplicationController
   end
 
   def destroy
-    scan_run = ScanRun.find(params[:id])
-    scan_run_id = scan_run.id
-    if scan_run.destroy!
+    @scan_run = ScanRun.find(params[:id])
+    @scan_run.id
+    if @scan_run.destroy!
       flash[:success] = "Scan run deleted."
       redirect_to scan_runs_path
     else
-      flash[:error] = scan_run.errors.full_messages.join(", ")
+      flash[:error] = @scan_run.errors.full_messages.join(", ")
       redirect_to scan_runs_path
     end
+  end
+
+  def scanned_occurrences
+    @occurrences = @scan_run.occurrences.includes(:repository_file)
+      .page(params[:page])
+      .per(10)
+  end
+
+  def scanned_files
+    @scan_run_files = @scan_run.scan_run_files.includes(:repository_file)
+      .page(params[:page])
+      .per(10)
+  end
+
+  private
+
+  def set_scan_run
+    @scan_run = ScanRun.find(params[:id])
   end
 end

@@ -42,7 +42,13 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :scan_runs, only: [:index, :create, :destroy]
+  resources :scan_runs, only: [:index, :create, :destroy] do
+    member do
+      get :sccanned_occurrences
+      get :scanned_files
+    end
+  end
+
   resources :replacement_targets, only: [:index, :show, :edit, :update]
   resources :lexeme_processings, only: [:index, :show]
   resources :replacement_actions, only: [:index, :show]
