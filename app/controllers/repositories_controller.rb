@@ -68,7 +68,6 @@ class RepositoriesController < ApplicationController
 
   def destroy
     if @repository.destroy
-      RepositoryCleanJob.perform_later(@repository.id)
       flash[:success] = "Repository deleted successfully. Cleaning up associated files."
       redirect_to repositories_path
     else

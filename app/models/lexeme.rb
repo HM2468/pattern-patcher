@@ -1,8 +1,8 @@
 # app/models/lexeme.rb
 class Lexeme < ApplicationRecord
-  has_many :occurrences, dependent: :restrict_with_error
-  has_many :lexeme_processings, dependent: :destroy
-  has_many :replacement_targets, dependent: :destroy
+  has_many :occurrences, dependent: :delete_all
+  has_many :lexeme_processings, dependent: :delete_all
+  has_many :replacement_targets, dependent: :delete_all
 
   validates :source_text, presence: true
   validates :normalized_text, presence: true

@@ -24,6 +24,7 @@ class ScanRun < ApplicationRecord
   scope :latest,   -> { order(created_at: :desc) }
   scope :finished, -> { where(status: "finished") }
   before_validation :default_status, on: :create
+  after_destroy :cleanup_lexemes
 
   # Single cache key for "latest progress" (phase is stored in payload)
   def progress_key
@@ -66,5 +67,9 @@ class ScanRun < ApplicationRecord
 
   def default_status
     self.status ||= "pending"
+  end
+
+  def cleanup_lexemes
+    Lexeme.left_joins(:occurrences).where(occurrences: { id: nil }).delete_all
   end
 end
