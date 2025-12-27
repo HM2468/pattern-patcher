@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   root "dashboard#index"
 
   # Health check endpoint
-  get "up" => "rails/health#show", as: :rails_health_check
+  get "up" => "rails/health#show", :as => :rails_health_check
 
   # Sidekiq Web UI
   require "sidekiq/web"
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :occurrences, only: [:index, :show] do
+  resources :occurrences, only: %i[index show] do
     member do
       post :apply
       post :reject
@@ -36,21 +36,21 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :lexemes, only: [:index, :show] do
+  resources :lexemes, only: %i[index show] do
     collection do
       post :process_unprocessed
     end
   end
 
-  resources :scan_runs, only: [:index, :create, :destroy] do
+  resources :scan_runs, only: %i[index create destroy] do
     member do
       get :sccanned_occurrences
       get :scanned_files
     end
   end
 
-  resources :replacement_targets, only: [:index, :show, :edit, :update]
-  resources :lexeme_processings, only: [:index, :show]
-  resources :replacement_actions, only: [:index, :show]
-  resources :settings, only: [:index, :edit, :update, :destroy]
+  resources :replacement_targets, only: %i[index show edit update]
+  resources :lexeme_processings, only: %i[index show]
+  resources :replacement_actions, only: %i[index show]
+  resources :settings, only: %i[index edit update destroy]
 end
