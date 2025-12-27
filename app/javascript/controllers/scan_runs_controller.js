@@ -1,3 +1,4 @@
+// app/javascript/controllers/scan_runs_controller.js
 import { Controller } from "@hotwired/stimulus"
 import consumer from "channels/consumer"
 

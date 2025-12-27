@@ -14,18 +14,18 @@ class FileScanService
     @git_cli      = @repository.git_cli
     @file_content = @git_cli.read_file(@repo_file.blob_sha).to_s
     @regex        = @pattern.compiled_regex
-
+    @occ_created  = 0
     return 0 if @file_content.empty?
 
     # Pre-split lines for context building (keeps \n)
     @lines = @file_content.lines
-
     case @scan_run.scan_mode.to_s
     when "file"
       scan_whole_file!
     else
       scan_by_line!
     end
+    @occ_created
   end
 
   private
@@ -34,8 +34,6 @@ class FileScanService
   # Scan modes
   # Line mode: fast, simple offsets, but cannot match cross-line patterns
   def scan_by_line!
-    occurrences_created = 0
-
     byte_base = 0 # byte offset at the start of current line in the full file
     @lines.each_with_index do |line, idx|
       line_no = idx + 1
@@ -50,16 +48,12 @@ class FileScanService
 
         start_char = m.begin(0)
         end_char   = m.end(0) # exclusive
-
         # Convert char offsets -> byte offsets (exclusive end)
         start_byte_in_line = char_index_to_byte_index(line, start_char)
         end_byte_in_line   = char_index_to_byte_index(line, end_char)
-
         byte_start = byte_base + start_byte_in_line
         byte_end   = byte_base + end_byte_in_line
-
         lexeme = find_or_create_lexeme_from_raw!(raw)
-
         Occurrence.create!(
           scan_run_id: @scan_run.id,
           lexeme_id: lexeme.id,
@@ -73,20 +67,14 @@ class FileScanService
           matched_text: raw,
           status: "unreviewed"
         )
-
-        occurrences_created += 1
+        @occ_created += 1
       end
-
       byte_base += line.bytesize
     end
-
-    occurrences_created
   end
 
   # File mode: supports cross-line matching. Offsets are based on full file.
   def scan_whole_file!
-    occurrences_created = 0
-
     @file_content.to_enum(:scan, @regex).each do
       m = Regexp.last_match
       next unless m
@@ -100,11 +88,8 @@ class FileScanService
       # Byte offsets in whole file
       byte_start = char_index_to_byte_index(@file_content, start_char)
       byte_end   = char_index_to_byte_index(@file_content, end_char)
-
       line_no, line_char_start, line_char_end = locate_line_and_char(@file_content, start_char, end_char)
-
       lexeme = find_or_create_lexeme_from_raw!(raw)
-
       Occurrence.create!(
         scan_run_id: @scan_run.id,
         lexeme_id: lexeme.id,
@@ -118,11 +103,8 @@ class FileScanService
         matched_text: raw,
         status: "unreviewed"
       )
-
-      occurrences_created += 1
+      @occ_created += 1
     end
-
-    occurrences_created
   end
 
 

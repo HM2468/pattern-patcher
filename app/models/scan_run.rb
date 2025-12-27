@@ -32,11 +32,12 @@ class ScanRun < ApplicationRecord
   end
 
   # Schema: {phase,total,done,failed,(optional)error}
-  def progress_payload(phase:, total:, done: 0, failed: 0, error: nil)
+  def progress_payload(phase:, total:, done: 0, occ_count: 0, failed: 0, error: nil)
     payload = {
       phase: phase.to_s,
       total: total.to_i,
       done: done.to_i,
+      occ_count: occ_count.to_i,
       failed: failed.to_i
     }
     payload[:error] = error.to_s if error.present?
