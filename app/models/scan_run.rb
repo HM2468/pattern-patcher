@@ -58,10 +58,10 @@ class ScanRun < ApplicationRecord
   end
 
   def read_progress
-    Rails.cache.read(progress_key)
+    Rails.cache.read(progress_key) || progress_persisted
   rescue => e
     Rails.logger&.warn("[ScanRun] cache read failed key=#{progress_key}: #{e.class}: #{e.message}")
-    nil
+    progress_persisted
   end
 
   private

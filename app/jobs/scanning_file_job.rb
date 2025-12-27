@@ -59,6 +59,7 @@ class ScanningFileJob < ApplicationJob
   # Work
   # @return [Array(Boolean, Integer)] [ok, occ_count]
   def process_one_scan_file!(scan_file)
+    occ_count = 0
     scan_file.update!(status: "scanning")
     repo_file = scan_file.repository_file
     raise "RepositoryFile missing for scan_run_file=#{scan_file.id}" unless repo_file
@@ -78,47 +79,36 @@ class ScanningFileJob < ApplicationJob
   end
 
   def write_progress(error: nil)
-    payload =
-      @scan_run.progress_payload(
-        phase: ScanRun::PHASES[1],
-        total: @total.to_i,
-        done: @done.to_i,
-        failed: @failed.to_i,
-        occ_count: @occ_count.to_i,
-        error: error
-      )
+    payload = init_progress_payload(error: error)
     @scan_run.write_progress(payload)
   end
 
   def finalize!
     final_status = @failed.to_i.positive? ? "finished_with_errors" : "finished"
-    @scan_run.update!(status: final_status, finished_at: Time.current)
+    @scan_run.update!(status: final_status, finished_at: Time.current, progress_persisted: init_progress_payload)
     write_progress
   end
 
   def fail_run!(error)
     return unless defined?(@scan_run) && @scan_run
-
+    payload = init_progress_payload(error: error)
     @scan_run.update(
       status: "failed",
       error: error.message.to_s,
-      finished_at: Time.current
+      finished_at: Time.current,
+      progress_persisted: payload
     ) rescue nil
+    @scan_run.write_progress(payload)
+  end
 
-    begin
-      total = pending_scope.count
-      payload =
-        @scan_run.progress_payload(
-          phase: ScanRun::PHASES[1],
-          total: total,
-          done: 0,
-          failed: 0,
-          occ_count: 0,
-          error: error.message.to_s
-        )
-      @scan_run.write_progress(payload)
-    rescue
-      nil
-    end
+  def init_progress_payload(error: nil)
+    @scan_run.progress_payload(
+      phase: ScanRun::PHASES[1],
+      total: @total.to_i,
+      done: @done.to_i,
+      failed: @failed.to_i,
+      occ_count: @occ_count.to_i,
+      error: error
+    )
   end
 end
