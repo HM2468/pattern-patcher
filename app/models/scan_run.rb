@@ -10,7 +10,7 @@ class ScanRun < ApplicationRecord
   STATUSES   = %w[pending running finished failed finished_with_errors].freeze
   PHASES     = %w[preparing scanning].freeze
   SCAN_MODES = %w[line file].freeze
-  CACHE_TTL = 1.day
+  CACHE_TTL = 1.hour
   PROGRESS_COLOR = {
     "pending" => "bg-indigo-500",
     "running" => "bg-emerald-500",
