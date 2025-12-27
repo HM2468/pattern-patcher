@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_25_095059) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_27_070805) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,9 +74,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_25_095059) do
     t.integer "byte_start"
     t.integer "byte_end"
     t.text "context"
+    t.string "match_fingerprint", null: false
     t.index ["lexeme_id", "status"], name: "index_occurrences_on_lexeme_id_and_status"
     t.index ["lexeme_id"], name: "index_occurrences_on_lexeme_id"
     t.index ["lexical_pattern_id"], name: "index_occurrences_on_lexical_pattern_id"
+    t.index ["match_fingerprint"], name: "index_occurrences_on_match_fingerprint", unique: true
     t.index ["repository_file_id", "line_at"], name: "index_occurrences_on_repository_file_id_and_line_at"
     t.index ["repository_file_id"], name: "index_occurrences_on_repository_file_id"
     t.index ["scan_run_id"], name: "index_occurrences_on_scan_run_id"
