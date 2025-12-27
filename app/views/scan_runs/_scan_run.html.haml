@@ -34,18 +34,17 @@
         data: { confirm_title: "Delete scan run", confirm_message: "Delete this scan run? This cannot be undone." },
         class: "button-danger"
 
-  -# Progress header (phase + counters)
+  -# Progress header (phase + counters) — phase left, counters right, tightly aligned
   %div{ class: "flex items-center justify-between text-xs text-gray-600" }
-    %div
-      %span{ class: "font-medium" } Phase:
-      %span{ class: "font-mono", data: { scan_runs_target: "phase" } }= p[:phase]
-    %div{ class: "font-mono" }
-      %span{ data: { scan_runs_target: "done" } }= p[:done]
-      %span /
-      %span{ data: { scan_runs_target: "total" } }= p[:total]
-      %span{ class: "text-gray-400" } (failed:
-      %span{ data: { scan_runs_target: "failed" } }= p[:failed]
-      %span{ class: "text-gray-400" } )
+    %div{ class: "flex items-center gap-2" }
+      %div{ class: "font-medium", data: { scan_runs_target: "phase" } }= p[:phase]
+      %div{ class: "font-mono" }
+        %span{ data: { scan_runs_target: "done" } }= p[:done]
+        %span /
+        %span{ data: { scan_runs_target: "total" } }= p[:total]
+        %span{ class: "text-gray-400" } (failed:
+        %span{ data: { scan_runs_target: "failed" } }= p[:failed]
+        %span{ class: "text-gray-400" } )
 
   -# Progress bar
   %div{ class: "w-full h-3 rounded-full bg-gray-200 overflow-hidden" }
