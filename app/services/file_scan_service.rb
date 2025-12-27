@@ -9,88 +9,95 @@ class FileScanService
   end
 
   def execute
-    @git_cli      = @repository.git_cli
-    @file_content = @git_cli.read_file(@repo_file.blob_sha).to_s
-    @regex        = @pattern.compiled_regex
-    @occ_created  = 0
-    return 0 if @file_content.empty?
+    @git_cli = @repository.git_cli
+    raw_content = @git_cli.read_file(@repo_file.blob_sha).to_s
+    return 0 if raw_content.empty?
 
-    # Pre-split lines for context building (keeps \n)
-    @lines = @file_content.lines
+    # Normalize + build mapping helpers (file-level)
+    @mapper = Support::FileByteOffsets.build(raw_content)
+    @content = @mapper.content
+    @lines   = @mapper.lines
+
+    @regex = @pattern.compiled_regex
+    @occ_created = 0
+
     if @scan_run.scan_mode.to_s == "file"
       scan_whole_file!
     else
       scan_by_line!
     end
+
     @occ_created
   end
 
   private
+
+
   # Scan modes
-  # Line mode: fast, simple offsets, but cannot match cross-line patterns
-  # Uniq: scan_run_id + lexeme_id + repository_file_id + line_at + line_char_start
+  # Line mode:
+  # - MatchData begin/end are line-local char indices
+  # - Convert to file-level char indices via accumulating file_char_base
+  # - Then use @mapper.char_to_byte(file_char_idx) to get file-level byte offsets
   def scan_by_line!
-    byte_base = 0 # byte offset at the start of current line in the full file
+    file_char_base = 0
     @lines.each_with_index do |line, idx|
       line_no = idx + 1
-
       line.to_enum(:scan, @regex).each do
         m = Regexp.last_match
         next unless m
 
-        raw = m[0].to_s
-        next if raw.empty?
+        matched_text = m[0].to_s
+        next if matched_text.empty?
 
-        start_char = m.begin(0)
-        end_char   = m.end(0) # exclusive
+        line_char_start = m.begin(0)
+        line_char_end   = m.end(0) # exclusive
+        file_char_start = file_char_base + line_char_start
+        file_char_end   = file_char_base + line_char_end
+        byte_start = @mapper.char_to_byte(file_char_start)
+        byte_end   = @mapper.char_to_byte(file_char_end)
 
-        start_byte_in_line = char_index_to_byte_index(line, start_char)
-        end_byte_in_line   = char_index_to_byte_index(line, end_char)
-        byte_start = byte_base + start_byte_in_line
-        byte_end   = byte_base + end_byte_in_line
-
-        lexeme = find_or_create_lexeme_from_raw!(raw)
-
+        lexeme = find_or_create_lexeme_from_raw!(matched_text)
         create_occurrence!(
           lexeme: lexeme,
-          matched_text: raw,
+          matched_text: matched_text,
           line_at: line_no,
-          line_char_start: start_char,
-          line_char_end: end_char,
+          line_char_start: line_char_start,
+          line_char_end: line_char_end,
           byte_start: byte_start,
           byte_end: byte_end,
           context: line
         )
       end
 
-      byte_base += line.bytesize
+      # IMPORTANT: advance by char count (not bytes)
+      file_char_base += line.each_char.count
     end
   end
 
-  # File mode: supports cross-line matching. Offsets are based on full file.
-  # Uniq: lexeme_id + repository_file_id + line_at + line_char_start + byte_start
+  # File mode:
+  # - MatchData begin/end are file-level char indices
+  # - Use mapper for both line locate and byte offsets
   def scan_whole_file!
-    @file_content.to_enum(:scan, @regex).each do
+    @content.to_enum(:scan, @regex).each do
       m = Regexp.last_match
       next unless m
 
-      raw = m[0].to_s
-      next if raw.empty?
+      matched_text = m[0].to_s
+      next if matched_text.empty?
 
       start_char = m.begin(0)
       end_char   = m.end(0) # exclusive
-      byte_start = char_index_to_byte_index(@file_content, start_char)
-      byte_end   = char_index_to_byte_index(@file_content, end_char)
+      byte_start = @mapper.char_to_byte(start_char)
+      byte_end   = @mapper.char_to_byte(end_char)
+      line_at, line_char_start, line_char_end =
+        @mapper.locate_line_and_char(start_char, end_char)
+      context = @mapper.line_text(line_at)
+      lexeme = find_or_create_lexeme_from_raw!(matched_text)
 
-      line_no, line_char_start, line_char_end =
-        locate_line_and_char(@file_content, start_char, end_char)
-
-      lexeme = find_or_create_lexeme_from_raw!(raw)
-      context = @lines[line_no - 1].to_s
       create_occurrence!(
         lexeme: lexeme,
-        matched_text: raw,
-        line_at: line_no,
+        matched_text: matched_text,
+        line_at: line_at,
         line_char_start: line_char_start,
         line_char_end: line_char_end,
         byte_start: byte_start,
@@ -100,7 +107,12 @@ class FileScanService
     end
   end
 
-  # Occurrence create (dedupe)
+
+  # Occurrence create (dedupe by match_fingerprint)
+  # Global unique:
+  # match_fingerprint = sha_digest("#{repository_file_id}:#{byte_start}:#{byte_end}:#{lexeme_id}")
+  # NOTE: 你现在的 occurrences 仍然包含 scan_run_id NOT NULL，所以这里必须写 scan_run_id。
+  # 如果你后续真的要移除 occurrences.scan_run_id，那就把 scan_run_id 移到 observation 表去。
   def create_occurrence!(
     lexeme:,
     matched_text:,
@@ -111,30 +123,73 @@ class FileScanService
     byte_end:,
     context:
   )
-    uniq_attrs = {
-      lexeme_id: lexeme.id,
-      repository_file_id: @repo_file.id,
-      line_at: line_at,
-      line_char_start: line_char_start
-    }
+    fp_source = "#{@repo_file.id}:#{byte_start}:#{byte_end}:#{lexeme.id}"
+    fingerprint = Lexeme.sha_digest(fp_source)
+
     occ =
-      Occurrence.find_or_initialize_by(uniq_attrs) do |o|
-        o.lexical_pattern_id = @pattern.id
+      Occurrence.find_or_initialize_by(match_fingerprint: fingerprint) do |o|
         o.scan_run_id        = @scan_run.id
-        o.line_char_end      = line_char_end
-        o.byte_start         = byte_start
-        o.byte_end           = byte_end
-        o.matched_text       = matched_text
-        o.context            = context.to_s
-        o.status             = "unreviewed"
+        o.lexeme_id          = lexeme.id
+        o.lexical_pattern_id = @pattern.id
+        o.repository_file_id = @repo_file.id
+        o.line_at         = line_at
+        o.line_char_start = line_char_start
+        o.line_char_end   = line_char_end
+        o.byte_start      = byte_start
+        o.byte_end        = byte_end
+        o.matched_text    = matched_text
+        o.context         = context.to_s
+        o.status          = "unreviewed"
       end
-    @occ_created += 1 if occ.save! && occ.previously_new_record?
+
+    if occ.new_record?
+      occ.save!
+      @occ_created += 1
+      return occ
+    end
+
+    # 已存在：不重置 status（避免覆盖人工 review）
+    # 但可以修正定位字段/上下文（如果你希望保持最新）
+    changed = false
+
+    if occ.line_at != line_at
+      occ.line_at = line_at
+      changed = true
+    end
+    if occ.line_char_start != line_char_start
+      occ.line_char_start = line_char_start
+      changed = true
+    end
+    if occ.line_char_end != line_char_end
+      occ.line_char_end = line_char_end
+      changed = true
+    end
+    if occ.byte_start != byte_start
+      occ.byte_start = byte_start
+      changed = true
+    end
+    if occ.byte_end != byte_end
+      occ.byte_end = byte_end
+      changed = true
+    end
+    if occ.context.to_s != context.to_s
+      occ.context = context.to_s
+      changed = true
+    end
+    # 保证 scan_run_id 仍然满足 NOT NULL（同时允许你追踪“最近一次看到它的 run”）
+    if occ.scan_run_id != @scan_run.id
+      occ.scan_run_id = @scan_run.id
+      changed = true
+    end
+
+    occ.save! if changed
     occ
   end
 
-  # Lexeme normalization
+
+  # Lexeme normalization (extracted)
   def find_or_create_lexeme_from_raw!(raw)
-    normalized, meta = normalize_matched_text(raw)
+    normalized, meta = Support::LexemeNormalizer.normalize(raw)
     fingerprint = Lexeme.sha_digest(normalized)
 
     Lexeme.find_or_create_by!(fingerprint: fingerprint) do |lx|
@@ -142,58 +197,5 @@ class FileScanService
       lx.normalized_text = normalized
       lx.metadata        = meta
     end
-  end
-
-  # Rules:
-  # - strip matching outer quotes ("..." or '...')
-  # - Ruby interpolation: "#{expr}" -> "%{paramsN}" and store mapping in metadata
-  def normalize_matched_text(raw)
-    s = raw.to_s
-    # Strip outer quotes only if they are paired and matching
-    if s.length >= 2
-      first = s[0]
-      last  = s[-1]
-      if (first == '"' && last == '"') || (first == "'" && last == "'")
-        s = s[1..-2]
-      end
-    end
-
-    interpolations = {}
-    idx = 0
-    # Pragmatic parser: "#{...}" where ... does not include "}"
-    s2 = s.gsub(/#\{([^}]+)\}/) do
-      idx += 1
-      key = "params#{idx}"
-      interpolations[key] = Regexp.last_match(1).to_s.strip
-      "%{#{key}}"
-    end
-
-    metadata = {}
-    metadata["interpolations"] = interpolations unless interpolations.empty?
-
-    [s2, metadata]
-  end
-
-  # Offsets helpers
-  # Convert a char-index into byte-index (end is exclusive if you pass exclusive char index).
-  def char_index_to_byte_index(str, char_index)
-    return 0 if char_index <= 0
-    str.each_char.take(char_index).join.bytesize
-  end
-
-  # For file-mode matches, derive:
-  # - line_no (1-based)
-  # - line_char_start/end (exclusive end) within that line
-  def locate_line_and_char(content, start_char, end_char)
-    prefix = content.each_char.take(start_char).join
-    line_no = prefix.count("\n") + 1
-
-    last_nl_pos = prefix.rindex("\n") # char index within prefix
-    line_start_char = last_nl_pos ? (last_nl_pos + 1) : 0
-
-    line_char_start = start_char - line_start_char
-    line_char_end   = end_char - line_start_char
-
-    [line_no, line_char_start, line_char_end]
   end
 end

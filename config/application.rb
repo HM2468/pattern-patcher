@@ -11,6 +11,7 @@ module PatternPatcher
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
     config.autoload_lib(ignore: %w[assets tasks])
+
     config.active_job.queue_adapter = :sidekiq
     config.generators do |g|
       g.template_engine :haml
