@@ -6,7 +6,7 @@
 %div{
   id: "scan_run_#{scan_run.id}",
   class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-3",
-  data: { scan_run_id: scan_run.id, scan_runs_target: "item" }
+  data: { "scan-run-id": scan_run.id }
 }
   %div{ class: "flex items-start justify-between gap-4" }
     %div{ class: "min-w-0 space-y-1" }
@@ -21,7 +21,7 @@
 
       %div{ class: "text-sm text-gray-700" }
         %span{ class: "font-medium" } Occurrences:
-        %span{ class: "font-mono" }= d[:occ_count]
+        %span{ class: "font-mono", data: { scan_runs_target: "occCount" } }= d[:occ_count]
 
     %div{ class: "flex items-center gap-2 flex-shrink-0" }
       = button_to "Delete",
