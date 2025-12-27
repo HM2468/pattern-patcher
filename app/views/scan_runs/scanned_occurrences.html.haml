@@ -30,8 +30,8 @@
     }
     .pp-row {
       display: grid;
-      grid-template-columns: 50px 1fr;
-      align-items: stretch;
+      grid-template-columns: 30px 1fr;
+      align-items: center; /* ⭐ 关键：垂直居中 */
       border-top: 1px solid rgb(240, 246, 252);
     }
     .pp-row:first-child { border-top: none; }
@@ -39,21 +39,33 @@
       background: rgb(240, 246, 252);
       color: rgb(99, 110, 123);
       text-align: right;
-      padding: 2px 6px;
+
+      padding: 0 6px;           /* 只留左右 padding */
+      height: 100%;
+      display: flex;
+      align-items: center;      /* ⭐ 行号垂直居中 */
+
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
-      line-height: 12px;
+      line-height: 16px;        /* 不要压到 12px */
       user-select: none;
+
       border-right: 1px solid rgb(208, 215, 222);
     }
     /* "added line" vibe */
     .pp-code {
       background: rgb(230, 255, 237);
       color: rgb(31, 35, 40);
-      padding: 2px 10px;
+
+      padding: 0 10px;          /* 只留左右 padding */
+      min-height: 16px;
+      display: flex;
+      align-items: center;      /* ⭐ 内容垂直居中 */
+
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 12px;
-      line-height: 12px;
+      line-height: 16px;
+
       white-space: pre-wrap;
       word-break: break-word;
     }
@@ -78,7 +90,6 @@
           %div{ class: "pp-row" }
             %div{ class: "pp-lno" }= occ.line_at
             %div{ class: "pp-code" }
-              -# safe: we escape first, then inject highlight spans
-              = highlight_context(occ.context, occ.matched_text).html_safe
+              = occ.highlighted_origin_context.html_safe
 
     = render "shared/pagination", collection: @occurrences

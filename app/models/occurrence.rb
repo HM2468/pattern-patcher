@@ -24,6 +24,11 @@ class Occurrence < ApplicationRecord
     line_char_start..line_char_end
   end
 
+  def highlighted_origin_context
+    highlighted = "<span class=\"ppmatchhi\">#{matched_text}</span>"
+    context[0..(line_char_start - 1)] + highlighted + context[(line_char_end + 1)..]
+  end
+
   private
 
   def default_status

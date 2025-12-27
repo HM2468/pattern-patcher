@@ -2,18 +2,6 @@
 
 # app/helpers/scan_runs_helper.rb
 module ScanRunsHelper
-  require "cgi"
-  def highlight_context(context, matched_text)
-    s = context.to_s
-    m = matched_text.to_s
-    escaped = CGI.escapeHTML(s)
-    return escaped if m.empty?
-
-    pattern = Regexp.new(Regexp.escape(m))
-    escaped.gsub(pattern) do |hit|
-      %(<span class="ppmatchhi">#{hit}</span>)
-    end
-  end
 
   # One call for scan_run derived display fields
   # Returns:
