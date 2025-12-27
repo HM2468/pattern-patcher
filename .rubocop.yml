@@ -1,8 +1,277 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+# .rubocop.yml
+# Rails 8 friendly + auto-correct friendly defaults
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+require:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.3
+  TargetRailsVersion: 8.0
+
+  # 建议开启：避免因不同编辑器/OS 换行导致 diff
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  ExtraDetails: true
+
+  # RuboCop 扫描范围
+  Include:
+    - "Rakefile"
+    - "config.ru"
+    - "Gemfile"
+    - "bin/**/*"
+    - "app/**/*.rb"
+    - "config/**/*.rb"
+    - "db/**/*.rb"
+    - "lib/**/*.rb"
+    - "spec/**/*.rb"
+
+  Exclude:
+    - "db/schema.rb"
+    - "db/structure.sql"
+    - "node_modules/**/*"
+    - "vendor/**/*"
+    - "public/**/*"
+    - "storage/**/*"
+    - "tmp/**/*"
+    - "log/**/*"
+    - "bin/bundle"
+    - "bin/rails"
+    - "bin/rubocop"
+    - "bin/setup"
+    - "bin/update"
+    - "config/initializers/devise.rb" # 例：第三方生成文件（按需删）
+    - "config/initializers/simple_form.rb" # 例：第三方生成文件（按需删）
+
+# ---------------------------
+# Layout / Style (更利于 -A 自动修复)
+# ---------------------------
+
+Layout/LineLength:
+  Max: 120
+  AllowedPatterns:
+    - '\A\s*#' # 注释允许更长（也可删）
+  Exclude:
+    - "config/routes.rb"
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: true
+
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: key
+  EnforcedColonStyle: key
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/SymbolArray:
+  EnforcedStyle: percent
+
+Style/WordArray:
+  EnforcedStyle: percent
+
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+
+Style/RedundantPercentQ:
+  Enabled: true
+
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/IfUnlessModifier:
+  Enabled: true
+
+Style/GuardClause:
+  Enabled: true
+  MinBodyLength: 1
+
+Style/SafeNavigation:
+  Enabled: true
+
+Style/RedundantInterpolation:
+  Enabled: true
+
+Style/RedundantSelf:
+  Enabled: true
+
+Style/FetchEnvVar:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: true
+
+Style/NumericPredicate:
+  Enabled: true
+
+Style/SignalException:
+  EnforcedStyle: semantic
+
+# Ruby 3.3 / Rails 8 常见写法友好
+Style/HashExcept:
+  Enabled: true
+
+# ---------------------------
+# Lint (尽量不阻碍自动修复，但保留质量闸门)
+# ---------------------------
+
+Lint/UselessAssignment:
+  Enabled: true
+
+Lint/AmbiguousBlockAssociation:
+  Exclude:
+    - "spec/**/*.rb"
+
+Lint/UnusedMethodArgument:
+  Enabled: true
+  AllowUnusedKeywordArguments: true
+  IgnoreEmptyMethods: true
+
+# ---------------------------
+# Metrics（默认稍微放宽，让项目更容易落地；可逐步收紧）
+# ---------------------------
+
+Metrics/MethodLength:
+  Max: 25
+  CountComments: false
+
+Metrics/AbcSize:
+  Max: 25
+
+Metrics/CyclomaticComplexity:
+  Max: 10
+
+Metrics/PerceivedComplexity:
+  Max: 10
+
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*.rb"
+    - "config/routes.rb"
+    - "Rakefile"
+    - "*.gemspec"
+    - "lib/tasks/**/*.rake"
+
+# ---------------------------
+# Rails
+# ---------------------------
+
+Rails:
+  Enabled: true
+
+Rails/TimeZone:
+  Enabled: true
+
+Rails/SkipsModelValidations:
+  Enabled: true
+  AllowedMethods:
+    - update_columns
+    - update_column
+    - touch
+
+Rails/OutputSafety:
+  Enabled: true
+
+Rails/FindById:
+  Enabled: true
+
+Rails/HasManyOrHasOneDependent:
+  Enabled: false # 你项目里大量 delete_all + DB cascade 讨论过，先不强制；需要再开
+
+Rails/InverseOf:
+  Enabled: true
+
+Rails/Delegate:
+  Enabled: true
+
+Rails/I18nLocaleTexts:
+  Enabled: true
+
+# ---------------------------
+# Performance
+# ---------------------------
+
+Performance:
+  Enabled: true
+
+Performance/ChainArrayAllocation:
+  Enabled: true
+
+Performance/RedundantMerge:
+  Enabled: true
+
+# ---------------------------
+# Bundler
+# ---------------------------
+
+Bundler/OrderedGems:
+  Enabled: false
+
+# ---------------------------
+# RSpec（如果你不用 RSpec，可以删除 rubocop-rspec gem + require）
+# ---------------------------
+
+RSpec:
+  Enabled: true
+
+RSpec/ExampleLength:
+  Max: 25
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/ContextWording:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: true
+
+# ---------------------------
+# Naming
+# ---------------------------
+
+Naming/PredicateName:
+  Enabled: true
+  ForbiddenPrefixes:
+    - is_
+    - have_
+
+# ---------------------------
+# Security（可选）
+# ---------------------------
+
+Security:
+  Enabled: true
