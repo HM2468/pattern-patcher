@@ -84,15 +84,21 @@ class ScanRunsController < ApplicationController
   end
 
   def scanned_occurrences
-    @occurrences = @scan_run.occurrences.includes(:repository_file)
-      .page(params[:page])
-      .per(10)
+    @occurrences =
+      @scan_run.occurrences
+        .includes(:repository_file)
+        .order(:repository_file_id, :line_at, :line_char_start, :id)
+        .page(params[:page])
+        .per(10)
   end
 
   def scanned_files
-    @scan_run_files = @scan_run.scan_run_files.includes(:repository_file)
-      .page(params[:page])
-      .per(10)
+    @scan_run_files =
+      @scan_run.scan_run_files
+        .includes(:repository_file)
+        .order(:id)
+        .page(params[:page])
+        .per(10)
   end
 
   private

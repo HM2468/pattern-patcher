@@ -19,7 +19,9 @@
         %span{ class: "font-medium" } Pattern:
         %span= d[:lp_name]
 
-      %div{ class: "text-sm text-gray-700" }
+      = link_to scanned_occurrences_scan_run_path(scan_run),
+        class: "inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded",
+        title: "View scanned matches" do
         %span{ class: "font-medium" } Matches:
         %span{ class: "font-mono", data: { scan_runs_target: "occCount" } }= d[:occ_count]
 

@@ -2,6 +2,19 @@
 
 # app/helpers/scan_runs_helper.rb
 module ScanRunsHelper
+  require "cgi"
+  def highlight_context(context, matched_text)
+    s = context.to_s
+    m = matched_text.to_s
+    escaped = CGI.escapeHTML(s)
+    return escaped if m.empty?
+
+    pattern = Regexp.new(Regexp.escape(m))
+    escaped.gsub(pattern) do |hit|
+      %(<span class="ppmatchhi">#{hit}</span>)
+    end
+  end
+
   # One call for scan_run derived display fields
   # Returns:
   # {
@@ -13,9 +26,9 @@ module ScanRunsHelper
     {
       repo_name: scan_run.repository_name,
       sha_short: scan_run.commit_sha.to_s[0, sha_length],
-      lp_name:   scan_run.lexical_pattern_name,
+      lp_name: scan_run.lexical_pattern_name,
       occ_count: scan_run.occurrences_count.to_i,
-      bar_class: ScanRun::PROGRESS_COLOR[status]
+      bar_class: ScanRun::PROGRESS_COLOR[status],
     }
   end
 
@@ -45,7 +58,7 @@ module ScanRunsHelper
       done: done,
       failed: failed,
       err_msg: err,
-      pct: pct
+      pct: pct,
     }
   end
 
@@ -53,6 +66,7 @@ module ScanRunsHelper
 
   def fetch(obj, key)
     return nil if obj.blank?
+
     obj[key] || obj[key.to_s]
   end
 end
