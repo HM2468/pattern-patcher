@@ -98,7 +98,7 @@ class ScanRunsController < ApplicationController
         .includes(:repository_file)
         .order(:id)
         .page(params[:page])
-        .per(10)
+        .per(20)
   end
 
   private
