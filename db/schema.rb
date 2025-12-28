@@ -10,48 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_28_061425) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_28_070741) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
-
-  create_table "lexeme_process_jobs", force: :cascade do |t|
-    t.bigint "lexeme_process_id", null: false
-    t.string "status", default: "pending", null: false
-    t.jsonb "progress_persisted", default: {}, null: false
-    t.text "error"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["lexeme_process_id", "created_at"], name: "index_lexeme_process_jobs_on_lexeme_process_id_and_created_at"
-    t.index ["lexeme_process_id"], name: "index_lexeme_process_jobs_on_lexeme_process_id"
-    t.index ["status"], name: "index_lexeme_process_jobs_on_status"
-  end
-
-  create_table "lexeme_process_results", force: :cascade do |t|
-    t.bigint "lexeme_process_job_id", null: false
-    t.bigint "lexeme_id", null: false
-    t.jsonb "metadata", default: {}, null: false
-    t.jsonb "output_json", default: {}, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["lexeme_id"], name: "index_lexeme_process_results_on_lexeme_id"
-    t.index ["lexeme_process_job_id", "lexeme_id"], name: "idx_lexeme_process_results_unique", unique: true
-    t.index ["lexeme_process_job_id"], name: "index_lexeme_process_results_on_lexeme_process_job_id"
-  end
-
-  create_table "lexeme_processes", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "key", null: false
-    t.string "entrypoint", null: false
-    t.jsonb "default_config", default: {}, null: false
-    t.jsonb "output_schema", default: {}, null: false
-    t.boolean "enabled", default: true, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["enabled"], name: "index_lexeme_processes_on_enabled"
-    t.index ["key"], name: "index_lexeme_processes_on_key", unique: true
-  end
 
   create_table "lexemes", force: :cascade do |t|
     t.text "source_text"
@@ -193,9 +154,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_061425) do
     t.index ["key"], name: "index_settings_on_key", unique: true
   end
 
-  add_foreign_key "lexeme_process_jobs", "lexeme_processes"
-  add_foreign_key "lexeme_process_results", "lexeme_process_jobs"
-  add_foreign_key "lexeme_process_results", "lexemes"
   add_foreign_key "occurrence_reviews", "occurrences"
   add_foreign_key "occurrences", "lexemes"
   add_foreign_key "occurrences", "lexical_patterns"
