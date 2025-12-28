@@ -10,25 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_27_080837) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_28_044829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
-
-  create_table "lexeme_processings", force: :cascade do |t|
-    t.integer "lexeme_id", null: false
-    t.string "process_type"
-    t.string "locale"
-    t.text "output"
-    t.string "provider"
-    t.string "model"
-    t.string "status"
-    t.text "error"
-    t.json "metadata"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["lexeme_id", "process_type", "locale"], name: "idx_lexeme_processings_unique", unique: true
-    t.index ["lexeme_id"], name: "index_lexeme_processings_on_lexeme_id"
-  end
 
   create_table "lexemes", force: :cascade do |t|
     t.text "source_text"
@@ -83,44 +67,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_27_080837) do
     t.index ["repository_file_id"], name: "index_occurrences_on_repository_file_id"
     t.index ["scan_run_id"], name: "index_occurrences_on_scan_run_id"
     t.index ["status"], name: "index_occurrences_on_status"
-  end
-
-  create_table "replacement_actions", force: :cascade do |t|
-    t.integer "occurrence_id", null: false
-    t.integer "repository_file_id", null: false
-    t.text "original_fragment"
-    t.text "patched_fragment"
-    t.text "original_line"
-    t.text "patched_line"
-    t.string "base_file_sha"
-    t.string "decision"
-    t.string "status"
-    t.datetime "applied_at"
-    t.datetime "rejected_at"
-    t.text "rejected_reason"
-    t.text "error"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["applied_at"], name: "index_replacement_actions_on_applied_at"
-    t.index ["decision"], name: "index_replacement_actions_on_decision"
-    t.index ["occurrence_id"], name: "index_replacement_actions_on_occurrence_id"
-    t.index ["repository_file_id"], name: "index_replacement_actions_on_repository_file_id"
-    t.index ["status"], name: "index_replacement_actions_on_status"
-  end
-
-  create_table "replacement_targets", force: :cascade do |t|
-    t.integer "lexeme_id", null: false
-    t.integer "repository_file_id", null: false
-    t.string "target_type"
-    t.string "target_value"
-    t.string "key_prefix"
-    t.text "rendered_code"
-    t.text "notes"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["lexeme_id", "repository_file_id", "target_type"], name: "idx_replacement_targets_unique", unique: true
-    t.index ["lexeme_id"], name: "index_replacement_targets_on_lexeme_id"
-    t.index ["repository_file_id"], name: "index_replacement_targets_on_repository_file_id"
   end
 
   create_table "repositories", force: :cascade do |t|
@@ -195,15 +141,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_27_080837) do
     t.index ["key"], name: "index_settings_on_key", unique: true
   end
 
-  add_foreign_key "lexeme_processings", "lexemes"
   add_foreign_key "occurrences", "lexemes"
   add_foreign_key "occurrences", "lexical_patterns"
   add_foreign_key "occurrences", "repository_files"
   add_foreign_key "occurrences", "scan_runs"
-  add_foreign_key "replacement_actions", "occurrences"
-  add_foreign_key "replacement_actions", "repository_files"
-  add_foreign_key "replacement_targets", "lexemes"
-  add_foreign_key "replacement_targets", "repository_files"
   add_foreign_key "repository_files", "repositories"
   add_foreign_key "repository_snapshots", "repositories"
   add_foreign_key "scan_run_files", "repository_files"

@@ -15,7 +15,7 @@
       - dash_active = current_page?(root_path)
       - repo_active = request.path.start_with?(repositories_path)
       - pat_active  = request.path.start_with?(lexical_patterns_path)
-      - proc_active = request.path.start_with?(replacement_targets_path)
+      - proc_active = false
       - rev_active  = request.path.start_with?(occurrences_path)
 
       = link_to "Dashboard", root_path,
@@ -31,7 +31,7 @@
         = link_to "Scans", scan_runs_path,
           class: "px-3 py-2 rounded-xl #{pat_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
-      = link_to "Processing", replacement_targets_path,
+      = link_to "Processing", '',
         class: "px-3 py-2 rounded-xl #{proc_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
       - if Occurrence.any?
