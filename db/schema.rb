@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_28_051016) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_28_061425) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,7 +57,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_051016) do
     t.text "source_text"
     t.text "normalized_text"
     t.string "fingerprint"
-    t.string "locale"
+    t.string "process_status", default: "pending", null: false
     t.jsonb "metadata"
     t.datetime "processed_at"
     t.datetime "created_at", null: false
