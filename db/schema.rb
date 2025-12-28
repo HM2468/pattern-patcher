@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_28_050259) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_28_051016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -58,7 +58,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_050259) do
     t.text "normalized_text"
     t.string "fingerprint"
     t.string "locale"
-    t.json "metadata"
+    t.jsonb "metadata"
     t.datetime "processed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -145,7 +145,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_050259) do
   create_table "repository_snapshots", force: :cascade do |t|
     t.integer "repository_id", null: false
     t.string "commit_sha", null: false
-    t.json "metadata"
+    t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["commit_sha"], name: "index_repository_snapshots_on_commit_sha"
