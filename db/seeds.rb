@@ -16,15 +16,17 @@ LexicalPattern.create!(
 LexemeProcessor.create!(
   name: "Localize Rails",
   key: "localize_rails",
-  entrypoint: "LexemeProcessors::LocalizeRails",
+  entrypoint: "LocalizeRails",
   default_config: {
-    "provider" => "openai",
-    "model" => "gpt-4o",
-    "key_prefix" => "gpt_trans",
+    use_llm: true,
+    llm_provider: "openai",
+    llm_model:  "gpt-4o",
+    batch_token_limit: 1500,
+    key_prefix: "gpt_trans",
   },
   output_schema: {
-    "translated_text" => "string",
-    "i18n_key" => "string",
-    "locale" => 'en'
+    processed_text: "string",
+    i18n_key: "string",
+    locale: "string"
   },
 )
