@@ -3,8 +3,6 @@ class RepositoryFile < ApplicationRecord
   belongs_to :repository
 
   has_many :occurrences, dependent: :delete_all
-  has_many :replacement_targets, dependent: :delete_all
-  has_many :replacement_actions, dependent: :delete_all
   has_many :scan_run_files, dependent: :delete_all
 
   validates :path, presence: true

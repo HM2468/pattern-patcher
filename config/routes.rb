@@ -49,8 +49,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :replacement_targets, only: %i[index show edit update]
-  resources :lexeme_processings, only: %i[index show]
-  resources :replacement_actions, only: %i[index show]
+
   resources :settings, only: %i[index edit update destroy]
 end
