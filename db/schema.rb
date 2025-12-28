@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_28_045816) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_28_050259) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -80,6 +80,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_045816) do
     t.index ["language", "pattern_type"], name: "index_lexical_patterns_on_language_and_pattern_type"
     t.index ["mode"], name: "index_lexical_patterns_on_mode"
     t.index ["priority"], name: "index_lexical_patterns_on_priority"
+  end
+
+  create_table "occurrence_reviews", force: :cascade do |t|
+    t.bigint "occurrence_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.text "rendered_code"
+    t.string "status", default: "pending", null: false
+    t.string "apply_status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["apply_status"], name: "index_occurrence_reviews_on_apply_status"
+    t.index ["occurrence_id"], name: "index_occurrence_reviews_on_occurrence_id"
+    t.index ["status"], name: "index_occurrence_reviews_on_status"
   end
 
   create_table "occurrences", force: :cascade do |t|
@@ -183,6 +196,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_28_045816) do
   add_foreign_key "lexeme_process_jobs", "lexeme_processes"
   add_foreign_key "lexeme_process_results", "lexeme_process_jobs"
   add_foreign_key "lexeme_process_results", "lexemes"
+  add_foreign_key "occurrence_reviews", "occurrences"
   add_foreign_key "occurrences", "lexemes"
   add_foreign_key "occurrences", "lexical_patterns"
   add_foreign_key "occurrences", "repository_files"
