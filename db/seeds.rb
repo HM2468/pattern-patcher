@@ -13,19 +13,18 @@ LexicalPattern.create!(
   enabled: false,
   pattern: '/"[^"]*[\u4e00-\u9fff]+[^"]*"/',
 )
-LexemeProcess.create!(
+LexemeProcessor.create!(
   name: "Localize Rails",
   key: "localize_rails",
   entrypoint: "LexemeProcessors::LocalizeRails",
   default_config: {
-    "target_locale" => "en",
     "provider" => "openai",
     "model" => "gpt-4o",
-    "key_prefix" => "rails",
+    "key_prefix" => "gpt_trans",
   },
   output_schema: {
     "translated_text" => "string",
-    "locale" => "string",
-    "suggested_i18n_key" => "string",
+    "i18n_key" => "string",
+    "locale" => 'en'
   },
 )

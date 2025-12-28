@@ -1,3 +1,5 @@
 :queues:
   - default
   - scanning
+  - lexeme_process
+  - lexeme_process_control
