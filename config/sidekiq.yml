@@ -1,5 +1,6 @@
+:concurrency: 6
 :queues:
   - default
   - scanning
-  - lexeme_process
-  - lexeme_process_control
+  - lexeme_process_worker
+  - lexeme_process_dispatcher
