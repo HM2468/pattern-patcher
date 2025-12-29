@@ -16,6 +16,14 @@ module LexemeProcessorsHelper
     locale: "string",
   }.freeze
 
+  def nav_selections
+    [
+      ["Processors", "processors"],
+      ["Process Jobs", "process_jobs"],
+      ["Lexemes", "lexemes"]
+    ]
+  end
+
   # 给 placeholder 用：永远返回默认 JSON（pretty）
   def lexeme_processor_default_json_placeholder(field)
     data =
