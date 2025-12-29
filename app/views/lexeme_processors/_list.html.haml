@@ -30,7 +30,14 @@
               - else
                 %span{ class: "inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700" } disabled
             %td{ class: "py-2 pr-0 text-right space-x-2" }
-              = link_to "Run", '', class: "button-secondary"
+              = button_to "Run",
+                lexeme_process_jobs_path,
+                method: :post,
+                params: { lexeme_processor_id: lp.id },
+                form: { class: "inline-flex" },
+                onclick: "return window.PopConfirmLog.open(event, this)",
+                data: { confirm_title: "Start process", confirm_message: "Run this processor?" },
+                class: "button-secondary"
               = link_to "Edit", edit_lexeme_processor_path(lp), class: "button-secondary"
               = button_to "Delete",
                 lexeme_processor_path(lp),
