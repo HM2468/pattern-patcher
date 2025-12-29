@@ -7,13 +7,13 @@ module LexemeProcessorsHelper
     llm_provider: "openai",
     llm_model: "gpt-4o",
     batch_token_limit: 1500,
-    key_prefix: "gpt_trans"
+    key_prefix: "gpt_trans",
   }.freeze
 
   DEFAULT_OUTPUT_SCHEMA = {
     processed_text: "string",
     i18n_key: "string",
-    locale: "string"
+    locale: "string",
   }.freeze
 
   # 给 placeholder 用：永远返回默认 JSON（pretty）
