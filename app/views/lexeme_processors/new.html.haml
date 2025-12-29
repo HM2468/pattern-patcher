@@ -1,0 +1,10 @@
+- content_for :title, "New lexeme processor"
+
+%h1 New lexeme processor
+
+= render "form", lexeme_processor: @lexeme_processor
+
+%br
+
+%div
+  = link_to "Back to lexeme processors", lexeme_processors_path

@@ -1,0 +1,13 @@
+%p{style: "color: green"}= notice
+
+- content_for :title, "Lexeme processors"
+
+%h1 Lexeme processors
+
+%div{id: "lexeme_processors"}
+  - @lexeme_processors.each do |lexeme_processor|
+    = render lexeme_processor
+    %p
+      = link_to "Show this lexeme processor", lexeme_processor
+
+= link_to "New lexeme processor", new_lexeme_processor_path

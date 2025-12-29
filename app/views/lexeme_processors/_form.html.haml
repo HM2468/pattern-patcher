@@ -1,0 +1,35 @@
+= form_with(model: lexeme_processor) do |form|
+  - if lexeme_processor.errors.any?
+    %div{style: "color: red"}
+      %h2= "#{pluralize(lexeme_processor.errors.count, "error")} prohibited this lexeme_processor from being saved:"
+
+      %ul
+        - lexeme_processor.errors.each do |error|
+          %li= error.full_message
+
+  %div
+    = form.label :name, style: "display: block"
+    = form.text_field :name
+
+  %div
+    = form.label :key, style: "display: block"
+    = form.text_field :key
+
+  %div
+    = form.label :entrypoint, style: "display: block"
+    = form.text_field :entrypoint
+
+  %div
+    = form.label :default_config, style: "display: block"
+    = form.text_field :default_config
+
+  %div
+    = form.label :output_schema, style: "display: block"
+    = form.text_field :output_schema
+
+  %div
+    = form.label :enabled, style: "display: block"
+    = form.checkbox :enabled
+
+  %div
+    = form.submit

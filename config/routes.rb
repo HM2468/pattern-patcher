@@ -49,6 +49,6 @@ Rails.application.routes.draw do
     end
   end
 
-
+  resources :lexeme_processors
   resources :settings, only: %i[index edit update destroy]
 end

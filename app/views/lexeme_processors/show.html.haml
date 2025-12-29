@@ -1,0 +1,10 @@
+%p{style: "color: green"}= notice
+
+= render @lexeme_processor
+
+%div
+  = link_to "Edit this lexeme processor", edit_lexeme_processor_path(@lexeme_processor)
+  |
+  = link_to "Back to lexeme processors", lexeme_processors_path
+
+  = button_to "Destroy this lexeme processor", @lexeme_processor, method: :delete
