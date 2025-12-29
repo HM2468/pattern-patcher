@@ -8,6 +8,8 @@ class LexemeProcessJobsController < ApplicationController
       LexemeProcessJob
         .includes(:lexeme_processor)
         .order(created_at: :desc)
+        .page(params[:page])
+        .per(10)
   end
 
   def create

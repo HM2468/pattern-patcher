@@ -7,20 +7,9 @@ class LexemeProcessJob < ApplicationRecord
   STATUSES = %w[pending running succeeded failed].freeze
   validates :status, inclusion: { in: STATUSES }, presence: true
 
-  # entrypoint 示例：
-  # - "LexemeProcessors::LocalizeRails"（推荐：全限定名）
-  # - "LocalizeRails"（也支持：会自动补 LexemeProcessors::）
   def init_processor
     entry = lexeme_processor.entrypoint.to_s.strip
-    raise ArgumentError, "entrypoint is blank" if entry.blank?
-
-    klass_name =
-      if entry.include?("::")
-        entry
-      else
-        "LexemeProcessors::#{entry}"
-      end
-
+    klass_name = "LexemeProcessors::#{entry}"
     klass = klass_name.constantize
     klass.new(
       config: lexeme_processor.default_config || {},
