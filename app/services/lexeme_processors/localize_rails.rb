@@ -21,7 +21,7 @@ module LexemeProcessors
         {
           id: lexeme_id,
           output_json: {
-            "translated_text" => translated,
+            "processed_text" => translated,
             "i18n_key" => i18n_key,
             "locale" => locale
           },

@@ -4,13 +4,12 @@ module LexemeProcessors
   class BaseProcessor
     attr_reader :config, :processor, :process_job
 
-    DEFAULT_MAX_TOKENS_PER_BATCH = 1_500
-
     # config: job_config merged with default_config (可在 job 层做 merge 提供过来)
     def initialize(config: {}, processor: nil, process_job: nil)
       @config = (config || {}).deep_dup
       @processor = processor
       @process_job = process_job
+      raise ArgumentError, "process_job is required" unless @process_job&.id
     end
 
     # 子类必须实现：
@@ -27,8 +26,6 @@ module LexemeProcessors
       raise NotImplementedError, "#{self.class} must implement #run_process"
     end
 
-    # === Public: helpers ===
-
     # Lexeme -> input hash
     def build_input(lexemes)
       lexemes.map do |lx|
@@ -40,16 +37,18 @@ module LexemeProcessors
       end
     end
 
-    # 批量写入产物
-    # @param results [Array<Hash>] reminder:
+    # 批量写入产物 + 更新 lexeme 状态 + 更新进度
+    # @param results [Array<Hash>]
     #   { id: Integer, output_json: Hash, metadata: Hash }
+    # @return [Integer] 本次成功处理（标记 processed）的 lexeme 数
     def write_results!(results: [])
       return 0 if results.blank?
-      raise ArgumentError, "process_job is required" unless process_job&.id
 
       now = Time.current
+      lexeme_ids = []
       rows = results.map do |res|
         lexeme_id = res.fetch(:id)
+        lexeme_ids << lexeme_id
         {
           lexeme_process_job_id: process_job.id,
           lexeme_id: lexeme_id,
@@ -60,50 +59,45 @@ module LexemeProcessors
         }
       end
 
-      # upsert_all 返回值各版本 Rails 有差异，这里返回写入行数更直观
-      ::LexemeProcessResult.upsert_all(
-        rows,
-        unique_by: :idx_lexeme_process_results_unique
-      )
-
-      rows.size
-    end
-
-    # 根据 token 估算把 lexemes 分批
-    def batch_by_token(lexemes, max_tokens: DEFAULT_MAX_TOKENS_PER_BATCH)
-      items = lexemes.map { |lx| [lx, estimate_tokens(lx.normalized_text)] }
-                     .sort_by { |(_lx, t)| -t } # long first
-
-      batches = []
-      current = []
-      current_tokens = 0
-
-      items.each do |lx, t|
-        # 单条超大：单独一批（否则永远装不进去）
-        if t >= max_tokens
-          batches << [lx]
-          next
-        end
-
-        if current_tokens + t > max_tokens
-          batches << current if current.any?
-          current = [lx]
-          current_tokens = t
-          next
-        end
-
-        current << lx
-        current_tokens += t
+      batch_total = lexeme_ids.size
+      # 事务保证：结果写入 与 lexeme 状态更新保持一致
+      ActiveRecord::Base.transaction do
+        # 幂等写入：避免并发/重试 insert_all 的唯一键冲突
+        ::LexemeProcessResult.upsert_all(
+          rows,
+          unique_by: :idx_lexeme_process_results_unique
+          # 如需严格控制更新列，可加：
+          # update_only: %i[metadata output_json updated_at]
+        )
+        ::Lexeme.where(id: lexeme_ids).update_all(
+          process_status: "processed",
+          updated_at: now
+        )
       end
-
-      batches << current if current.any?
-      batches
-    end
-
-    # 粗略 token 估算：UTF-8 bytes / 4
-    def estimate_tokens(text)
-      s = text.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "�")
-      (s.bytesize / 4.0).ceil
+      # 进度计数：Redis 原子累加
+      Rails.cache.increment(process_job.succeed_count_key, batch_total)
+      batch_total
+    rescue => e
+      # DB 写失败 / 事务失败：把 lexeme 标记为 failed（尽力而为）
+      begin
+        ::Lexeme.where(id: lexeme_ids).update_all(
+          process_status: "failed",
+          updated_at: Time.current
+        )
+      rescue => e2
+        Rails.logger&.error("[BaseProcessor] failed to mark lexemes failed: #{e2.class}: #{e2.message}")
+      end
+      # 失败计数：用 batch_total（本批数量）
+      begin
+        Rails.cache.increment(process_job.failed_count_key, batch_total)
+      rescue => e3
+        Rails.logger&.error("[BaseProcessor] failed to increment failed counter: #{e3.class}: #{e3.message}")
+      end
+      Rails.logger&.error(
+        "[BaseProcessor] write_results! failed job_id=#{process_job.id} lexeme_ids=#{lexeme_ids.take(20)}" \
+        " err=#{e.class}: #{e.message}"
+      )
+      0
     end
   end
 end
