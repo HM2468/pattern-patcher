@@ -1,35 +1,104 @@
-= form_with(model: lexeme_processor) do |form|
+-# app/views/lexeme_processors/_form.html.haml
+
+= form_with(model: lexeme_processor, class: "space-y-6", data: { turbo: false }) do |form|
   - if lexeme_processor.errors.any?
-    %div{style: "color: red"}
-      %h2= "#{pluralize(lexeme_processor.errors.count, "error")} prohibited this lexeme_processor from being saved:"
-
-      %ul
+    %div{ class: "form-errors" }
+      %h3{ class: "form-errors__title" }
+        = pluralize(lexeme_processor.errors.count, "error")
+        prohibited this lexeme processor from being saved:
+      %ul{ class: "form-errors__list" }
         - lexeme_processor.errors.each do |error|
-          %li= error.full_message
+          %li{ class: "form-errors__item" }
+            %span{ class: "form-errors__dot" }
+            %span= error.full_message
 
-  %div
-    = form.label :name, style: "display: block"
-    = form.text_field :name
+  %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm" }
+    %div{ class: "space-y-4" }
 
-  %div
-    = form.label :key, style: "display: block"
-    = form.text_field :key
+      / Name
+      %div
+        %label{ for: "lexeme_processor_name", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Name
+        = form.text_field :name,
+          id: "lexeme_processor_name",
+          class: "form-input",
+          placeholder: "Customized Processor"
 
-  %div
-    = form.label :entrypoint, style: "display: block"
-    = form.text_field :entrypoint
+      / Key
+      %div
+        %label{ for: "lexeme_processor_key", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Key
+        = form.text_field :key,
+          id: "lexeme_processor_key",
+          class: "form-input",
+          placeholder: "customized_processor"
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Stable identifier (lowercase, underscores). Used as filename:
+          %span{ class: "font-mono" } localize_rails.rb
 
-  %div
-    = form.label :default_config, style: "display: block"
-    = form.text_field :default_config
+      / Entrypoint
+      %div
+        %label{ for: "lexeme_processor_entrypoint", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Entrypoint
+        = form.text_field :entrypoint,
+          id: "lexeme_processor_entrypoint",
+          class: "form-input",
+          placeholder: "CustomizedProcessor"
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Ruby class name (supports namespaces with
+          %span{ class: "font-mono" } ::
+          ).
 
-  %div
-    = form.label :output_schema, style: "display: block"
-    = form.text_field :output_schema
+      / Default config (JSON)
+      %div
+        %label{ for: "lexeme_processor_default_config", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Default Config (JSON)
 
-  %div
-    = form.label :enabled, style: "display: block"
-    = form.checkbox :enabled
+        - value_str = lexeme_processor_json_value_or_nil(lexeme_processor, :default_config)
+        = form.text_area :default_config,
+          id: "lexeme_processor_default_config",
+          class: "form-input font-mono text-sm pp-json-textarea",
+          rows: 6,
+          value: value_str,
+          placeholder: lexeme_processor_default_json_placeholder(:default_config)
 
-  %div
-    = form.submit
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Stored as JSONB. Use valid JSON.
+
+      / Output schema (JSON)
+      %div
+        %label{ for: "lexeme_processor_output_schema", class: "block text-sm font-medium text-gray-700 mb-1" }
+          Output Schema (JSON)
+
+        - value_str = lexeme_processor_json_value_or_nil(lexeme_processor, :output_schema)
+        = form.text_area :output_schema,
+          id: "lexeme_processor_output_schema",
+          class: "form-input font-mono text-sm pp-json-textarea",
+          rows: 6,
+          value: value_str,
+          placeholder: lexeme_processor_default_json_placeholder(:output_schema)
+
+        %div{ class: "text-xs text-gray-600 mt-1" }
+          Defines the shape of
+          %span{ class: "font-mono" } lexeme_process_results.output_json
+          Must include
+          %span{ class: "font-mono" } processed_text
+
+      / Enabled
+      %div{ class: "flex items-center gap-2" }
+        = form.check_box :enabled, id: "lexeme_processor_enabled", class: "h-4 w-4 rounded border-gray-300"
+        %label{ for: "lexeme_processor_enabled", class: "text-sm font-medium text-gray-700" }
+          Enabled
+
+  / Actions
+  %div{ class: "flex items-center justify-end gap-4" }
+    - if defined?(new_action?) && new_action?
+      %a{ href: "javascript:history.back()", class: "button-secondary" }
+        Back
+    = form.submit "Save", class: "button-primary"
+
+  :css
+    /* Make textarea placeholder keep pretty JSON newlines/indentation */
+    .pp-json-textarea::placeholder {
+      white-space: pre-wrap;
+    }

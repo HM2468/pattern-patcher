@@ -11,23 +11,7 @@ class LexemeProcessorsController < ApplicationController
 
   # GET /lexeme_processors/new
   def new
-    @lexeme_processor = LexemeProcessor.new(
-      name: "Example Processor",
-      key: "example_processor",
-      entrypoint: "ExampleProcessor",
-      default_config: {
-        use_llm: true,
-        llm_provider: "openai",
-        llm_model: "gpt-4o",
-        batch_token_limit: 1500,
-        key_prefix: "gpt_trans",
-      },
-      output_schema: {
-        processed_text: "string",
-        i18n_key: "string",
-        locale: "string",
-      },
-    )
+    @lexeme_processor = LexemeProcessor.new
   end
 
   # GET /lexeme_processors/1/edit
