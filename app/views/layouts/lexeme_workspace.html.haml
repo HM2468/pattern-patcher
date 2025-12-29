@@ -1,51 +1,29 @@
 -# app/views/layouts/lexeme_workspace.html.haml
--# Based on app/views/layouts/application.html.haml, but with a left sidebar workspace layout.
+-# Reuse layouts/application.html.haml (no duplicated <head>/<body>)
 - nav = nav_selections
 - current = lexeme_workspace_section
-!!!
-%html
-  %head
-    %meta{ content: "text/html; charset=UTF-8", "http-equiv": "Content-Type" }/
-    %title= content_for(:title) || "PatternPatcher"
-    %meta{ content: "width=device-width,initial-scale=1", name: "viewport" }/
-    %meta{ content: "yes", name: "apple-mobile-web-app-capable" }/
-    %meta{ content: "yes", name: "mobile-web-app-capable" }/
-    = csrf_meta_tags
-    = csp_meta_tag
-    = yield :head
-    %link{ href: "/icon.png", rel: "icon", type: "image/png" }/
-    %link{ href: "/icon.svg", rel: "icon", type: "image/svg+xml" }/
-    %link{ href: "/icon.png", rel: "apple-touch-icon" }/
-    = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
-    = stylesheet_link_tag_all
-    = javascript_importmap_tags
 
-  %body
-    %div{ class: "mx-auto max-w-6xl flex flex-col gap-[16px]" }
-      = render "shared/header"
-      = render "shared/flash"
+- content_for :layout_main do
+  -# Workspace layout (sidebar + main)
+  %div{ class: "flex gap-6" }
+    -# Left sidebar (25%~30%)
+    %aside{ class: "w-full md:w-[28%] lg:w-[26%] flex-shrink-0" }
+      %div{ class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-2" }
+        %div{ class: "text-sm font-semibold text-gray-900" } Workspace
+        %div{ class: "text-xs text-gray-600" }
+          Manage processors, process jobs, and lexemes.
 
-      %main{ class: "px-6" }
-        -# Workspace layout (sidebar + main)
-        %div{ class: "flex gap-6" }
-          -# Left sidebar (25%~30%)
-          %aside{ class: "w-full md:w-[28%] lg:w-[26%] flex-shrink-0" }
-            %div{ class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-2" }
-              %div{ class: "text-sm font-semibold text-gray-900" } Workspace
-              %div{ class: "text-xs text-gray-600" }
-                Manage processors, process jobs, and lexemes.
+        %div{ class: "pt-3 space-y-1" }
+          - nav.each do |label, key, url|
+            - active = (current == key)
+            = link_to url,
+              class: ["flex items-center justify-between rounded-xl px-3 py-2 text-sm", active ? "bg-white shadow-sm text-gray-900 font-semibold" : "text-gray-700 hover:bg-white hover:shadow-sm"].join(" ") do
+              %span= label
+              - if active
+                %span{ class: "text-xs text-gray-500" } •
 
-              %div{ class: "pt-3 space-y-1" }
-                - nav.each do |label, key, url|
-                  - active = (current == key)
-                  = link_to url,
-                    class: ["flex items-center justify-between rounded-xl px-3 py-2 text-sm", active ? "bg-white shadow-sm text-gray-900 font-semibold" : "text-gray-700 hover:bg-white hover:shadow-sm"].join(" ") do
-                    %span= label
-                    - if active
-                      %span{ class: "text-xs text-gray-500" } •
+    -# Right main content
+    %section{ class: "flex-1 min-w-0" }
+      = yield
 
-          -# Right main content
-          %section{ class: "flex-1 min-w-0" }
-            = yield
-
-        = render "shared/confirm_log"
+= render template: "layouts/application"
