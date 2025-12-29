@@ -16,6 +16,7 @@ class LexemeProcessJobsController < ApplicationController
     @lexeme_process_job = @lexeme_processor.lexeme_process_jobs.build(status: "pending")
     if @lexeme_process_job.save
       flash[:success] = "Process job created successfully."
+      LexemeProcessDispatcherJob.perform_now(@lexeme_process_job.id)
       redirect_to lexeme_process_jobs_path
     else
       render :new, status: :unprocessable_entity
