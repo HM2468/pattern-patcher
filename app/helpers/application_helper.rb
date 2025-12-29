@@ -11,6 +11,18 @@ module ApplicationHelper
     "error"   => "border-red-200 bg-red-50 text-red-800"
   }.freeze
 
+  # Returns:
+  # [
+  #   ["Processors", "processors", "/lexeme_processors"],
+  #   ["Process Jobs", "process_jobs", "/lexeme_process_jobs"],
+  #   ["Lexemes", "lexemes", "/lexemes"]
+  # ]
+  def nav_selections
+    LexemeWorkspace::NAV.map do |label, key, route_helper|
+      [label, key, public_send(route_helper)]
+    end
+  end
+
   def flash_css_class(type)
     FLASH_CLASSES[type.to_s] || "border-gray-200 bg-gray-50 text-gray-800"
   end

@@ -1,31 +1,6 @@
--# app/vie
-- nav = nav_selections
-%div{ class: "max-w-7xl mx-auto p-6" }
-  %div{ class: "flex gap-6" }
-    -# Left sidebar (25%~30%)
-    %aside{ class: "w-full md:w-[28%] lg:w-[26%] flex-shrink-0" }
-      %div{ class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-2" }
-        %div{ class: "text-sm font-semibold text-gray-900" } Workspace
-        %div{ class: "text-xs text-gray-600" }
-          Manage processors, process jobs, and lexemes.
-        %div{ class: "pt-3 space-y-1" }
-          - nav.each do |label, key|
-            - active = (@section == key)
-            = link_to lexeme_processors_path(section: key),
-              class: [ "flex items-center justify-between rounded-xl px-3 py-2 text-sm", active ? "bg-white shadow-sm text-gray-900 font-semibold" : "text-gray-700 hover:bg-white hover:shadow-sm"].join(" ") do
-              %span= label
-              - if active
-                %span{ class: "text-xs text-gray-500" } •
-    -# Right main content
-    %main{ class: "flex-1 min-w-0" }
-      - if @section == "processors"
-        - if @lexeme_processors.blank?
-          = render "new"
-        - else
-          = render "list"
-      - elsif @section == "process_jobs"
-        = render template: "lexeme_process_jobs/index"
-      - elsif @section == "lexemes"
-        = render template: "lexemes/index"
-      - else
-        = render template: "lexeme_process_jobs/index"
+-# app/views/lexeme_processors/index.html.haml
+-# app/views/lexeme_processors/index.html.haml
+- if @lexeme_processors.blank?
+  = render "new"
+- else
+  = render "list"

@@ -1,34 +1,12 @@
 # app/controllers/lexeme_processors_controller.rb
 class LexemeProcessorsController < ApplicationController
+  include LexemeWorkspaceSection
   before_action :set_lexeme_processor, only: %i[show edit update destroy]
-  before_action :set_section
 
   def index
-    case @section
-    when "processors"
-      @lexeme_processors = LexemeProcessor.order(created_at: :desc)
-
-      # processors 为空：右侧直接渲染 new 表单（你已有 _form）
-      if @lexeme_processors.blank?
-        @lexeme_processor = LexemeProcessor.new
-      end
-
-    when "process_jobs"
-      @lexeme_process_jobs =
-        LexemeProcessJob
-          .includes(:lexeme_processor)
-          .order(created_at: :desc)
-
-    when "lexemes"
-      @lexemes =
-        Lexeme
-          .order(created_at: :desc)
-
-    else
-      # fallback
-      @section = "processors"
-      @lexeme_processors = LexemeProcessor.order(created_at: :desc)
-      @lexeme_processor = LexemeProcessor.new if @lexeme_processors.blank?
+    @lexeme_processors = LexemeProcessor.order(created_at: :desc)
+    if @lexeme_processors.blank?
+      @lexeme_processor = LexemeProcessor.new
     end
   end
 
@@ -71,11 +49,6 @@ class LexemeProcessorsController < ApplicationController
   end
 
   private
-
-  # processors | process_jobs | lexemes
-  def set_section
-    @section = params[:section].presence || "processors"
-  end
 
   def set_lexeme_processor
     @lexeme_processor = LexemeProcessor.find(params[:id])
