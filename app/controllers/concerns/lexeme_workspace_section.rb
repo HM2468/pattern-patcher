@@ -5,10 +5,10 @@ module LexemeWorkspaceSection
   extend ActiveSupport::Concern
 
   included do
-    before_action :set_section
+    before_action :set_processor_nav
     layout "lexeme_workspace"
 
-    # ✅ 让 layout / view 里也能直接调用 nav_selections
+    # 让 layout / view 里也能直接调用 nav_selections
     helper_method :nav_selections, :lexeme_workspace_section
   end
 
@@ -41,7 +41,7 @@ module LexemeWorkspaceSection
   end
 
   # controller -> section
-  def set_section
+  def set_processor_nav
     @section =
       case controller_name
       when "lexeme_processors"   then "processors"

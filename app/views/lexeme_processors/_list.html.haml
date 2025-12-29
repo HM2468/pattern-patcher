@@ -30,11 +30,12 @@
               - else
                 %span{ class: "inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700" } disabled
             %td{ class: "py-2 pr-0 text-right space-x-2" }
-              = link_to "Show", lexeme_processor_path(lp), class: "button-secondary"
+              = link_to "Run", '', class: "button-secondary"
               = link_to "Edit", edit_lexeme_processor_path(lp), class: "button-secondary"
               = button_to "Delete",
                 lexeme_processor_path(lp),
                 method: :delete,
                 form: { class: "inline-flex" },
-                onclick: "return window.PopConfirmLog?.open?.(event, this) || confirm('Delete this processor?')",
+                onclick: "return window.PopConfirmLog.open(event, this)",
+                data: { confirm_title: "Delete processor", confirm_message: "Delete this processor? This cannot be undone." },
                 class: "button-danger"

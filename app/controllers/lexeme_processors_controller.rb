@@ -1,7 +1,8 @@
 # app/controllers/lexeme_processors_controller.rb
 class LexemeProcessorsController < ApplicationController
   include LexemeWorkspaceSection
-  before_action :set_lexeme_processor, only: %i[show edit update destroy]
+
+  before_action :set_lexeme_processor, only: %i[edit update destroy]
 
   def index
     @lexeme_processors = LexemeProcessor.order(created_at: :desc)
@@ -24,7 +25,8 @@ class LexemeProcessorsController < ApplicationController
     return render :new, status: :unprocessable_content if @lexeme_processor.errors.any?
 
     if @lexeme_processor.save
-      redirect_to @lexeme_processor, notice: "Lexeme processor was successfully created."
+      flash[:success] = "Lexeme processor was successfully created."
+      redirect_to lexeme_processors_url, status: :see_other
     else
       render :new, status: :unprocessable_content
     end
@@ -37,15 +39,17 @@ class LexemeProcessorsController < ApplicationController
     return render :edit, status: :unprocessable_content if @lexeme_processor.errors.any?
 
     if @lexeme_processor.save
-      redirect_to @lexeme_processor, notice: "Lexeme processor was successfully updated.", status: :see_other
+      flash[:success] = "Lexeme processor was successfully updated."
+      redirect_to lexeme_processors_url, status: :see_other
     else
       render :edit, status: :unprocessable_content
     end
   end
 
   def destroy
+    flash[:success] = "Lexeme processor was successfully destroyed."
     @lexeme_processor.destroy
-    redirect_to lexeme_processors_url, notice: "Lexeme processor was successfully destroyed.", status: :see_other
+    redirect_to lexeme_processors_url, status: :see_other
   end
 
   private
