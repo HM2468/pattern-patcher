@@ -4,25 +4,25 @@
 class LexemeProcessFinalizeJob < ApplicationJob
   queue_as :lexeme_process_dispatcher
 
-  # @param process_job_id [Integer]
-  def perform(process_job_id)
-    job = LexemeProcessJob.find_by(id: process_job_id)
-    return if job.nil?
-    return if %w[succeeded failed].include?(job.status)
+  # @param process_run_id [Integer]
+  def perform(process_run_id)
+    run = ProcessRun.find_by(id: process_run_id)
+    return if run.nil?
+    return if %w[succeeded failed].include?(run.status)
 
     # 分布式锁：确保只有一个 finalize 在跑
-    lock_key = job.finalize_lock_key
+    lock_key = run.finalize_lock_key
     locked = acquire_lock(lock_key, ttl: 5.minutes)
     return unless locked
 
-    total = Rails.cache.read(job.total_count_key).to_i
-    succ  = Rails.cache.read(job.succeed_count_key).to_i
-    fail  = Rails.cache.read(job.failed_count_key).to_i
+    total = Rails.cache.read(run.total_count_key).to_i
+    succ  = Rails.cache.read(run.succeed_count_key).to_i
+    fail  = Rails.cache.read(run.failed_count_key).to_i
 
-    total_batches = Rails.cache.read(job.batches_total_key).to_i
-    done_batches  = Rails.cache.read(job.batches_done_key).to_i
+    total_batches = Rails.cache.read(run.batches_total_key).to_i
+    done_batches  = Rails.cache.read(run.batches_done_key).to_i
 
-    started_at_ts = Rails.cache.read(job.started_at_key).to_i
+    started_at_ts = Rails.cache.read(run.started_at_key).to_i
     started_at    = started_at_ts > 0 ? Time.at(started_at_ts) : nil
     finished_at   = Time.current
 
@@ -55,12 +55,12 @@ class LexemeProcessFinalizeJob < ApplicationJob
         "succeeded"
       end
 
-    job.update!(
+    run.update!(
       status: final_status,
       progress_persisted: payload
     )
   rescue => e
-    Rails.logger&.error("[LexemeProcessFinalizeJob] failed job_id=#{process_job_id} err=#{e.class}: #{e.message}")
+    Rails.logger&.error("[LexemeProcessFinalizeJob] failed run_id=#{process_run_id} err=#{e.class}: #{e.message}")
     # finalize 出错时不强行改 failed，避免误伤；让它重试
     raise
   ensure

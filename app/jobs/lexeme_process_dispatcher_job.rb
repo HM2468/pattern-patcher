@@ -4,26 +4,26 @@
 class LexemeProcessDispatcherJob < ApplicationJob
   queue_as :lexeme_process_dispatcher
 
-  # @param process_job_id [Integer]
-  def perform(process_job_id)
-    job = LexemeProcessJob.find_by(id: process_job_id)
-    return if job.nil?
+  # @param process_run_id [Integer]
+  def perform(process_run_id)
+    run = ProcessRun.find_by(id: process_run_id)
+    return if run.nil?
 
-    processor = job.init_processor
+    processor = run.init_processor
     unless processor
-      Rails.logger&.error("[LexemeProcessDispatcherJob] init_processor returned nil job_id=#{job.id}")
-      job.mark_failed!(reason: "init_processor_failed")
+      Rails.logger&.error("[LexemeProcessDispatcherJob] init_processor returned nil run_id=#{run.id}")
+      run.mark_failed!(reason: "init_processor_failed")
       return
     end
 
-    unless %w[pending running].include?(job.status)
-      Rails.logger&.info("[LexemeProcessDispatcherJob] skip dispatch due to status=#{job.status} job_id=#{job.id}")
+    unless %w[pending running].include?(run.status)
+      Rails.logger&.info("[LexemeProcessDispatcherJob] skip dispatch due to status=#{run.status} run_id=#{run.id}")
       return
     end
 
-    job.update!(status: "running") if job.status == "pending"
+    run.update!(status: "running") if run.status == "pending"
     total = Lexeme.pending.count
-    job.init_progress!(total: total)
+    run.init_progress!(total: total)
     lexemes = []
     Lexeme.pending
           .select(:id, :normalized_text, :metadata)
@@ -31,22 +31,22 @@ class LexemeProcessDispatcherJob < ApplicationJob
       lexemes.concat(relation.to_a)
     end
     if total == 0
-      LexemeProcessFinalizeJob.perform_later(job.id)
+      LexemeProcessFinalizeJob.perform_later(run.id)
       return
     end
 
     # return Array<Array<Lexeme>>
-    batches = job.batch_by_token(lexemes)
+    batches = run.batch_by_token(lexemes)
     # record batch count（flag of finalization）
-    Rails.cache.write(job.batches_total_key, batches.size, expires_in: 2.days)
-    # dispatch worker jobs（one batch one job）
+    Rails.cache.write(run.batches_total_key, batches.size, expires_in: 2.days)
+    # dispatch worker runs（one batch one run）
     batches.each do |batch|
       ids = batch.map(&:id)
-      LexemeProcessWorkerJob.perform_later(job.id, ids)
+      LexemeProcessWorkerJob.perform_later(run.id, ids)
     end
   rescue => e
-    Rails.logger&.error("[LexemeProcessDispatcherJob] failed job_id=#{process_job_id} err=#{e.class}: #{e.message}")
-    job&.update!(status: "failed")
+    Rails.logger&.error("[LexemeProcessDispatcherJob] failed run_id=#{process_run_id} err=#{e.class}: #{e.message}")
+    run&.update!(status: "failed")
     raise
   end
 end
