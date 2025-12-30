@@ -8,8 +8,6 @@ class LexemeProcessFinalizeJob < ApplicationJob
   def perform(process_job_id)
     job = LexemeProcessJob.find_by(id: process_job_id)
     return if job.nil?
-
-    # 幂等：如果已经结束就直接返回
     return if %w[succeeded failed].include?(job.status)
 
     # 分布式锁：确保只有一个 finalize 在跑
