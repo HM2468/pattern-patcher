@@ -50,7 +50,7 @@ module LexemeProcessors
         lexeme_id = res.fetch(:id)
         lexeme_ids << lexeme_id
         {
-          lexeme_process_job_id: process_job.id,
+          process_run_id: process_job.id,
           lexeme_id: lexeme_id,
           metadata: (res[:metadata] || {}),
           output_json: (res[:output_json] || {}),

@@ -14,7 +14,7 @@ module ApplicationHelper
   # Returns:
   # [
   #   ["Processors", "processors", "/lexeme_processors"],
-  #   ["Process Jobs", "process_jobs", "/lexeme_process_jobs"],
+  #   ["Process Runs", "process_runs", "/process_runs"],
   #   ["Lexemes", "lexemes", "/lexemes"]
   # ]
   def nav_selections

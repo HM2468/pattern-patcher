@@ -18,7 +18,7 @@ module LexemeWorkspaceSection
   def lexeme_workspace_nav
     [
       ["Processors",   "processors",   :lexeme_processors_path],
-      ["Process Jobs", "process_jobs", :lexeme_process_jobs_path],
+      ["Process Runs", "process_runs", :process_runs_path],
       ["Lexemes",      "lexemes",      :lexemes_path]
     ]
   end
@@ -31,7 +31,7 @@ module LexemeWorkspaceSection
   # 给 layout 用：返回带 url 的三元组
   # [
   #   ["Processors", "processors", "/lexeme_processors"],
-  #   ["Process Jobs", "process_jobs", "/lexeme_process_jobs"],
+  #   ["Process Runs", "process_runs", "/process_runs"],
   #   ["Lexemes", "lexemes", "/lexemes"]
   # ]
   def nav_selections
@@ -45,7 +45,7 @@ module LexemeWorkspaceSection
     @section =
       case controller_name
       when "lexeme_processors"   then "processors"
-      when "lexeme_process_jobs" then "process_jobs"
+      when "process_runs" then "process_runs"
       when "lexemes"             then "lexemes"
       else "processors"
       end

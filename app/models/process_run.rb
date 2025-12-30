@@ -1,7 +1,7 @@
 # frozen_string_literal: true
-# app/models/lexeme_process_job.rb
+# app/models/process_run.rb
 
-class LexemeProcessJob < ApplicationRecord
+class ProcessRun < ApplicationRecord
   belongs_to :lexeme_processor
   has_many :lexeme_process_results, dependent: :delete_all
 
@@ -23,12 +23,12 @@ class LexemeProcessJob < ApplicationRecord
     )
   rescue NameError => e
     Rails.logger&.error(
-      "[LexemeProcessJob] processor not found: #{klass_name} (#{e.class}: #{e.message})"
+      "[ProcessRun] processor not found: #{klass_name} (#{e.class}: #{e.message})"
     )
     nil
   rescue => e
     Rails.logger&.error(
-      "[LexemeProcessJob] init_processor failed: #{e.class}: #{e.message}"
+      "[ProcessRun] init_processor failed: #{e.class}: #{e.message}"
     )
     nil
   end
@@ -84,7 +84,7 @@ class LexemeProcessJob < ApplicationRecord
       }
     )
   rescue => e
-    Rails.logger&.error("[LexemeProcessJob] mark_failed! error job_id=#{id} err=#{e.class}: #{e.message}")
+    Rails.logger&.error("[ProcessRun] mark_failed! error job_id=#{id} err=#{e.class}: #{e.message}")
   end
 
   # Batch scheduling

@@ -1,18 +1,16 @@
 # frozen_string_literal: true
 
 class LexemeProcessResult < ApplicationRecord
-  belongs_to :lexeme_process_job
+  belongs_to :process_run
   belongs_to :lexeme
 
   attribute :metadata, :jsonb, default: {}
   attribute :output_json, :jsonb, default: {}
 
-  validates :lexeme_process_job_id, presence: true
+  validates :process_run_id, presence: true
   validates :lexeme_id, presence: true
-  validates :lexeme_id, uniqueness: { scope: :lexeme_process_job_id }
+  validates :lexeme_id, uniqueness: { scope: :process_run_id }
 
-  # 常用查询
-  scope :for_job, ->(job_id) { where(lexeme_process_job_id: job_id) }
   scope :for_lexeme, ->(lexeme_id) { where(lexeme_id: lexeme_id) }
   scope :with_output, -> { where.not(output_json: {}) }
 

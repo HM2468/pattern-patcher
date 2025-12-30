@@ -50,6 +50,6 @@ Rails.application.routes.draw do
   end
 
   resources :lexeme_processors
-  resources :lexeme_process_jobs, only: %i[index create destroy]
+  resources :process_runs, only: %i[index create destroy]
   resources :settings, only: %i[index edit update destroy]
 end

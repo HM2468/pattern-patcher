@@ -1,11 +1,11 @@
-class LexemeProcessJobsController < ApplicationController
+class ProcessRunsController < ApplicationController
   include LexemeWorkspaceSection
   before_action :set_lexeme_processor, only: %i[create]
-  before_action :set_lexeme_process_job, only: %i[destroy]
+  before_action :set_process_run, only: %i[destroy]
 
   def index
-    @lexeme_process_jobs =
-      LexemeProcessJob
+    @process_runs =
+      ProcessRun
         .includes(:lexeme_processor)
         .order(created_at: :desc)
         .page(params[:page])
@@ -13,20 +13,20 @@ class LexemeProcessJobsController < ApplicationController
   end
 
   def create
-    @lexeme_process_job = @lexeme_processor.lexeme_process_jobs.build(status: "pending")
-    if @lexeme_process_job.save
+    @process_run = @lexeme_processor.process_runs.build(status: "pending")
+    if @process_run.save
       flash[:success] = "Process job created successfully."
-      LexemeProcessDispatcherJob.perform_now(@lexeme_process_job.id)
-      redirect_to lexeme_process_jobs_path
+      LexemeProcessDispatcherJob.perform_now(@process_run.id)
+      redirect_to process_runs_path
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def destroy
-    @lexeme_process_job.destroy!
+    @process_run.destroy!
     flash[:success] = "Process job deleted successfully."
-    redirect_to lexeme_process_jobs_path
+    redirect_to process_runs_path
   end
 
   private
@@ -35,7 +35,7 @@ class LexemeProcessJobsController < ApplicationController
     @lexeme_processor = LexemeProcessor.find_by(id: params[:lexeme_processor_id])
   end
 
-  def set_lexeme_process_job
-    @lexeme_process_job = LexemeProcessJob.find_by(id: params[:id])
+  def set_process_run
+    @process_run = ProcessRun.find_by(id: params[:id])
   end
 end
