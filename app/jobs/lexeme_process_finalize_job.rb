@@ -10,14 +10,13 @@ class LexemeProcessFinalizeJob < ApplicationJob
     return if run.nil?
     return if %w[succeeded failed].include?(run.status)
 
-    # 分布式锁：确保只有一个 finalize 在跑
     lock_key = run.finalize_lock_key
     locked = acquire_lock(lock_key, ttl: 5.minutes)
     return unless locked
 
     total = Rails.cache.read(run.total_count_key).to_i
     succ  = Rails.cache.read(run.succeed_count_key).to_i
-    fail  = Rails.cache.read(run.failed_count_key).to_i
+    failc = Rails.cache.read(run.failed_count_key).to_i
 
     total_batches = Rails.cache.read(run.batches_total_key).to_i
     done_batches  = Rails.cache.read(run.batches_done_key).to_i
@@ -26,9 +25,9 @@ class LexemeProcessFinalizeJob < ApplicationJob
     started_at    = started_at_ts > 0 ? Time.at(started_at_ts) : nil
     finished_at   = Time.current
 
-    processed = succ + fail
+    processed = succ + failc
 
-    # 如果还有 batch 没完成，不 finalize（防止误触发）
+    # 防止误触发：batch 未全部完成则不 finalize（让后续 worker 再触发）
     if total_batches > 0 && done_batches < total_batches
       return
     end
@@ -36,7 +35,7 @@ class LexemeProcessFinalizeJob < ApplicationJob
     payload = {
       total: total,
       succeeded: succ,
-      failed: fail,
+      failed: failc,
       processed: processed,
       batches_total: total_batches,
       batches_done: done_batches,
@@ -45,11 +44,10 @@ class LexemeProcessFinalizeJob < ApplicationJob
       duration_seconds: started_at ? (finished_at - started_at).round(3) : nil
     }
 
-    # 根据失败情况决定最终状态（你也可以用更严格规则）
     final_status =
       if total == 0
         "succeeded"
-      elsif fail > 0
+      elsif failc > 0
         "failed"
       else
         "succeeded"
@@ -59,9 +57,11 @@ class LexemeProcessFinalizeJob < ApplicationJob
       status: final_status,
       progress_persisted: payload
     )
+
+    # DB 落库成功后广播最终结果（UI 以此为准）
+    LexemeProcessors::ProgressBroadcaster.broadcast_final(run, payload: payload)
   rescue => e
     Rails.logger&.error("[LexemeProcessFinalizeJob] failed run_id=#{process_run_id} err=#{e.class}: #{e.message}")
-    # finalize 出错时不强行改 failed，避免误伤；让它重试
     raise
   ensure
     release_lock(lock_key) if defined?(lock_key) && lock_key.present?
@@ -69,11 +69,11 @@ class LexemeProcessFinalizeJob < ApplicationJob
 
   private
 
-  # 下面这套 lock 实现只依赖 Rails.cache（Redis 后端）
-  # 如果你的 Rails.cache 不支持 write NX（不同 store 行为差异），可以改成直接用 Redis 客户端 set(nx: true)
+  # 说明：
+  # - RedisCacheStore 支持 unless_exist: true，可用作锁
+  # - 这里不使用 fetch，因为 fetch 会在 key 已存在时返回旧值，难以判定“是否抢到锁”
   def acquire_lock(key, ttl:)
-    # 使用 fetch 实现“抢占式”锁：已经存在就不执行 block
-    Rails.cache.fetch(key, expires_in: ttl, race_condition_ttl: 0) { SecureRandom.hex(12) }.present?
+    Rails.cache.write(key, SecureRandom.hex(12), expires_in: ttl, unless_exist: true)
   rescue => e
     Rails.logger&.error("[LexemeProcessFinalizeJob] acquire_lock failed err=#{e.class}: #{e.message}")
     false
