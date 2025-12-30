@@ -65,9 +65,7 @@ module LexemeProcessors
         # 幂等写入：避免并发/重试 insert_all 的唯一键冲突
         ::LexemeProcessResult.upsert_all(
           rows,
-          unique_by: :idx_lexeme_process_results_unique
-          # 如需严格控制更新列，可加：
-          # update_only: %i[metadata output_json updated_at]
+          unique_by: %i[process_run_id lexeme_id]
         )
         ::Lexeme.where(id: lexeme_ids).update_all(
           process_status: "processed",

@@ -6,7 +6,7 @@ class ProcessRun < ApplicationRecord
   has_many :lexeme_process_results, dependent: :delete_all
 
   STATUSES = %w[pending running succeeded failed].freeze
-  DEFAULT_MAX_TOKENS_PER_BATCH = 1_500
+  DEFAULT_MAX_TOKENS_PER_BATCH = 150
   CACHE_TTL = 1.day
 
   validates :status, inclusion: { in: STATUSES }, presence: true
@@ -69,9 +69,11 @@ class ProcessRun < ApplicationRecord
 
   def init_progress!(total: 0)
     Rails.cache.write(total_count_key, total, expires_in: CACHE_TTL) unless Rails.cache.exist?(total_count_key)
-    Rails.cache.write(succeed_count_key, 0, expires_in: CACHE_TTL) unless Rails.cache.exist?(succeed_count_key)
-    Rails.cache.write(failed_count_key, 0, expires_in: CACHE_TTL)  unless Rails.cache.exist?(failed_count_key)
-    Rails.cache.write(batches_done_key, 0, expires_in: CACHE_TTL) unless Rails.cache.exist?(batches_done_key)
+
+    Rails.cache.increment(succeed_count_key, 0, expires_in: CACHE_TTL)
+    Rails.cache.increment(failed_count_key, 0, expires_in: CACHE_TTL)
+    Rails.cache.increment(batches_done_key, 0, expires_in: CACHE_TTL)
+
     Rails.cache.write(started_at_key, Time.current.to_i, expires_in: CACHE_TTL) unless Rails.cache.exist?(started_at_key)
   end
 

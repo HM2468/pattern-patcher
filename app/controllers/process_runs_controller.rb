@@ -16,7 +16,7 @@ class ProcessRunsController < ApplicationController
     @process_run = @lexeme_processor.process_runs.build(status: "pending")
     if @process_run.save
       flash[:success] = "Process run created successfully."
-      LexemeProcessDispatcherJob.perform_now(@process_run.id)
+      LexemeProcessDispatcherJob.perform_later(@process_run.id)
       redirect_to process_runs_path
     else
       render :new, status: :unprocessable_entity
