@@ -50,7 +50,7 @@ class LexemeProcessDispatcherJob < ApplicationJob
     batches = job.batch_by_token(lexemes)
 
     # 记录 batch 总数（用于完成判断）
-    Rails.cache.write(batches_total_key(job), batches.size, expires_in: 2.days)
+    Rails.cache.write(job.batches_total_key, batches.size, expires_in: 2.days)
 
     # 投递 worker jobs（每个 batch 一个 job）
     batches.each do |batch|
@@ -74,10 +74,10 @@ class LexemeProcessDispatcherJob < ApplicationJob
     Rails.cache.write(job.failed_count_key, 0, expires_in: 2.days)  unless Rails.cache.exist?(job.failed_count_key)
 
     # batches_done 初始化
-    Rails.cache.write(batches_done_key(job), 0, expires_in: 2.days) unless Rails.cache.exist?(batches_done_key(job))
+    Rails.cache.write(job.batches_done_key, 0, expires_in: 2.days) unless Rails.cache.exist?(job.batches_done_key)
 
     # 可选：记录开始时间（便于 finalize 输出）
-    Rails.cache.write(started_at_key(job), Time.current.to_i, expires_in: 2.days) unless Rails.cache.exist?(started_at_key(job))
+    Rails.cache.write(job.started_at_key, Time.current.to_i, expires_in: 2.days) unless Rails.cache.exist?(job.started_at_key)
   end
 
   def mark_job_failed!(job, reason:)
@@ -90,17 +90,5 @@ class LexemeProcessDispatcherJob < ApplicationJob
     )
   rescue => e
     Rails.logger&.error("[LexemeProcessDispatcherJob] mark_job_failed! error job_id=#{job.id} err=#{e.class}: #{e.message}")
-  end
-
-  def batches_total_key(job)
-    "#{job.progress_namespace}:batches_total"
-  end
-
-  def batches_done_key(job)
-    "#{job.progress_namespace}:batches_done"
-  end
-
-  def started_at_key(job)
-    "#{job.progress_namespace}:started_at"
   end
 end

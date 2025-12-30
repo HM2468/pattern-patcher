@@ -13,7 +13,7 @@ class LexemeProcessFinalizeJob < ApplicationJob
     return if %w[succeeded failed].include?(job.status)
 
     # 分布式锁：确保只有一个 finalize 在跑
-    lock_key = finalize_lock_key(job)
+    lock_key = job.finalize_lock_key
     locked = acquire_lock(lock_key, ttl: 5.minutes)
     return unless locked
 
@@ -21,10 +21,10 @@ class LexemeProcessFinalizeJob < ApplicationJob
     succ  = Rails.cache.read(job.succeed_count_key).to_i
     fail  = Rails.cache.read(job.failed_count_key).to_i
 
-    total_batches = Rails.cache.read(batches_total_key(job)).to_i
-    done_batches  = Rails.cache.read(batches_done_key(job)).to_i
+    total_batches = Rails.cache.read(job.batches_total_key).to_i
+    done_batches  = Rails.cache.read(job.batches_done_key).to_i
 
-    started_at_ts = Rails.cache.read(started_at_key(job)).to_i
+    started_at_ts = Rails.cache.read(job.started_at_key).to_i
     started_at    = started_at_ts > 0 ? Time.at(started_at_ts) : nil
     finished_at   = Time.current
 
@@ -70,22 +70,6 @@ class LexemeProcessFinalizeJob < ApplicationJob
   end
 
   private
-
-  def finalize_lock_key(job)
-    "#{job.progress_namespace}:finalize_lock"
-  end
-
-  def batches_total_key(job)
-    "#{job.progress_namespace}:batches_total"
-  end
-
-  def batches_done_key(job)
-    "#{job.progress_namespace}:batches_done"
-  end
-
-  def started_at_key(job)
-    "#{job.progress_namespace}:started_at"
-  end
 
   # 下面这套 lock 实现只依赖 Rails.cache（Redis 后端）
   # 如果你的 Rails.cache 不支持 write NX（不同 store 行为差异），可以改成直接用 Redis 客户端 set(nx: true)

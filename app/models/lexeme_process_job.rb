@@ -35,7 +35,23 @@ class LexemeProcessJob < ApplicationRecord
 
   # Progress (Redis keys)
   def progress_namespace
-    "lexeme_process_jobs:progress:#{id}"
+    "lexeme_processing_progress:#{id}"
+  end
+
+  def batches_total_key
+    "#{progress_namespace}:batches_total"
+  end
+
+  def batches_done_key
+    "#{progress_namespace}:batches_done"
+  end
+
+  def started_at_key
+    "#{progress_namespace}:started_at"
+  end
+
+  def finalize_lock_key
+    "#{progress_namespace}:finalize_lock"
   end
 
   def total_count_key

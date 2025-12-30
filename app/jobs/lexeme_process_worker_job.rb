@@ -67,14 +67,14 @@ class LexemeProcessWorkerJob < ApplicationJob
   private
 
   def bump_batch_done!(job)
-    Rails.cache.increment(batches_done_key(job), 1)
+    Rails.cache.increment(job.batches_done_key, 1)
   rescue => e
     Rails.logger&.error("[LexemeProcessWorkerJob] bump_batch_done! err=#{e.class}: #{e.message}")
   end
 
   def try_finalize!(job)
-    total_batches = Rails.cache.read(batches_total_key(job)).to_i
-    done_batches  = Rails.cache.read(batches_done_key(job)).to_i
+    total_batches = Rails.cache.read(job.batches_total_key).to_i
+    done_batches  = Rails.cache.read(job.batches_done_key).to_i
 
     return if total_batches <= 0
     return unless done_batches >= total_batches
@@ -83,13 +83,5 @@ class LexemeProcessWorkerJob < ApplicationJob
     LexemeProcessFinalizeJob.perform_later(job.id)
   rescue => e
     Rails.logger&.error("[LexemeProcessWorkerJob] try_finalize! err=#{e.class}: #{e.message}")
-  end
-
-  def batches_total_key(job)
-    "#{job.progress_namespace}:batches_total"
-  end
-
-  def batches_done_key(job)
-    "#{job.progress_namespace}:batches_done"
   end
 end
