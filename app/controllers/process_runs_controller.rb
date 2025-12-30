@@ -15,7 +15,7 @@ class ProcessRunsController < ApplicationController
   def create
     @process_run = @lexeme_processor.process_runs.build(status: "pending")
     if @process_run.save
-      flash[:success] = "Process job created successfully."
+      flash[:success] = "Process run created successfully."
       LexemeProcessDispatcherJob.perform_now(@process_run.id)
       redirect_to process_runs_path
     else
@@ -25,7 +25,7 @@ class ProcessRunsController < ApplicationController
 
   def destroy
     @process_run.destroy!
-    flash[:success] = "Process job deleted successfully."
+    flash[:success] = "Process run deleted successfully."
     redirect_to process_runs_path
   end
 
