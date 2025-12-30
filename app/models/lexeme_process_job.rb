@@ -7,6 +7,7 @@ class LexemeProcessJob < ApplicationRecord
 
   STATUSES = %w[pending running succeeded failed].freeze
   DEFAULT_MAX_TOKENS_PER_BATCH = 1_500
+  CACHE_TTL = 1.day
 
   validates :status, inclusion: { in: STATUSES }, presence: true
 
@@ -64,6 +65,26 @@ class LexemeProcessJob < ApplicationRecord
 
   def failed_count_key
     "#{progress_namespace}:failed"
+  end
+
+  def init_progress!(total: 0)
+    Rails.cache.write(total_count_key, total, expires_in: CACHE_TTL) unless Rails.cache.exist?(total_count_key)
+    Rails.cache.write(succeed_count_key, 0, expires_in: CACHE_TTL) unless Rails.cache.exist?(succeed_count_key)
+    Rails.cache.write(failed_count_key, 0, expires_in: CACHE_TTL)  unless Rails.cache.exist?(failed_count_key)
+    Rails.cache.write(batches_done_key, 0, expires_in: CACHE_TTL) unless Rails.cache.exist?(batches_done_key)
+    Rails.cache.write(started_at_key, Time.current.to_i, expires_in: CACHE_TTL) unless Rails.cache.exist?(started_at_key)
+  end
+
+  def mark_failed!(reason:)
+    self.update!(
+      status: "failed",
+      progress_persisted: {
+        reason: reason,
+        failed_at: Time.current.iso8601
+      }
+    )
+  rescue => e
+    Rails.logger&.error("[LexemeProcessJob] mark_failed! error job_id=#{id} err=#{e.class}: #{e.message}")
   end
 
   # Batch scheduling

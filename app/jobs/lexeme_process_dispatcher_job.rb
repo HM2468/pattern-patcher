@@ -15,7 +15,7 @@ class LexemeProcessDispatcherJob < ApplicationJob
     processor = job.init_processor
     unless processor
       Rails.logger&.error("[LexemeProcessDispatcherJob] init_processor returned nil job_id=#{job.id}")
-      mark_job_failed!(job, reason: "init_processor_failed")
+      job.mark_failed!(reason: "init_processor_failed")
       return
     end
 
@@ -38,7 +38,7 @@ class LexemeProcessDispatcherJob < ApplicationJob
     total = lexemes.size
 
     # 初始化进度（幂等写：如果重复调度，尽量不破坏已有计数）
-    init_progress!(job, total: total)
+    job.init_progress!(total: total)
 
     if total == 0
       # 没有要处理的，直接 finalize
@@ -61,34 +61,5 @@ class LexemeProcessDispatcherJob < ApplicationJob
     Rails.logger&.error("[LexemeProcessDispatcherJob] failed job_id=#{process_job_id} err=#{e.class}: #{e.message}")
     job&.update!(status: "failed")
     raise
-  end
-
-  private
-
-  def init_progress!(job, total:)
-    # total：只在不存在时写，避免重复调度覆盖
-    Rails.cache.write(job.total_count_key, total, expires_in: 2.days) unless Rails.cache.exist?(job.total_count_key)
-
-    # succeeded/failed：不存在则初始化为 0
-    Rails.cache.write(job.succeed_count_key, 0, expires_in: 2.days) unless Rails.cache.exist?(job.succeed_count_key)
-    Rails.cache.write(job.failed_count_key, 0, expires_in: 2.days)  unless Rails.cache.exist?(job.failed_count_key)
-
-    # batches_done 初始化
-    Rails.cache.write(job.batches_done_key, 0, expires_in: 2.days) unless Rails.cache.exist?(job.batches_done_key)
-
-    # 可选：记录开始时间（便于 finalize 输出）
-    Rails.cache.write(job.started_at_key, Time.current.to_i, expires_in: 2.days) unless Rails.cache.exist?(job.started_at_key)
-  end
-
-  def mark_job_failed!(job, reason:)
-    job.update!(
-      status: "failed",
-      progress_persisted: {
-        reason: reason,
-        failed_at: Time.current.iso8601
-      }
-    )
-  rescue => e
-    Rails.logger&.error("[LexemeProcessDispatcherJob] mark_job_failed! error job_id=#{job.id} err=#{e.class}: #{e.message}")
   end
 end
