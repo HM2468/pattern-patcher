@@ -1,15 +1,16 @@
 # frozen_string_literal: true
+
 # app/services/lexeme_processors/base_processor.rb
 module LexemeProcessors
   class BaseProcessor
-    attr_reader :config, :processor, :process_job
+    attr_reader :config, :processor, :run
 
     # config: job_config merged with default_config (可在 job 层做 merge 提供过来)
-    def initialize(config: {}, processor: nil, process_job: nil)
+    def initialize(config: {}, processor: nil, run: nil)
       @config = (config || {}).deep_dup
       @processor = processor
-      @process_job = process_job
-      raise ArgumentError, "process_job is required" unless @process_job&.id
+      @run = run
+      raise ArgumentError, "run is required" unless @run&.id
     end
 
     # 子类必须实现：
@@ -37,65 +38,45 @@ module LexemeProcessors
       end
     end
 
-    # 批量写入产物 + 更新 lexeme 状态 + 更新进度
+    # 逐条写入产物 + 逐条更新 lexeme 状态 + 逐条更新进度
+    #
+    # 设计目标：
+    # - 本地单机工具：用“逐条”换更细粒度的进度 & 更易定位失败记录
+    # - 单条失败不影响其它记录（best-effort）
+    #
     # @param results [Array<Hash>]
-    #   { id: Integer, output_json: Hash, metadata: Hash }
-    # @return [Integer] 本次成功处理（标记 processed）的 lexeme 数
     def write_results!(results: [])
-      return 0 if results.blank?
+      return if results.blank?
 
-      now = Time.current
-      lexeme_ids = []
-      rows = results.map do |res|
-        lexeme_id = res.fetch(:id)
-        lexeme_ids << lexeme_id
-        {
-          process_run_id: process_job.id,
-          lexeme_id: lexeme_id,
-          metadata: (res[:metadata] || {}),
-          output_json: (res[:output_json] || {}),
-          created_at: now,
-          updated_at: now
+      results.each do |res|
+        lexeme_id = (res[:id] || res['id']).to_i
+        lexeme = ::Lexeme.find_by(id: lexeme_id)
+        if lexeme.nil?
+          Rails.cache.increment(run.failed_count_key, 1)
+          Rails.logger&.warn("[BaseProcessor] lexeme not found run_id=#{run.id} lexeme_id=#{lexeme_id}")
+          next
+        end
+
+        attrs = {
+          metadata: (res[:metadata] || res["metadata"] || {}),
+          output_json: (res[:output_json] || res["output_json"] || {})
         }
-      end
 
-      batch_total = lexeme_ids.size
-      # 事务保证：结果写入 与 lexeme 状态更新保持一致
-      ActiveRecord::Base.transaction do
-        # 幂等写入：避免并发/重试 insert_all 的唯一键冲突
-        ::LexemeProcessResult.upsert_all(
-          rows,
-          unique_by: %i[process_run_id lexeme_id]
-        )
-        ::Lexeme.where(id: lexeme_ids).update_all(
-          process_status: "processed",
-          updated_at: now
-        )
+        begin
+          ::LexemeProcessResult.transaction do
+            result_ar = ::LexemeProcessResult.find_or_initialize_by(run_id: run.id, lexeme_id: lexeme.id)
+            result_ar.assign_attributes(attrs)
+            result_ar.save!
+            lexeme.update!(process_status: "processed")
+          end
+          Rails.cache.increment(run.succeed_count_key, 1)
+        rescue => e
+          Rails.cache.increment(run.failed_count_key, 1)
+          lexeme.update(process_status: "failed")
+          Rails.logger&.error("[BaseProcessor] save_result failed run_id=#{run.id} lexeme_id=#{lexeme.id} err=#{e.class}: #{e.message}")
+          next
+        end
       end
-      # 进度计数：Redis 原子累加
-      Rails.cache.increment(process_job.succeed_count_key, batch_total)
-      batch_total
-    rescue => e
-      # DB 写失败 / 事务失败：把 lexeme 标记为 failed（尽力而为）
-      begin
-        ::Lexeme.where(id: lexeme_ids).update_all(
-          process_status: "failed",
-          updated_at: Time.current
-        )
-      rescue => e2
-        Rails.logger&.error("[BaseProcessor] failed to mark lexemes failed: #{e2.class}: #{e2.message}")
-      end
-      # 失败计数：用 batch_total（本批数量）
-      begin
-        Rails.cache.increment(process_job.failed_count_key, batch_total)
-      rescue => e3
-        Rails.logger&.error("[BaseProcessor] failed to increment failed counter: #{e3.class}: #{e3.message}")
-      end
-      Rails.logger&.error(
-        "[BaseProcessor] write_results! failed job_id=#{process_job.id} lexeme_ids=#{lexeme_ids.take(20)}" \
-        " err=#{e.class}: #{e.message}"
-      )
-      0
     end
   end
 end
