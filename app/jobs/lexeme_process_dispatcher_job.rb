@@ -21,7 +21,7 @@ class LexemeProcessDispatcherJob < ApplicationJob
       return
     end
 
-    run.update!(status: "running") if run.status == "pending"
+    run.update!(status: "running", started_at: Time.current) if run.status == "pending"
     total = Lexeme.pending.count
     run.init_progress!(total: total)
     lexemes = []
@@ -37,8 +37,7 @@ class LexemeProcessDispatcherJob < ApplicationJob
 
     # return Array<Array<Lexeme>>
     batches = run.batch_by_token(lexemes)
-    # record batch count（flag of finalization）
-    Rails.cache.write(run.batches_total_key, batches.size, expires_in: 2.days)
+    Rails.cache.increment(run.batches_total_key, batches.size)
     # dispatch worker runs（one batch one run）
     batches.each do |batch|
       ids = batch.map(&:id)

@@ -14,20 +14,14 @@ class LexemeProcessFinalizeJob < ApplicationJob
     locked = acquire_lock(lock_key, ttl: 5.minutes)
     return unless locked
 
-    total = Rails.cache.read(run.total_count_key).to_i
-    succ  = Rails.cache.read(run.succeed_count_key).to_i
-    failc = Rails.cache.read(run.failed_count_key).to_i
-
-    total_batches = Rails.cache.read(run.batches_total_key).to_i
-    done_batches  = Rails.cache.read(run.batches_done_key).to_i
-
-    started_at_ts = Rails.cache.read(run.started_at_key).to_i
-    started_at    = started_at_ts > 0 ? Time.at(started_at_ts) : nil
+    total = Rails.cache.increment(run.total_count_key, 0)
+    succ  = Rails.cache.increment(run.succeed_count_key, 0)
+    failc = Rails.cache.increment(run.failed_count_key, 0)
+    total_batches = Rails.cache.increment(run.batches_total_key, 0)
+    done_batches  = Rails.cache.increment(run.batches_done_key, 0)
     finished_at   = Time.current
-
     processed = succ + failc
 
-    # 防止误触发：batch 未全部完成则不 finalize（让后续 worker 再触发）
     if total_batches > 0 && done_batches < total_batches
       return
     end
@@ -38,10 +32,7 @@ class LexemeProcessFinalizeJob < ApplicationJob
       failed: failc,
       processed: processed,
       batches_total: total_batches,
-      batches_done: done_batches,
-      started_at: started_at&.iso8601,
-      finished_at: finished_at.iso8601,
-      duration_seconds: started_at ? (finished_at - started_at).round(3) : nil
+      batches_done: done_batches
     }
 
     final_status =
@@ -55,6 +46,7 @@ class LexemeProcessFinalizeJob < ApplicationJob
 
     run.update!(
       status: final_status,
+      finished_at: Time.current,
       progress_persisted: payload
     )
 

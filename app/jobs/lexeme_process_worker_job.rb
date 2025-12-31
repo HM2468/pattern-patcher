@@ -64,8 +64,8 @@ class LexemeProcessWorkerJob < ApplicationJob
   end
 
   def try_finalize!(run)
-    total_batches = Rails.cache.read(run.batches_total_key).to_i
-    done_batches  = Rails.cache.read(run.batches_done_key).to_i
+    total_batches = Rails.cache.increment(run.batches_total_key, 0)
+    done_batches  = Rails.cache.increment(run.batches_done_key, 0)
 
     return if total_batches <= 0
     return unless done_batches >= total_batches

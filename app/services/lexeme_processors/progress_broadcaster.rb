@@ -21,22 +21,11 @@ module LexemeProcessors
         Rails.logger&.error("[ProgressBroadcaster] broadcast_progress_throttled failed run_id=#{run&.id} err=#{e.class}: #{e.message}")
       end
 
-      # 最终结果广播：payload 由 finalize 生成并持久化后传入
       def broadcast_final(run, payload:)
         return if run.nil?
         broadcast(run, payload: payload.merge(status: run.status), kind: "final")
       rescue => e
         Rails.logger&.error("[ProgressBroadcaster] broadcast_final failed run_id=#{run&.id} err=#{e.class}: #{e.message}")
-      end
-
-      # 可选：started 广播（dispatcher 用）
-      def broadcast_started(run)
-        return if run.nil?
-        payload = build_progress_payload_from_cache(run)
-        payload ||= { status: run.status }
-        broadcast(run, payload: payload, kind: "started")
-      rescue => e
-        Rails.logger&.error("[ProgressBroadcaster] broadcast_started failed run_id=#{run&.id} err=#{e.class}: #{e.message}")
       end
 
       private
@@ -55,13 +44,11 @@ module LexemeProcessors
 
       # 从 Redis（Rails.cache）拼实时进度 payload
       def build_progress_payload_from_cache(run)
-        total = Rails.cache.read(run.total_count_key).to_i
-        succ  = Rails.cache.read(run.succeed_count_key).to_i
-        failc = Rails.cache.read(run.failed_count_key).to_i
-        batches_total = Rails.cache.read(run.batches_total_key).to_i
-        batches_done  = Rails.cache.read(run.batches_done_key).to_i
-        started_at_ts = Rails.cache.read(run.started_at_key).to_i
-        started_at    = started_at_ts > 0 ? Time.at(started_at_ts) : nil
+        total = Rails.cache.increment(run.total_count_key, 0)
+        succ  = Rails.cache.increment(run.succeed_count_key, 0)
+        failc = Rails.cache.increment(run.failed_count_key, 0)
+        batches_total = Rails.cache.increment(run.batches_total_key, 0)
+        batches_done  = Rails.cache.increment(run.batches_done_key, 0)
         processed = succ + failc
         percent =
           if total > 0
@@ -78,8 +65,7 @@ module LexemeProcessors
           processed: processed,
           percent: percent,
           batches_total: batches_total,
-          batches_done: batches_done,
-          started_at: started_at&.iso8601
+          batches_done: batches_done
         }
       end
 

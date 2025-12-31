@@ -64,7 +64,7 @@ module LexemeProcessors
 
         begin
           ::LexemeProcessResult.transaction do
-            result_ar = ::LexemeProcessResult.find_or_initialize_by(run_id: run.id, lexeme_id: lexeme.id)
+            result_ar = ::LexemeProcessResult.find_or_initialize_by(process_run_id: run.id, lexeme_id: lexeme.id)
             result_ar.assign_attributes(attrs)
             result_ar.save!
             lexeme.update!(process_status: "processed")

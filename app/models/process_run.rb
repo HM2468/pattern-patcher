@@ -19,7 +19,7 @@ class ProcessRun < ApplicationRecord
     klass.new(
       config: lexeme_processor.default_config || {},
       processor: lexeme_processor,
-      process_job: self
+      run: self
     )
   rescue NameError => e
     Rails.logger&.error(
@@ -47,10 +47,6 @@ class ProcessRun < ApplicationRecord
     "#{progress_namespace}:batches_done"
   end
 
-  def started_at_key
-    "#{progress_namespace}:started_at"
-  end
-
   def finalize_lock_key
     "#{progress_namespace}:finalize_lock"
   end
@@ -68,13 +64,11 @@ class ProcessRun < ApplicationRecord
   end
 
   def init_progress!(total: 0)
-    Rails.cache.write(total_count_key, total, expires_in: CACHE_TTL) unless Rails.cache.exist?(total_count_key)
-
+    Rails.cache.increment(total_count_key, total, expires_in: CACHE_TTL)
     Rails.cache.increment(succeed_count_key, 0, expires_in: CACHE_TTL)
     Rails.cache.increment(failed_count_key, 0, expires_in: CACHE_TTL)
     Rails.cache.increment(batches_done_key, 0, expires_in: CACHE_TTL)
-
-    Rails.cache.write(started_at_key, Time.current.to_i, expires_in: CACHE_TTL) unless Rails.cache.exist?(started_at_key)
+    Rails.cache.increment(batches_total_key, 0, expires_in: CACHE_TTL)
   end
 
   def mark_failed!(reason:)
