@@ -6,6 +6,7 @@ class Occurrence < ApplicationRecord
   belongs_to :repository_file
 
   has_many :replacement_actions, dependent: :destroy
+  has_one :occurrence_review, dependent: :destroy
 
   STATUSES = %w[unreviewed approved ignored replaced].freeze
   validates :status, presence: true, inclusion: { in: STATUSES }
