@@ -11,14 +11,12 @@ module LexemeProcessors
         text = item.fetch(:normalized_text).to_s
         simulate_external_call!
         locale = config.fetch("locale", "en")
-        key_prefix = config.fetch("key_prefix", "gpt_trans")
         translated = fake_translate(text)
-        i18n_key = "#{key_prefix}.#{fake_key}"
         {
           id: lexeme_id,
           output_json: {
             "processed_text" => translated,
-            "i18n_key" => i18n_key,
+            "i18n_key" => fake_key,
             "locale" => locale,
           },
           metadata: {
@@ -57,7 +55,7 @@ module LexemeProcessors
         end
         params_code = ", #{pairs.join(', ')}"
       end
-      rendered_code = %(I18n.t("#{i18n_key}"#{params_code}))
+      rendered_code = "I18n.t(\"#{full_key}#{params_code}\")"
       metadata = { full_key: full_key}
       [rendered_code, metadata]
     end
@@ -71,11 +69,12 @@ module LexemeProcessors
     )
       key_prefix = config.fetch("key_prefix", nil)
       last_key = lps_output["i18n_key"]
+
       pathkey_arr = file_path.to_s.split("/")
       filename = pathkey_arr.pop
       file_sha = ::Lexeme.sha_digest(file_path)[0..6]
-      last_key = "#{file_sha}_#{last_key}"
       pathkey_arr.reject! { |e| e == "app" }
+      pathkey_arr << file_sha
       pathkey_arr << last_key
       prefix_key = config.fetch("key_prefix", nil)
       pathkey_arr.unshift(prefix_key) if prefix_key.present?

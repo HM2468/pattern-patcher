@@ -124,16 +124,16 @@ module LexemeProcessors
               file_path: occ.repository_file&.path.to_s
             )
 
-            occ_res_attrs = {
+            occ_rev_attrs = {
               status: "pending",
               apply_status: "not_applied",
               metadata: metadata,
               rendered_code: rendered_code
             }
 
-            occ_res_ar = ::OccurrenceReviewResult.find_or_initialize_by(occurrence_id: occ.id)
-            occ_res_ar.assign_attributes(occ_res_attrs)
-            occ_res_ar.save!
+            occ_rev_ar = ::OccurrenceReview.find_or_initialize_by(occurrence_id: occ.id)
+            occ_rev_ar.assign_attributes(occ_rev_attrs)
+            occ_rev_ar.save!
 
             processed_occ_ids << occ.id
           end
