@@ -134,7 +134,7 @@ module LexemeProcessors
             occ_rev_ar = ::OccurrenceReview.find_or_initialize_by(occurrence_id: occ.id)
             occ_rev_ar.assign_attributes(occ_rev_attrs)
             occ_rev_ar.save!
-
+            Rails.cache.increment(run.occ_rev_count_key, 1)
             processed_occ_ids << occ.id
           end
 

@@ -36,6 +36,7 @@ module ProcessRunBroadcastor
     total = read_counter(total_count_key)
     succ  = read_counter(succeed_count_key)
     failc = read_counter(failed_count_key)
+    occ_revc = read_counter(occ_rev_count_key)
     batches_total = read_counter(batches_total_key)
     batches_done  = read_counter(batches_done_key)
 
@@ -55,7 +56,8 @@ module ProcessRunBroadcastor
       processed: processed,
       percent: percent,
       batches_total: batches_total,
-      batches_done: batches_done
+      batches_done: batches_done,
+      occ_revc: occ_revc
     }
   end
 

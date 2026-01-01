@@ -49,7 +49,7 @@ class ProcessRun < ApplicationRecord
 
   # Progress (Redis keys)
   def progress_namespace
-    "lexeme_processing_progress:#{id}"
+    "process_run_progress:#{id}"
   end
 
   def batches_total_key
@@ -76,12 +76,17 @@ class ProcessRun < ApplicationRecord
     "#{progress_namespace}:failed"
   end
 
+  def occ_rev_count_key
+    "#{progress_namespace}:occ_rev_created"
+  end
+
   def init_progress!(total: 0)
     Rails.cache.increment(total_count_key, total, expires_in: CACHE_TTL)
     Rails.cache.increment(succeed_count_key, 0, expires_in: CACHE_TTL)
     Rails.cache.increment(failed_count_key, 0, expires_in: CACHE_TTL)
     Rails.cache.increment(batches_done_key, 0, expires_in: CACHE_TTL)
     Rails.cache.increment(batches_total_key, 0, expires_in: CACHE_TTL)
+    Rails.cache.increment(occ_rev_count_key, 0, expires_in: CACHE_TTL)
   end
 
   def mark_failed!(reason:)
