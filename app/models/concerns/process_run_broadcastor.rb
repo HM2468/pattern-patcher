@@ -31,24 +31,6 @@ module ProcessRunBroadcastor
     )
   end
 
-  private
-
-  def terminal_status?
-    %w[succeeded failed].include?(status)
-  end
-
-  def broadcast(payload:, kind:)
-    ActionCable.server.broadcast(
-      CHANNEL,
-      {
-        id: id,
-        kind: kind,
-        ts: Time.current.to_i,
-        payload: payload
-      }
-    )
-  end
-
   # 从 Redis 读进度并拼 payload
   def build_progress_payload_from_cache
     total = read_counter(total_count_key)
@@ -75,6 +57,24 @@ module ProcessRunBroadcastor
       batches_total: batches_total,
       batches_done: batches_done
     }
+  end
+
+  private
+
+  def terminal_status?
+    %w[succeeded failed].include?(status)
+  end
+
+  def broadcast(payload:, kind:)
+    ActionCable.server.broadcast(
+      CHANNEL,
+      {
+        id: id,
+        kind: kind,
+        ts: Time.current.to_i,
+        payload: payload
+      }
+    )
   end
 
   # 节流：一个时间窗内只允许一次广播

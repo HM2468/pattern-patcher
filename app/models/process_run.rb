@@ -41,6 +41,11 @@ class ProcessRun < ApplicationRecord
     nil
   end
 
+  def read_progress
+    payload = progress_persisted.deep_symbolize_keys
+    payload = build_progress_payload_from_cache unless payload.present?
+    payload
+  end
 
   # Progress (Redis keys)
   def progress_namespace
