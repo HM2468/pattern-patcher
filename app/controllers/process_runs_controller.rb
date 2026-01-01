@@ -10,6 +10,11 @@ class ProcessRunsController < ApplicationController
         .order(created_at: :desc)
         .page(params[:page])
         .per(10)
+    # 进度条数据来自 cache（每页 10 次读取）
+    @progress_by_id = {}
+    @process_runs.each do |pr|
+      @progress_by_id[pr.id] = pr.read_progress
+    end
   end
 
   def create
