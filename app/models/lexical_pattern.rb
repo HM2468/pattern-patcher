@@ -3,19 +3,23 @@ class LexicalPattern < ApplicationRecord
   has_many :scan_runs, dependent: :restrict_with_error
   has_many :occurrences, dependent: :restrict_with_error
 
-  MODES = %w[line file].freeze
   ALLOWED_FLAGS  = %w[i m x].freeze
   PRIORITY_RANGE = (1..1000)
 
   validates :name, presence: true
   validates :pattern, presence: true
   validates :language, presence: true
-  validates :mode, presence: true, inclusion: { in: MODES }
+  validates :mode, presence: true
   validates :priority, numericality: { only_integer: true, in: PRIORITY_RANGE }, presence: true
   validate :pattern_must_be_valid_regex
 
   scope :enabled, -> { where(enabled: true) }
   scope :by_priority, -> { order(priority: :asc, name: :asc) }
+
+  enum :mode, {
+    line_mode: "line",
+    file_mode: "file"
+  }, default: :line
 
   class << self
     def current_pattern

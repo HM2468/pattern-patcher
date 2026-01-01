@@ -5,11 +5,17 @@ class ProcessRun < ApplicationRecord
   belongs_to :lexeme_processor
   has_many :lexeme_process_results, dependent: :delete_all
 
-  STATUSES = %w[pending running succeeded failed].freeze
   DEFAULT_MAX_TOKENS_PER_BATCH = 150
   CACHE_TTL = 1.day
 
-  validates :status, inclusion: { in: STATUSES }, presence: true
+  validates :status, presence: true
+
+  enum :status, {
+    pending: "pending",
+    running: "running",
+    succeeded: "succeeded",
+    failed: "failed"
+  }, default: :pending
 
   # Processor initialization
   def init_processor
