@@ -6,14 +6,14 @@ class OccurrenceReview < ApplicationRecord
   validates :status, presence: true
   validates :apply_status, presence: true
 
-  enum status: {
+  enum :status, {
     pending: "pending",
     reviewed: "reviewed",
     approved: "approved",
     rejected: "rejected"
   }, default: :pending
 
-  enum apply_status: {
+  enum :apply_status, {
     not_applied: "not_applied",
     applied: "applied",
     failed: "failed",
