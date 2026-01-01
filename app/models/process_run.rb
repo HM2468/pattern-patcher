@@ -2,6 +2,8 @@
 # app/models/process_run.rb
 
 class ProcessRun < ApplicationRecord
+  include ProcessRunBroadcastor
+
   belongs_to :lexeme_processor
   has_many :lexeme_process_results, dependent: :delete_all
 

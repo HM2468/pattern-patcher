@@ -49,9 +49,7 @@ class LexemeProcessFinalizeJob < ApplicationJob
       finished_at: Time.current,
       progress_persisted: payload
     )
-
-    # DB 落库成功后广播最终结果（UI 以此为准）
-    LexemeProcessors::ProgressBroadcaster.broadcast_final(run, payload: payload)
+    run.broadcast_final(payload: payload)
   rescue => e
     Rails.logger&.error("[LexemeProcessFinalizeJob] failed run_id=#{process_run_id} err=#{e.class}: #{e.message}")
     raise

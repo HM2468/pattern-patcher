@@ -50,7 +50,7 @@ class LexemeProcessWorkerJob < ApplicationJob
     # 统一在 ensure 里推进 batches_done + 广播进度 + 尝试 finalize
     if defined?(run) && run
       bump_batch_done!(run)
-      LexemeProcessors::ProgressBroadcaster.broadcast_progress_throttled(run)
+      run.broadcast_progress_throttled
       try_finalize!(run)
     end
   end
