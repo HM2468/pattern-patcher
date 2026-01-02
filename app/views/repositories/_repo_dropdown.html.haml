@@ -21,3 +21,6 @@
           options_for_select(@dropdown_list.map { |r| [r[:name], r[:id]] }, selected_id),
           class: "dropdown-select",
           onchange: "this.form.submit()"
+
+
+  = render "repositories/show"

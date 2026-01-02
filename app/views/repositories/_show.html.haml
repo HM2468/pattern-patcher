@@ -1,0 +1,48 @@
+-# app/views/repositories/_show.html.haml
+-# Left-panel read-only repository summary card (compact + consistent with dropdown + buttons)
+
+- return if @repository.nil?
+
+%div{ class: "p-3 flex-1 overflow-y-auto" }
+  -# ===== Summary Card =====
+  %div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
+
+    -# Header strip
+    %div{ class: "bg-indigo-50 px-4 py-3 flex items-start justify-between gap-3" }
+      %div{ class: "min-w-0" }
+        %div{ class: "text-sm font-semibold text-gray-900 truncate" }
+          = "Repository: #{@repository.name.presence || '—'}"
+
+        %div{ class: "mt-1 text-xs text-gray-600 font-mono truncate" }
+          Last scan version:
+          %span{ class: "text-gray-800" }
+            = @repository.current_snapshot&.commit_sha || "N/A"
+
+      %div{ class: "shrink-0" }
+        = link_to "Edit", edit_repository_path(@repository), class: "button-secondary"
+
+    -# Body: key/value fields
+    %div{ class: "px-4 py-4 space-y-4" }
+
+      -# Root path
+      %div{ class: "space-y-1" }
+        %div{ class: "text-xs font-semibold text-gray-700" }
+          Root Path
+        %div{ class: "rounded-xl border border-indigo-100 bg-gray-50 px-3 py-2 text-sm font-mono text-gray-900 break-all" }
+          = @repository.root_path.presence || "—"
+
+      -# Permitted extensions
+      %div{ class: "space-y-1" }
+        %div{ class: "text-xs font-semibold text-gray-700" }
+          Permitted extensions
+        %div{ class: "rounded-xl border border-indigo-100 bg-gray-50 px-3 py-2 text-sm font-mono text-gray-900 break-words" }
+          = @repository.permitted_ext.presence || "—"
+
+        %div{ class: "text-xs text-gray-600" }
+          Example:
+          %span{ class: "font-mono" } rb,haml
+          (no dots required; dots also accepted)
+
+  -# Optional: small helper footer (kept subtle)
+  %div{ class: "mt-3 text-xs text-gray-500" }
+    Select another repository from the dropdown above to view its details.
