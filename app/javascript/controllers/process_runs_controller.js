@@ -1,6 +1,6 @@
 // app/javascript/controllers/process_runs_controller.js
 import { Controller } from "@hotwired/stimulus"
-import consumer from "../channels/consumer"
+import consumer from "channels/consumer"
 
 // 监听 ActionCable 广播到 process_runs 的消息：
 // {id, kind, ts, payload: {status, total, succeeded, failed, processed, percent, batches_total, batches_done, occ_revc}}
