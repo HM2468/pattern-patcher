@@ -29,7 +29,9 @@ class ProcessRunsController < ApplicationController
   end
 
   def destroy
+    run_id = @process_run.id
     @process_run.destroy!
+    ProcessRunRollbackJob.perform_later(process_run_id: run_id)
     flash[:success] = "Process run deleted successfully."
     redirect_to process_runs_path
   end
