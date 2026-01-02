@@ -6,6 +6,7 @@ class RepositoriesController < ApplicationController
 
   def index
     @repositories = Repository.order(name: :asc)
+    @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }
 
     if @repositories.empty?
       @current_repo = nil

@@ -128,3 +128,59 @@
   color: #94a3b8; /* slate-400 */
   pointer-events: none;
 }
+
+/* =========================
+   Dropdown select (native <select>)
+   ========================= */
+
+.dropdown-select {
+  /* 继承 form-select 的整体风格 */
+  display: block;
+  width: 100%;
+
+  border: 1px solid #c7d2fe; /* indigo-200 */
+  border-radius: 0.75rem;    /* rounded-xl */
+
+  padding: 0.5rem 1rem;      /* py-2 px-4 */
+  padding-right: 2.75rem;    /* 给箭头留空间 */
+  font-size: 0.875rem;       /* text-sm */
+  font-weight: 600;          /* 让选中的 repo 更“标题感” */
+
+  background-color: #ffffff;
+  color: #0f172a;            /* slate-900 */
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #6366f1 50%),
+    linear-gradient(135deg, #6366f1 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.25rem) calc(50% - 0.125rem),
+    calc(100% - 1rem) calc(50% - 0.125rem);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.dropdown-select:hover {
+  background-color: #f8fafc; /* slate-50 */
+}
+
+.dropdown-select:focus {
+  outline: none;
+  border-color: #818cf8; /* indigo-400 */
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.35);
+}
+
+/* disabled */
+.dropdown-select:disabled {
+  background-color: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}

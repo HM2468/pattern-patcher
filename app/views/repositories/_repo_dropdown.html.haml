@@ -1,0 +1,23 @@
+-# app/views/repositories/_repo_dropdown.html.haml
+
+%div{ class: "bg-indigo-100 p-3 flex items-center justify-between" }
+  %div
+    %h1{ class: "text-xl font-semibold" } Repositories
+  %div
+    = link_to "New Repo", new_repository_path, class: "button-primary"
+
+- if @repositories.empty?
+  %div{ class: "p-3" }
+    %div{ class: "font-semibold mb-2" } No repositories yet
+    %div{ class: "text-sm text-gray-700 mb-4" }
+      Create one to import files from a local folder.
+
+- else
+  -# Dropdown (current repo)
+  %div{ class: "p-3 border-b border-gray-200" }
+    = form_with url: repositories_path, method: :get, local: true do
+      - selected_id = (@current_repo&.id || @repositories.first.id)
+      = select_tag :repository_id,
+          options_for_select(@dropdown_list.map { |r| [r[:name], r[:id]] }, selected_id),
+          class: "dropdown-select",
+          onchange: "this.form.submit()"
