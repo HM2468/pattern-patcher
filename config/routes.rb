@@ -50,6 +50,7 @@ Rails.application.routes.draw do
   end
 
   resources :lexeme_processors
+  resources :occurrence_reviews
   resources :process_runs, only: %i[index create destroy]
   resources :settings, only: %i[index edit update destroy]
 end
