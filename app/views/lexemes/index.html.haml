@@ -5,15 +5,20 @@
         %thead
           %tr{ class: "text-left text-gray-600" }
             %th{ class: "py-2 pr-4" } ID
-            %th{ class: "py-2 pr-4" } fingerprint
-            %th{ class: "py-2 pr-4" } process_status
-            %th{ class: "py-2 pr-0" } processed_at
+            %th{ class: "py-2 pr-4" } Source Text
+            %th{ class: "py-2 pr-4" } Metadata
+            %th{ class: "py-2 pr-0" } Status
         %tbody
           - @lexemes.limit(50).each do |lx|
             %tr{ class: "border-t border-gray-200" }
               %td{ class: "py-2 pr-4 font-mono" }= lx.id
-              %td{ class: "py-2 pr-4 font-mono text-gray-700" }= lx.fingerprint
-              %td{ class: "py-2 pr-4" }= lx.process_status
-              %td{ class: "py-2 pr-0 text-gray-700" }= lx.processed_at&.strftime("%Y-%m-%d %H:%M:%S")
+              %td{ class: "py-2 pr-4 font-mono text-gray-700" }= lx.source_text
+              %td{ class: "py-2 pr-4" }= lx.metadata
+              %td{ class: "py-2 pr-0 text-gray-700" }= lx.process_status
 - else
   %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No lexemes found.
+
+-# IMPORTANT: stable pagination container (Turbo replace)
+%div{ id: "lexical_patterns_pagination" }
+  - if @lexemes.any?
+    = render "shared/pagination", collection: @lexemes
