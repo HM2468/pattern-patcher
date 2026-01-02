@@ -10,7 +10,7 @@ module RepositoriesHelper
           "Scan selected files with pattern: <strong>#{@current_pattern.name}</strong>?
             Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>."
       @scan_all_hint =
-          "Scan all files in <strong>#{@current_repo.name}</strong> with pattern: <strong>#{@current_pattern.name}</strong>?
+          "Scan all files in <strong>#{@repository.name}</strong> with pattern: <strong>#{@current_pattern.name}</strong>?
             Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>."
     end
   end

@@ -3,7 +3,7 @@
 
 - if @repositories.empty?
   %div{ class: "p-6 text-gray-700" } No repositories found.
-- elsif @current_repo.nil?
+- elsif @repository.nil?
   %div{ class: "p-6 text-gray-700" } Please select a repository.
 - elsif @repository_files.empty?
   %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
@@ -12,7 +12,7 @@
   %div#repo_files_panel{
     class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm",
     data: {
-      repo_id: @current_repo.id,
+      repo_id: @repository.id,
       scan_hint_empty: @scan_all_hint,    # file_ids empty => use this
       scan_hint_all: @scan_hint_message   # file_ids non-empty => use this
     }
@@ -65,7 +65,7 @@
   %div{ class: "hidden" }
     = form_with url: scan_runs_path, method: :post, local: true,
       html: { id: "bulk_scan_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, @current_repo.id, id: "bulk_scan_repository_id"
+      = hidden_field_tag :repository_id, @repository.id, id: "bulk_scan_repository_id"
       %div#bulk_scan_file_ids
       %button#bulk_scan_trigger{
         type: "submit",
@@ -83,7 +83,7 @@
   %div{ class: "hidden" }
     = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
       html: { id: "bulk_delete_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, @current_repo.id
+      = hidden_field_tag :repository_id, @repository.id
       %div#bulk_delete_file_ids
       %button#bulk_delete_trigger{
         type: "submit",
@@ -100,7 +100,7 @@
 %div#repo_files_pagination{ class: "bottom-pagination" }
   = render "shared/pagination",
     collection: @repository_files,
-    options: { repository_id: @current_repo&.id, path_filter: @path_filter }.compact
+    options: { repository_id: @repository&.id, path_filter: @path_filter }.compact
 
 :javascript
   (function() {

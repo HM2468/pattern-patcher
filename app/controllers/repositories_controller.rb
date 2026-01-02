@@ -9,18 +9,18 @@ class RepositoriesController < ApplicationController
     @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }
 
     if @repositories.empty?
-      @current_repo = nil
+      @repository = nil
       @path_filter = ""
       @repository_files = RepositoryFile.none.page(params[:page]).per(200)
       return
     end
 
     repository_id = params[:repository_id].presence || @repositories.first.id
-    @current_repo = Repository.find_by(id: repository_id) || @repositories.first
+    @repository = Repository.find_by(id: repository_id) || @repositories.first
     @path_filter = params[:path_filter].to_s.strip
 
     @repository_files =
-      @current_repo.repository_files
+      @repository.repository_files
                   .path_starts_with(@path_filter) # scope 已经处理 blank => all
                   .by_path                        # 建议保持稳定排序
                   .page(params[:page])

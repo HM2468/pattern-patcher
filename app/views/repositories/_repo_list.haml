@@ -16,7 +16,7 @@
   %div{ class: "flex-grow overflow-y-auto" }
     %table{ class: "w-full text-sm table-fixed" }
       %tbody{ class: "divide-y divide-gray-300" }
-        - current_id = @current_repo&.id
+        - current_id = @repository&.id
 
         - @repositories.each do |repo|
           - active = (current_id.present? && repo.id == current_id)
