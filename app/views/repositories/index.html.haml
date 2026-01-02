@@ -5,9 +5,25 @@
   %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
     = render "repositories/repo_dropdown"
 
+    - if @selected_id.present?
+      = turbo_frame_tag "repo_show",
+          src: repository_path(@selected_id),
+          loading: "eager",
+          class: "flex-1 overflow-y-auto"
+    - else
+      %div{ class: "p-3 text-sm text-gray-600" }
+        No repository selected.
+
   -# Divider
   %div{ class: "w-px bg-gray-300 mx-4" }
 
   -# Right: files (70%)
   %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
-    = render "repository_files/file_list"
+    - if @selected_id.present?
+      = turbo_frame_tag "repo_files",
+          src: repository_files_path(repository_id: @selected_id, path_filter: @path_filter),
+          loading: "eager",
+          class: "flex-1 overflow-y-auto"
+    - else
+      %div{ class: "p-3 text-sm text-gray-600" }
+        No files to display.

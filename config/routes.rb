@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :repository_files, only: [] do
+  resources :repository_files, only: [:index] do
     collection do
       post :bulk_delete
     end

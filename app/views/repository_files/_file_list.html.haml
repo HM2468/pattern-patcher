@@ -1,20 +1,27 @@
 -# frozen_string_literal: true
 -# app/views/repository_files/_file_list.html.haml
+-# This partial is rendered inside a Turbo Frame. It must work with locals.
+- repository = local_assigns.fetch(:repository, nil) || @repository
+- repository_files = local_assigns.fetch(:repository_files, nil) || @repository_files
+- path_filter = local_assigns.fetch(:path_filter, nil) || @path_filter
 
-- if @repositories.empty?
-  %div{ class: "p-6 text-gray-700" } No repositories found.
-- elsif @repository.nil?
-  %div{ class: "p-6 text-gray-700" } Please select a repository.
-- elsif @repository_files.empty?
-  %div{ class: "p-6 text-gray-700" } Please import files or check whether the repository is empty.
+-# confirm message html (fallback to ivars if you still set them somewhere)
+- scan_hint_message = local_assigns.fetch(:scan_hint_message, nil) || @scan_hint_message
+- scan_all_hint   = local_assigns.fetch(:scan_all_hint, nil) || @scan_all_hint
+
+- if repository.nil?
+  %div{ class: "p-6 text-gray-700" }
+    Please select a repository.
+- elsif repository_files.blank? || repository_files.empty?
+  %div{ class: "p-6 text-gray-700" }
+    Please import files or check whether the repository is empty.
 - else
-  -# pass two confirm messages to JS via data- attrs
   %div#repo_files_panel{
     class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm",
     data: {
-      repo_id: @repository.id,
-      scan_hint_empty: @scan_all_hint,    # file_ids empty => use this
-      scan_hint_all: @scan_hint_message   # file_ids non-empty => use this
+      repo_id: repository.id,
+      scan_hint_empty: scan_all_hint,    # file_ids empty => use this
+      scan_hint_all: scan_hint_message   # file_ids non-empty => use this
     }
   }
     %table#repo_files_table{ class: "w-full text-sm table-fixed" }
@@ -33,20 +40,18 @@
               %div{ class: "flex-1 px-2" }
                 %input#path_filter_input{
                   type: "text",
-                  value: @path_filter,
+                  value: path_filter,
                   placeholder: "prefix matching filter (live search)",
                   class: "w-full text-sm rounded px-3 py-2 bg-white",
                   autocomplete: "off"
                 }
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
-                -# Scan is ALWAYS enabled (even when nothing selected)
                 %button#bulk_scan{ type: "button", class: "button-primary" } Scan
-                -# Delete is disabled until something selected
                 %button#bulk_delete{ type: "button", class: "button-danger" } Delete
 
       %tbody#repo_files_tbody{ class: "divide-y divide-gray-300" }
-        - @repository_files.each do |f|
+        - repository_files.each do |f|
           %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
             %td{ class: "px-4 py-3" }
               %div{ class: "flex items-start gap-3" }
@@ -61,29 +66,27 @@
                   %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
                     = f.path
 
-  -# ✅ Scan form (hidden). JS fills file_ids[] then clicks hidden submit button (with PopConfirmLog)
   %div{ class: "hidden" }
     = form_with url: scan_runs_path, method: :post, local: true,
       html: { id: "bulk_scan_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, @repository.id, id: "bulk_scan_repository_id"
+      = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
       %div#bulk_scan_file_ids
       %button#bulk_scan_trigger{
         type: "submit",
         onclick: "return window.PopConfirmLog.open(event, this)",
         data: {
           confirm_title: "Scan files",
-          confirm_message_html: @scan_hint_message, # JS will override before click
+          confirm_message_html: scan_hint_message, # JS will override before click
           confirm_confirm_label: "Scan",
           confirm_cancel_label: "Cancel"
         },
         class: "button-primary"
       } Scan
 
-  -# ✅ Delete form (hidden). JS fills file_ids[] then clicks hidden submit button (with PopConfirmLog)
   %div{ class: "hidden" }
     = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
       html: { id: "bulk_delete_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, @repository.id
+      = hidden_field_tag :repository_id, repository.id
       %div#bulk_delete_file_ids
       %button#bulk_delete_trigger{
         type: "submit",
@@ -99,8 +102,8 @@
 
 %div#repo_files_pagination{ class: "bottom-pagination" }
   = render "shared/pagination",
-    collection: @repository_files,
-    options: { repository_id: @repository&.id, path_filter: @path_filter }.compact
+    collection: repository_files,
+    options: { repository_id: repository&.id, path_filter: path_filter }.compact
 
 :javascript
   (function() {
@@ -133,7 +136,6 @@
         return checks().filter(x => x.checked).map(x => x.value);
       }
 
-      // Scan always enabled; Delete requires selection.
       function setButtonsEnabled() {
         const count = selectedIds().length;
         if (bulkScanBtn) bulkScanBtn.disabled = false;
@@ -169,10 +171,6 @@
 
         const msgEmpty = panel.dataset.scanHintEmpty || "";
         const msgAll   = panel.dataset.scanHintAll || "";
-
-        // Per requirement:
-        // - ids empty => confirm_message_html = @scan_hint_message
-        // - ids non-empty => confirm_message_html = @scan_all_hint
         const useMsg = (idsCount === 0 ? msgEmpty : msgAll);
 
         if (useMsg.length > 0) {
@@ -180,7 +178,6 @@
         }
       }
 
-      // Select All
       if (checkAll) {
         checkAll.addEventListener("change", () => {
           checks().forEach(c => { c.checked = checkAll.checked; });
@@ -188,7 +185,6 @@
         });
       }
 
-      // Single checkbox toggle
       panel.addEventListener("change", (e) => {
         if (e.target && e.target.matches && e.target.matches('input[data-file-check="1"]')) {
           syncCheckAllState();
@@ -196,10 +192,8 @@
         }
       });
 
-      // Init
       updateHintAndButtons();
 
-      // Delete: unchanged behavior (must have selection)
       if (bulkDeleteBtn) {
         bulkDeleteBtn.addEventListener("click", () => {
           const ids = selectedIds();
@@ -215,12 +209,9 @@
         });
       }
 
-      // Scan: can run with empty selection; file_ids[] becomes empty (no hidden inputs added)
       if (bulkScanBtn) {
         bulkScanBtn.addEventListener("click", () => {
           const ids = selectedIds();
-
-          // Always fill (empty => clears container => controller receives no file_ids[] => treat as [])
           fillHiddenIds(scanIdsBox, ids);
 
           if (!scanTrigger) {
@@ -233,7 +224,7 @@
         });
       }
 
-      // Live search
+      // Live search: refresh only the repo_files Turbo Frame (no full page reload)
       if (searchInput) {
         let timer = null;
 
@@ -244,8 +235,13 @@
           if (repoId) params.set("repository_id", repoId);
           if (value.length > 0) params.set("path_filter", value);
 
-          const url = `${window.location.pathname}?${params.toString()}`;
-          window.location.assign(url);
+          const frame = document.getElementById("repo_files");
+          if (frame) {
+            frame.src = `/repository_files.turbo_stream?${params.toString()}`;
+            frame.reload();
+          } else {
+            window.location.assign(`/repositories?${params.toString()}`);
+          }
         }
 
         searchInput.addEventListener("input", () => {

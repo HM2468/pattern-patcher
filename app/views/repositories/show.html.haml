@@ -1,0 +1,3 @@
+-# app/views/repositories/show.html.haml
+= turbo_frame_tag "repo_show" do
+  = render "repositories/show", repository: @repository

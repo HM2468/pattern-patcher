@@ -1,31 +1,26 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
-  include RepositoriesHelper
-
-  before_action :get_repository, only: %i[edit update destroy import]
+  before_action :set_repository, only: %i[show edit update destroy import]
 
   def index
     @repositories = Repository.order(name: :asc)
     @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }
 
-    if @repositories.empty?
-      @repository = nil
-      @path_filter = ""
-      @repository_files = RepositoryFile.none.page(params[:page]).per(200)
-      return
-    end
-
-    repository_id = params[:repository_id].presence || @repositories.first.id
-    @repository = Repository.find_by(id: repository_id) || @repositories.first
+    @selected_id = params[:repository_id].presence || @repositories.first&.id
     @path_filter = params[:path_filter].to_s.strip
+  end
 
-    @repository_files =
-      @repository.repository_files
-                  .path_starts_with(@path_filter) # scope 已经处理 blank => all
-                  .by_path                        # 建议保持稳定排序
-                  .page(params[:page])
-                  .per(200)
-    init_scan_hint_message
+  def show
+    respond_to do |format|
+      format.html do
+        render :show, layout: false
+      end
+      format.turbo_stream do
+        render partial: "repositories/show",
+              formats: [:html],
+              locals: { repository: @repository }
+      end
+    end
   end
 
   def new
@@ -85,7 +80,7 @@ class RepositoriesController < ApplicationController
 
   private
 
-  def get_repository
+  def set_repository
     @repository = Repository.find_by(id: params[:id])
     unless @repository
       redirect_to repositories_path, flash: { error: "Repository not found." }
