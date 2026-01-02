@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 # app/jobs/lexeme_process_finalize_job.rb
-
 class LexemeProcessFinalizeJob < ApplicationJob
   queue_as :lexeme_process_dispatcher
 
@@ -14,38 +13,24 @@ class LexemeProcessFinalizeJob < ApplicationJob
     locked = acquire_lock(lock_key, ttl: 5.minutes)
     return unless locked
 
-    total = Rails.cache.increment(run.total_count_key, 0)
-    succ  = Rails.cache.increment(run.succeed_count_key, 0)
-    failc = Rails.cache.increment(run.failed_count_key, 0)
-    total_batches = Rails.cache.increment(run.batches_total_key, 0)
-    done_batches  = Rails.cache.increment(run.batches_done_key, 0)
-    finished_at   = Time.current
-    processed = succ + failc
+    # payload:
+    # {
+    #   status: "done",
+    #   total: 6407,
+    #   succeeded: 6407,
+    #   failed: 0,
+    #   processed: 6407,
+    #   percent: 100.0,
+    #   batches_total: 38,
+    #   batches_done: 38,
+    #   occ_revc: 0
+    #  }
+    payload = run.build_progress_payload_from_cache
+    return if payload[:batches_total] > 0 && payload[:batches_done] < payload[:batches_total]
 
-    if total_batches > 0 && done_batches < total_batches
-      return
-    end
-
-    payload = {
-      total: total,
-      succeeded: succ,
-      failed: failc,
-      processed: processed,
-      batches_total: total_batches,
-      batches_done: done_batches
-    }
-
-    final_status =
-      if total == 0
-        "succeeded"
-      elsif failc > 0
-        "failed"
-      else
-        "succeeded"
-      end
-
+    payload[:status] = payload[:failed] > 0 ? "failed" : "done"
     run.update!(
-      status: final_status,
+      status: payload[:status],
       finished_at: Time.current,
       progress_persisted: payload
     )
