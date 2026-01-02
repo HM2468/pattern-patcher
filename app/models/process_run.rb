@@ -15,7 +15,7 @@ class ProcessRun < ApplicationRecord
   enum :status, {
     pending: "pending",
     running: "running",
-    succeeded: "succeeded",
+    done: "done",
     failed: "failed"
   }, default: :pending
 
