@@ -16,7 +16,7 @@
       - repo_active = request.path.start_with?(repositories_path)
       - pat_active  = request.path.start_with?(lexical_patterns_path)
       - proc_active = request.path.start_with?(lexeme_processors_path)
-      - rev_active  = request.path.start_with?(occurrences_path)
+      - rev_active  = request.path.start_with?(occurrence_reviews_path)
 
       = link_to "Dashboard", root_path,
         class: "px-3 py-2 rounded-xl #{dash_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
@@ -35,7 +35,7 @@
         class: "px-3 py-2 rounded-xl #{proc_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
       - if Occurrence.any?
-        = link_to "Review", occurrences_path,
+        = link_to "Review", occurrence_reviews_path,
           class: "px-3 py-2 rounded-xl #{rev_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
     -# Right actions (optional)

@@ -1,0 +1,27 @@
+= form_with(model: occurrence_review) do |form|
+  - if occurrence_review.errors.any?
+    %div{style: "color: red"}
+      %h2= "#{pluralize(occurrence_review.errors.count, "error")} prohibited this occurrence_review from being saved:"
+
+      %ul
+        - occurrence_review.errors.each do |error|
+          %li= error.full_message
+
+  %div
+    = form.label :rendered_code, style: "display: block"
+    = form.textarea :rendered_code
+
+  %div
+    = form.label :status, style: "display: block"
+    = form.text_field :status
+
+  %div
+    = form.label :apply_status, style: "display: block"
+    = form.text_field :apply_status
+
+  %div
+    = form.label :metadata, style: "display: block"
+    = form.text_field :metadata
+
+  %div
+    = form.submit

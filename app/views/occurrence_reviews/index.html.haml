@@ -1,0 +1,11 @@
+%p{style: "color: green"}= notice
+
+- content_for :title, "Occurrence reviews"
+
+%h1 Occurrence reviews
+
+-if @occurrence_reviews.any?
+  = render "occurrence_review"
+  = render "shared/pagination", collection: @occurrence_reviews
+-else
+  %p No occurrence reviews found.

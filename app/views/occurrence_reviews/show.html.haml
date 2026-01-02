@@ -1,0 +1,10 @@
+%p{style: "color: green"}= notice
+
+= render @occurrence_review
+
+%div
+  = link_to "Edit this occurrence review", edit_occurrence_review_path(@occurrence_review)
+  |
+  = link_to "Back to occurrence reviews", occurrence_reviews_path
+
+  = button_to "Destroy this occurrence review", @occurrence_review, method: :delete
