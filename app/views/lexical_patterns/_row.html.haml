@@ -18,19 +18,23 @@
   %td{ class: "px-4 py-3 align-top" }
     = render "enabled_toggle", lexical_pattern: pattern
 
-  %td{ class: "px-4 py-3 align-top" }
-    %span{ class: "inline-flex items-center rounded-lg bg-gray-100 text-gray-700 px-2 py-1 text-xs font-mono" }
-      = pattern.priority
-
   %td{ class: "px-4 py-3 align-top rounded-r-xl" }
     %div{ class: "flex flex-wrap items-center gap-2 justify-end" }
-      = link_to "Test", test_lexical_pattern_path(pattern), class: "button-secondary"
-      = link_to "Edit", edit_lexical_pattern_path(pattern), class: "button-secondary"
-      = button_to "Delete",
-        lexical_pattern_path(pattern),
+      = link_to test_lexical_pattern_path(pattern),
+        class: "icon-button",
+        data: { controller: "tooltip", tooltip_text_value: "test", tooltip_placement_value: "bottom" } do
+        = svg_icon("play", class_name: "w-5 h-5")
+
+      = link_to edit_lexical_pattern_path(pattern),
+        class: "icon-button",
+        data: { controller: "tooltip", tooltip_text_value: "edit", tooltip_placement_value: "bottom" } do
+        = svg_icon("pencil-square", class_name: "w-5 h-5")
+
+      = button_to lexical_pattern_path(pattern),
         method: :delete,
         params: { page: params[:page] },
         form: { class: "inline-flex" },
+        class: "icon-button",
         onclick: "return window.PopConfirmLog.open(event, this)",
-        data: { confirm_title: "Delete pattern", confirm_message: "Delete this pattern? This cannot be undone." },
-        class: "button-danger"
+        data: { controller: "tooltip", tooltip_text_value: "Delete", tooltip_placement_value: "bottom", confirm_title: "Delete pattern", confirm_message: "Delete this pattern? This cannot be undone." } do
+        = svg_icon("trash", class_name: "w-5 h-5")
