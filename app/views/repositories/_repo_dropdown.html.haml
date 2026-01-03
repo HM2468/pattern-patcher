@@ -6,7 +6,7 @@
   %div
     = link_to new_repository_path,
       class: "icon-button",
-      title: "New Repository" do
+      data: { controller: "tooltip", tooltip_text_value: "New Repository", tooltip_placement_value: "bottom" } do
       = svg_icon("folder-plus", class_name: "w-6 h-6")
 
 - if @repositories.nil? || @repositories.empty?

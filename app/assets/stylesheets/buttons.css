@@ -22,10 +22,6 @@
   background-color: #312e81; /* indigo-900 */
 }
 
-.button-primary:active {
-  background-color: #0f172a; /* slate-900 */
-}
-
 .button-secondary {
   display: inline-flex;
   align-items: center;
@@ -61,4 +57,29 @@
 
 .button-danger:hover {
   background-color: #fee2e2; /* red-100 */
+}
+
+/* ===== Tooltip rendered in <body> (NOT clipped by overflow) ===== */
+.app-tooltip {
+  position: fixed;             /* fixed relative to viewport */
+  z-index: 2147483647;
+
+  font-size: 0.75rem;          /* 12px */
+  font-weight: 500;
+  line-height: 1.2;
+
+  color: #3730a3;              /* indigo-800 */
+  background: #eef2ff;         /* indigo-50 */
+  border: 1px solid #c7d2fe;   /* indigo-200 */
+  border-radius: 0.625rem;     /* 10px */
+  padding: 0.35rem 0.55rem;
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+
+  transition: opacity 0.08s ease, visibility 0.08s ease;
+  white-space: nowrap;
 }
