@@ -16,6 +16,7 @@ class RepositoriesController < ApplicationController
 
   def new
     @repository = Repository.new
+    render_repo_right(:new)
   end
 
   def create
@@ -42,6 +43,7 @@ class RepositoriesController < ApplicationController
         confirm_message: "Import files from this repository?"
       }
     }
+    render_repo_right(:edit)
   end
 
   def update
