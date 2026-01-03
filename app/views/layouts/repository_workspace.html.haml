@@ -3,8 +3,8 @@
 
 - content_for :layout_main do
   %div{ class: "flex h-[85vh]" }
-    -# Left: repositories (30%)
-    %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
+    -# Left: repositories (25%)
+    %div{ class: "w-[25%] rounded-lg bg-white overflow-hidden flex flex-col" }
       = render "repositories/repo_dropdown"
 
       - if @selected_id.present?
@@ -19,8 +19,8 @@
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
 
-    -# Right: dynamic area (70%)
-    %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
+    -# Right: dynamic area (75%)
+    %div{ class: "w-[75%] rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "repo_right", class: "flex-1 overflow-y-auto" do
         = yield
 
