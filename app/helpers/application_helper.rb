@@ -11,6 +11,16 @@ module ApplicationHelper
     "error"   => "border-red-200 bg-red-50 text-red-800"
   }.freeze
 
+
+  def svg_icon(name, class_name: "")
+    path = Rails.root.join("app/assets/images/icons/#{name}.svg")
+    return "" unless File.exist?(path)
+
+    svg = File.read(path)
+    svg.sub("<svg", %(<svg class="#{ERB::Util.html_escape(class_name)}")).html_safe
+  end
+
+
   # Returns:
   # [
   #   ["Processors", "processors", "/lexeme_processors"],
