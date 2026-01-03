@@ -9,19 +9,21 @@ module RepositoryWorkspaceContext
   private
 
   def prepare_repository_workspace
-    # 1) Left sidebar list (1 query)
+    # 1) Left sidebar @current_pattern
+    @current_pattern = LexicalPattern.current_pattern
+    # 2) Left sidebar list (1 query)
     @repositories   = Repository.order(name: :asc).to_a
     @dropdown_list  = @repositories.map { |r| { id: r.id, name: r.name } }
     @path_filter    = params[:path_filter].to_s.strip
 
-    # 2) Selected repo id (don't override controller's @repository)
+    # 3) Selected repo id (don't override controller's @repository)
     @selected_id =
       params[:repository_id].presence ||
       params[:id].presence ||            # 让 /repositories/:id/edit 自动选中
       @repository&.id ||
       @repositories.first&.id
 
-    # 3) Workspace selected repo object: prioritize controller's @repository, then find from list (0 query)
+    # 4) Workspace selected repo object: prioritize controller's @repository, then find from list (0 query)
     @selected_repository =
       if defined?(@repository) && @repository&.id.to_s == @selected_id.to_s
         @repository
@@ -29,7 +31,7 @@ module RepositoryWorkspaceContext
         @repositories.find { |r| r.id == @selected_id.to_i }
       end
 
-    # 4) Statistics: calculate only when needed (optional)
+    # 5) Statistics: calculate only when needed (optional)
     load_repository_counters if needs_repository_counters?
   end
 
