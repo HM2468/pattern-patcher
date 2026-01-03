@@ -1,0 +1,89 @@
+/* app/assets/stylesheets/repository-show.css */
+/* ===== Repo stats cards (left sidebar) ===== */
+
+.repo-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 0.75rem;            /* 12px */
+  border: 1px solid #c7d2fe;         /* indigo-200 */
+  background-color: #ffffff;
+
+  padding: 0.75rem 0.5rem;           /* tighter but solid */
+  text-align: center;
+
+  cursor: pointer;
+
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
+}
+
+.repo-stat-card:hover {
+  background-color: #eef2ff;         /* indigo-50 */
+  border-color: #a5b4fc;              /* indigo-300 */
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+}
+
+.repo-stat-label {
+  font-size: 0.75rem;                 /* 12px */
+  font-weight: 600;
+  color: #4b5563;                     /* gray-600 */
+  letter-spacing: 0.02em;
+}
+
+.repo-stat-value {
+  margin-top: 0.25rem;
+  font-size: 1.5rem;                  /* 24px */
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #3730a3;                     /* indigo-800 */
+  line-height: 1.1;
+}
+
+.repo-stat-card:hover .repo-stat-value {
+  color: #312e81;                     /* indigo-900 */
+}
+
+/* ===== Repo meta fields (Root Path / Permitted ext) ===== */
+
+.repo-meta-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem; /* 4px */
+}
+
+.repo-meta-label {
+  font-size: 0.75rem;     /* 12px */
+  font-weight: 600;
+  color: #374151;         /* gray-700 */
+}
+
+.repo-meta-value {
+  border-radius: 0.75rem;       /* 12px */
+  border: 1px solid #e0e7ff;    /* indigo-100 */
+  background-color: #f9fafb;    /* gray-50 */
+
+  padding: 0.5rem 0.75rem;      /* 8px 12px */
+
+  font-size: 0.875rem;          /* 14px */
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: #111827;               /* gray-900 */
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  cursor: default;
+}
+
+.repo-meta-value:hover {
+  background-color: #eef2ff;    /* indigo-50 */
+  border-color: #c7d2fe;        /* indigo-200 */
+}

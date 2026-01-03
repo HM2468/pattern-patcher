@@ -4,7 +4,7 @@
 - content_for :layout_main do
   %div{ class: "flex h-[85vh]" }
     -# Left: repositories (25%)
-    %div{ class: "w-[25%] rounded-lg bg-white overflow-hidden flex flex-col" }
+    %div{ class: "w-[25%] space-y-3 rounded-lg bg-white overflow-hidden flex flex-col" }
       = render "repositories/repo_dropdown"
 
       - if @selected_id.present?

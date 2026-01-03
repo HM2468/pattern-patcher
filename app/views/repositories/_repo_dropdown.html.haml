@@ -1,36 +1,41 @@
 -# app/views/repositories/_repo_dropdown.html.haml
+-# Top card in the left sidebar. Style aligned with repositories/show.html.haml.
+%div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
+  -# Header
+  %div{ class: "bg-indigo-100 px-4 py-3 flex items-center justify-between gap-3" }
+    %div{ class: "min-w-0" }
+      %h1{ class: "text-sm font-semibold text-gray-900 truncate" } Repositories
 
-%div{ class: "rounded-2xl bg-indigo-100 p-3 flex items-center justify-between" }
-  %div
-    %h1{ class: "text-xl font-semibold" } Repositories
-  %div
-    = link_to new_repository_path,
-      class: "icon-button",
-      data: { controller: "tooltip", tooltip_text_value: "New Repository", tooltip_placement_value: "bottom" } do
-      = svg_icon("folder-plus", class_name: "w-6 h-6")
+    %div{ class: "shrink-0" }
+      = link_to new_repository_path,
+        class: "icon-button",
+        data: { controller: "tooltip", tooltip_text_value: "New Repository", tooltip_placement_value: "bottom" } do
+        = svg_icon("folder-plus", class_name: "w-6 h-6")
 
-- if @repositories.nil? || @repositories.empty?
-  %div{ class: "p-3" }
-    %div{ class: "font-semibold mb-2" } No repositories yet
-    %div{ class: "text-sm text-gray-700 mb-4" }
-      Create one to import files from a local folder.
-- else
-  %div{ class: "p-3 border-b border-gray-200" }
-    %label{ class: "block text-xs font-semibold text-gray-700 mb-2" }
-      Select a repository
+  -# Body
+  %div{ class: "px-4 py-4 space-y-4" }
+    - if @repositories.nil? || @repositories.empty?
+      %div{ class: "rounded-xl border border-indigo-100 bg-gray-50 px-3 py-3" }
+        %div{ class: "text-sm font-semibold text-gray-900 mb-1" } No repositories yet
+        %div{ class: "text-xs text-gray-600" }
+          Create one to import files from a local folder.
+    - else
+      %div{ class: "space-y-2" }
+        %label{ class: "block text-xs font-semibold text-gray-700" }
+          Select a repository
 
-    - selected_id = @selected_id || @repositories.first.id
+        - selected_id = @selected_id || @repositories.first.id
 
-    %div{
-      data: {
-        controller: "repo-switcher",
-        repo_switcher_show_frame_id_value: "repo_right",
-        repo_switcher_files_frame_id_value: "repo_right",
-        repo_switcher_show_url_template_value: "/repositories/__ID__",
-        repo_switcher_files_url_template_value: "/repository_files?repository_id=__ID__&path_filter=#{CGI.escape(@path_filter.to_s)}"
-      }
-    }
-      = select_tag :repository_id,
-          options_for_select(@dropdown_list.map { |r| [r[:name], r[:id]] }, selected_id),
-          class: "dropdown-select",
-          data: { action: "change->repo-switcher#change" }
+        %div{
+          data: {
+            controller: "repo-switcher",
+            repo_switcher_show_frame_id_value: "repo_right",
+            repo_switcher_files_frame_id_value: "repo_right",
+            repo_switcher_show_url_template_value: "/repositories/__ID__",
+            repo_switcher_files_url_template_value: "/repository_files?repository_id=__ID__&path_filter=#{CGI.escape(@path_filter.to_s)}"
+          }
+        }
+          = select_tag :repository_id,
+              options_for_select(@dropdown_list.map { |r| [r[:name], r[:id]] }, selected_id),
+              class: "dropdown-select w-full",
+              data: { action: "change->repo-switcher#change" }

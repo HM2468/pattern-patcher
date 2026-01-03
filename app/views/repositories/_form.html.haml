@@ -51,9 +51,5 @@
 
       / Actions
       %div{ class: "flex items-center justify-end gap-4" }
-        - if new_action?
-          %a{ href: "javascript:history.back()", class: "button-secondary" }
-            Back
-
         = form.submit "Save",
           class: "button-primary"
