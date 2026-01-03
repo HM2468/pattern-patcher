@@ -1,12 +1,21 @@
 # app/controllers/scan_runs_controller.rb
 class ScanRunsController < ApplicationController
   include ScanRunsHelper
-
+  include RepositoryWorkspaceContext
+  layout "repository_workspace", only: %i[index scanned_files scanned_occurrences]
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
-    @scan_runs =
+    scope = if params[:repository_id].present?
       ScanRun
+        .joins(:repository_snapshot)
+        .where(repository_snapshots: { repository_id: params[:repository_id] })
+    else
+      ScanRun.all
+    end
+
+    @scan_runs =
+      scope
         .joins(repository_snapshot: :repository)
         .joins(:lexical_pattern)
         .left_joins(:occurrences)

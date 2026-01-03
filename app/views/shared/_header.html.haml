@@ -27,10 +27,6 @@
       = link_to "Patterns", lexical_patterns_path,
         class: "px-3 py-2 rounded-xl #{pat_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
-      - if ScanRun.any?
-        = link_to "Scans", scan_runs_path,
-          class: "px-3 py-2 rounded-xl #{pat_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
-
       = link_to "Processing", lexeme_processors_path,
         class: "px-3 py-2 rounded-xl #{proc_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
