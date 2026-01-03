@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 class RepositoryFilesController < ApplicationController
+  layout "repository_workspace", only: %i[index]
+
   def index
     @repository = Repository.find_by(id: params[:repository_id])
     @path_filter = params[:path_filter].to_s.strip

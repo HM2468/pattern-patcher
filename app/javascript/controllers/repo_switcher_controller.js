@@ -1,10 +1,9 @@
 // app/javascript/controllers/repo_switcher_controller.js
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 
 export default class extends Controller {
   static values = {
-    showFrameId: String,
-    filesFrameId: String,
     showUrlTemplate: String,
     filesUrlTemplate: String,
   }
@@ -13,17 +12,10 @@ export default class extends Controller {
     const id = event.target.value
     if (!id) return
 
-    const showFrame = document.getElementById(this.showFrameIdValue)
-    const filesFrame = document.getElementById(this.filesFrameIdValue)
+    // 左侧 show frame
+    Turbo.visit(this.showUrlTemplateValue.replace("__ID__", id), { frame: "repo_show" })
 
-    if (showFrame) {
-      showFrame.src = this.showUrlTemplateValue.replace("__ID__", id)
-      showFrame.reload()
-    }
-
-    if (filesFrame) {
-      filesFrame.src = this.filesUrlTemplateValue.replace("__ID__", id)
-      filesFrame.reload()
-    }
+    // 右侧主区域：默认切到 files（你也可以切到 scan_runs 等）
+    Turbo.visit(this.filesUrlTemplateValue.replace("__ID__", id), { frame: "repo_right" })
   }
 }

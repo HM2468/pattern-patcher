@@ -2,6 +2,8 @@
 class RepositoriesController < ApplicationController
   before_action :set_repository, only: %i[show edit update destroy import]
 
+  layout "repository_workspace", only: %i[new edit update]
+
   def index
     @repositories = Repository.order(name: :asc)
     @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }

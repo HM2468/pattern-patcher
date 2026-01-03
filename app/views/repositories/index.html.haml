@@ -4,7 +4,6 @@
   -# Left: repositories (30%)
   %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
     = render "repositories/repo_dropdown"
-
     - if @selected_id.present?
       = turbo_frame_tag "repo_show",
           src: repository_path(@selected_id),
@@ -20,10 +19,12 @@
   -# Right: files (70%)
   %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
     - if @selected_id.present?
-      = turbo_frame_tag "repo_files",
-          src: repository_files_path(repository_id: @selected_id, path_filter: @path_filter),
-          loading: "eager",
-          class: "flex-1 overflow-y-auto"
+      %div{ class: "p-3 text-sm text-gray-600" }
+        Select an item on the left, or open:
+        = link_to "Files",
+          repository_files_path(repository_id: @selected_id, path_filter: @path_filter),
+          data: { turbo_frame: "repo_right" },
+          class: "underline ml-2"
     - else
       %div{ class: "p-3 text-sm text-gray-600" }
-        No files to display.
+        No repository selected.
