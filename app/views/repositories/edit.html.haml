@@ -11,6 +11,12 @@
           %div.text-sm.text-gray-600.font-mono.mt-1
             Last scan version: #{@repository.current_snapshot&.commit_sha || "N/A"}
 
+        %div.flex.justify-end.pt-2
+          = link_to "Back",
+            repositories_path(repository_id: @repository.id),
+            class: "button-secondary",
+            data: { turbo_frame: "repo_right" }
+
       = render "repositories/form"
 
     / ===== Actions: side-by-side =====
@@ -55,12 +61,6 @@
             class: "button-danger",
             form: { data: { turbo_frame: "_top" } }
 
-    / ===== Footer =====
-    %div.flex.justify-end.pt-2
-      = link_to "Back",
-        repositories_path(repository_id: @repository.id),
-        class: "button-secondary",
-        data: { turbo_frame: "repo_right" }
 
 - if turbo_frame_request?
   = turbo_frame_tag "repo_right" do
