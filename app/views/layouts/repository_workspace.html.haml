@@ -1,5 +1,7 @@
 -# app/views/layouts/repository_workspace.html.haml
-= render template: "layouts/application" do
+-# Reuse layouts/application.html.haml (no duplicated <head>/<body>)
+
+- content_for :layout_main do
   %div{ class: "flex h-[85vh]" }
     -# Left: repositories (30%)
     %div{ class: "w-[30%] rounded-lg bg-white overflow-hidden flex flex-col" }
@@ -21,3 +23,5 @@
     %div{ class: "w-[70%] rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "repo_right", class: "flex-1 overflow-y-auto" do
         = yield
+
+= render template: "layouts/application"

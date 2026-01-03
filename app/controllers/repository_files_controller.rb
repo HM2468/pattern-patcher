@@ -23,7 +23,11 @@ class RepositoryFilesController < ApplicationController
 
     respond_to do |format|
       format.html do
-        render :index, layout: false
+        if turbo_frame_request?
+          render :index, layout: false
+        else
+          render :index
+        end
       end
     end
   end

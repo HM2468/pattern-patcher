@@ -6,7 +6,7 @@
   %div
     = link_to "New Repo", new_repository_path, class: "button-primary"
 
-- if @repositories.empty?
+- if @repositories.nil? || @repositories.empty?
   %div{ class: "p-3" }
     %div{ class: "font-semibold mb-2" } No repositories yet
     %div{ class: "text-sm text-gray-700 mb-4" }
