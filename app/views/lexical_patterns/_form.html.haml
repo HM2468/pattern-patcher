@@ -52,8 +52,8 @@
           %label{ for: "lexical_pattern_mode", class: "block text-sm font-medium text-gray-700 mb-1" }
             Mode
           = form.select :mode,
-            LexicalPattern::MODES,
-            { selected: @lexical_pattern.mode || "line" },
+            ['line', 'file'],
+            { selected: @lexical_pattern&.mode || "line" },
             { id: "lexical_pattern_mode", class: "form-select", required: true }
 
         %div

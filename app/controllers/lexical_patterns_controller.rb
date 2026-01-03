@@ -1,4 +1,6 @@
 class LexicalPatternsController < ApplicationController
+  include RepositoryWorkspaceContext
+  layout "repository_workspace", only: %i[index new edit update create test]
   before_action :set_lexical_pattern, only: [:test, :run_test, :toggle_enabled, :edit, :update, :destroy]
 
   def index
