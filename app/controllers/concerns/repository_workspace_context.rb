@@ -9,15 +9,45 @@ module RepositoryWorkspaceContext
   private
 
   def prepare_repository_workspace
-    @repositories = Repository.order(name: :asc)
-    @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }
+    # 1) Left sidebar list (1 query)
+    @repositories   = Repository.order(name: :asc).to_a
+    @dropdown_list  = @repositories.map { |r| { id: r.id, name: r.name } }
+    @path_filter    = params[:path_filter].to_s.strip
 
-    @path_filter = params[:path_filter].to_s.strip
-
-    # selected_id 来源：显式参数 > 当前 @repository > 默认第一个
+    # 2) Selected repo id (don't override controller's @repository)
     @selected_id =
       params[:repository_id].presence ||
+      params[:id].presence ||            # 让 /repositories/:id/edit 自动选中
       @repository&.id ||
       @repositories.first&.id
+
+    # 3) Workspace selected repo object: prioritize controller's @repository, then find from list (0 query)
+    @selected_repository =
+      if defined?(@repository) && @repository&.id.to_s == @selected_id.to_s
+        @repository
+      else
+        @repositories.find { |r| r.id == @selected_id.to_i }
+      end
+
+    # 4) Statistics: calculate only when needed (optional)
+    load_repository_counters if needs_repository_counters?
+  end
+
+  def needs_repository_counters?
+    # Adjust as needed: which controller/actions need to display statistics
+    controller_name.in?(%w[repositories repository_files scan_runs]) &&
+      action_name.in?(%w[index show edit])
+  end
+
+  def load_repository_counters
+    repo_id = @selected_repository&.id
+    return if repo_id.blank?
+
+    # Two count queries (stable and clear)
+    @file_count = RepositoryFile.where(repository_id: repo_id).count
+    @scan_count = ScanRun
+      .joins(:repository_snapshot)
+      .where(repository_snapshots: { repository_id: repo_id })
+      .count
   end
 end
