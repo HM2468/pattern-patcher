@@ -1,12 +1,10 @@
 -# app/views/repository_files/index.html.haml
 
-- content = capture do
-  %div{ class: "max-w-7xl mx-auto p-6" }
-    %h1{ class: "text-xl font-semibold mb-4" } Files for Repository
-    = render "repository_files/file_list"
+- inner = capture do
+  = render "repository_files/file_list"
 
 - if turbo_frame_request?
   = turbo_frame_tag "repo_right" do
-    = content
+    = inner
 - else
-  = content
+  = inner

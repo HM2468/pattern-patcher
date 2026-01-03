@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 class RepositoryFilesController < ApplicationController
+  include RepositoryWorkspaceContext
   layout "repository_workspace", only: %i[index]
 
   def index

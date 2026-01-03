@@ -1,28 +1,17 @@
 # app/controllers/repositories_controller.rb
 class RepositoriesController < ApplicationController
+  include RepositoryWorkspaceContext
   before_action :set_repository, only: %i[show edit update destroy import]
-
-  layout "repository_workspace", only: %i[new edit update]
+  layout "repository_workspace", only: %i[index new edit update]
 
   def index
-    @repositories = Repository.order(name: :asc)
-    @dropdown_list = @repositories.map { |repo| { id: repo.id, name: repo.name } }
-
-    @selected_id = params[:repository_id].presence || @repositories.first&.id
-    @path_filter = params[:path_filter].to_s.strip
+    if @selected_id.present?
+      redirect_to repository_files_path(repository_id: @selected_id, path_filter: @path_filter)
+    end
   end
 
   def show
-    respond_to do |format|
-      format.html do
-        render :show, layout: false
-      end
-      format.turbo_stream do
-        render partial: "repositories/show",
-              formats: [:html],
-              locals: { repository: @repository }
-      end
-    end
+    render :show, layout: false if turbo_frame_request?
   end
 
   def new

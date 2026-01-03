@@ -1,3 +1,5 @@
--# app/views/repositories/show.html.haml
-= turbo_frame_tag "repo_show" do
+- if turbo_frame_request?
+  = turbo_frame_tag "repo_show" do
+    = render "repositories/show", repository: @repository
+- else
   = render "repositories/show", repository: @repository
