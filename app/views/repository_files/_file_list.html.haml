@@ -20,8 +20,8 @@
     class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm",
     data: {
       repo_id: repository.id,
-      scan_hint_empty: scan_all_hint,    # file_ids empty => use this
-      scan_hint_all: scan_hint_message   # file_ids non-empty => use this
+      scan_hint_empty: scan_all_hint,
+      scan_hint_all: scan_hint_message
     }
   }
     %table#repo_files_table{ class: "w-full text-sm table-fixed" }
@@ -43,7 +43,16 @@
                   value: path_filter,
                   placeholder: "prefix matching filter (live search)",
                   class: "w-full text-sm rounded px-3 py-2 bg-white",
-                  autocomplete: "off"
+                  autocomplete: "off",
+                  data: {
+                    controller: "live-search",
+                    live_search_delay_value: 1200,
+                    live_search_url_template_value: "/repository_files?repository_id=__REPO_ID__",
+                    live_search_param_name_value: "path_filter",
+                    live_search_repo_id_value: repository.id,
+                    live_search_frame_id_value: "repo_right",
+                    live_search_min_length_value: 2
+                  }
                 }
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
@@ -76,7 +85,7 @@
         onclick: "return window.PopConfirmLog.open(event, this)",
         data: {
           confirm_title: "Scan files",
-          confirm_message_html: scan_hint_message, # JS will override before click
+          confirm_message_html: scan_hint_message,
           confirm_confirm_label: "Scan",
           confirm_cancel_label: "Cancel"
         },
@@ -114,8 +123,6 @@
       if (panel.dataset.initialized === "1") return;
       panel.dataset.initialized = "1";
 
-      const repoId = panel.dataset.repoId;
-
       const checkAll = document.getElementById("check_all");
       const hint = document.getElementById("bulk_hint");
 
@@ -127,8 +134,6 @@
 
       const scanIdsBox    = document.getElementById("bulk_scan_file_ids");
       const scanTrigger   = document.getElementById("bulk_scan_trigger");
-
-      const searchInput   = document.getElementById("path_filter_input");
 
       const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
 
@@ -221,32 +226,6 @@
 
           setScanConfirmMessage(ids.length);
           scanTrigger.click();
-        });
-      }
-
-      // Live search: refresh only the repo_files Turbo Frame (no full page reload)
-      if (searchInput) {
-        let timer = null;
-
-        function runSearch() {
-          const value = (searchInput.value || "").trim();
-          const params = new URLSearchParams();
-
-          if (repoId) params.set("repository_id", repoId);
-          if (value.length > 0) params.set("path_filter", value);
-
-          const frame = document.getElementById("repo_files");
-          if (frame) {
-            frame.src = `/repository_files.turbo_stream?${params.toString()}`;
-            frame.reload();
-          } else {
-            window.location.assign(`/repositories?${params.toString()}`);
-          }
-        }
-
-        searchInput.addEventListener("input", () => {
-          if (timer) clearTimeout(timer);
-          timer = setTimeout(runSearch, 250);
         });
       }
     }
