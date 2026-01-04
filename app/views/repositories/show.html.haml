@@ -22,9 +22,14 @@
 
         %div{ class: "shrink-0 flex items-center gap-2" }
           - if pattern.present?
-            = form_with url: scan_runs_path, method: :post, local: true do
-              = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
-              %button#bulk_scan_trigger{ type: "submit", class: "icon-button", onclick: "return window.PopConfirmLog.open(event, this)", data: {controller: "tooltip", tooltip_text_value: "Repository Scan", tooltip_placement_value: "bottom", confirm_title: "Scan Repository", confirm_message_html: scan_hint, confirm_confirm_label: "Scan", confirm_cancel_label: "Cancel"} }
+            = form_with url: scan_runs_path, method: :post, data: { turbo_frame: "repo_right" } do
+              = hidden_field_tag :repository_id, repository.id
+              %button#bulk_scan_trigger{
+                type: "submit",
+                class: "icon-button",
+                onclick: "return window.PopConfirmLog.open(event, this)",
+                data: confirm_scan_tip(tip: 'Repository Scan', title: 'Repository Scan', msg_html: scan_hint)
+              }
                 = svg_icon("magnifying-glass", class_name: "w-6 h-6")
 
           = link_to edit_repository_path(repository, repository_id: repository.id),
