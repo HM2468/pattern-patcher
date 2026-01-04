@@ -14,7 +14,7 @@
     %div{ class: "shrink-0 flex items-center gap-2" }
       = link_to lexical_patterns_path,
         class: "icon-button",
-        data: { turbo_frame: "repo_right", controller: "tooltip", tooltip_text_value: "All patterns", tooltip_placement_value: "bottom" } do
+        data: tooltip_data(tip: "All patterns", turbo_frame: "repo_right") do
         = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
 
   -# Body
@@ -25,7 +25,7 @@
       %div{ class: "flex items-center justify-center" }
         = link_to lexical_patterns_path,
           class: "icon-button",
-          data: { turbo_frame: "repo_right", controller: "tooltip", tooltip_text_value: "All patterns", tooltip_placement_value: "bottom" } do
+          data: tooltip_data(tip: "All patterns", turbo_frame: "repo_right") do
           = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
   -else
     %div{ class: "px-2 py-2 space-y-2" }

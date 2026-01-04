@@ -11,6 +11,48 @@ module ApplicationHelper
     "error"   => "border-red-200 bg-red-50 text-red-800"
   }.freeze
 
+  # Build data attributes for Stimulus tooltip controller.
+  #
+  # Usage:
+  #   data: tooltip_data(tip: "New Repository")
+  #   data: tooltip_data(tip: "Delete", placement: "bottom", confirm_title: "...", confirm_message: "...")
+  #   data: tooltip_data(tip: "Edit", controller: "tooltip other-controller", action: "mouseenter->x#y")
+  #
+  # Notes:
+  # - `tip:` is required.
+  # - `placement:` defaults to "bottom".
+  # - You can pass extra key-values, they will be merged into the data hash.
+  # - If you pass `controller:`, it will be appended (not overwritten).
+  def tooltip_data(tip:, placement: "bottom", controller: nil, **extra)
+    raise ArgumentError, "tooltip_data requires `tip:`" if tip.blank?
+    data = {
+      tooltip_text_value: tip,
+      tooltip_placement_value: placement
+    }
+    # Allow adding/merging controller(s).
+    # - If caller provides controller: "tooltip foo", we keep it.
+    # - Otherwise ensure "tooltip" is included.
+    controllers = []
+    controllers << "tooltip"
+    controllers.concat(controller.to_s.split(/\s+/)) if controller.present?
+    controllers = controllers.uniq
+    data[:controller] = controllers.join(" ")
+    # Merge extra data-* attributes (e.g. turbo_frame, action, confirm_title...)
+    # NOTE: keys should be snake_case here, Rails will render as data-*
+    data.merge!(extra) if extra.present?
+    data
+  end
+
+  # {
+  #   controller: "tooltip",
+  #   tooltip_text_value: "Delete",
+  #   tooltip_placement_value: "bottom",
+  #   confirm_title: "Delete pattern",
+  #   confirm_message: "Delete this pattern? This cannot be undone."
+  # }
+  def delete_tip(title: '', msg: '')
+    tooltip_data(tip: 'Delete', confirm_title: title, confirm_message: msg)
+  end
 
   def svg_icon(name, class_name: "")
     path = Rails.root.join("app/assets/images/icons/#{name}.svg")
