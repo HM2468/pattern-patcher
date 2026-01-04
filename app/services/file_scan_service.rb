@@ -144,7 +144,7 @@ class FileScanService
         o.byte_end        = byte_end
         o.matched_text    = matched_text
         o.context         = context.to_s
-        o.status          = "unreviewed"
+        o.status          = "unprocessed"
       end
 
     if occ.new_record?
