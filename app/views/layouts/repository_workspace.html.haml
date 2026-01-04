@@ -7,6 +7,7 @@
     %div{ class: "w-[25%] rounded-lg bg-white overflow-hidden flex flex-col" }
       -# Stack ALL left elements with spacing
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
+        = render "repositories/current_pattern"
         -# Top: repo dropdown (fixed)
         = render "repositories/repo_dropdown"
 
@@ -20,8 +21,6 @@
           - else
             %div{ class: "p-3 text-sm text-gray-600" }
               No repository selected.
-
-          = render "repositories/current_pattern"
 
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
