@@ -17,9 +17,9 @@ class LexicalPattern < ApplicationRecord
   scope :by_priority, -> { order(priority: :asc, name: :asc) }
 
   enum :mode, {
-    line_mode: "line",
-    file_mode: "file"
-  }, default: :line
+    line_mode: "line_mode",
+    file_mode: "file_mode"
+  }, default: :line_mode
 
   class << self
     def current_pattern
