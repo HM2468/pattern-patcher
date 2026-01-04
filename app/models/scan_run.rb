@@ -31,11 +31,6 @@ class ScanRun < ApplicationRecord
     finished_with_errors: "finished_with_errors"
   }, default: :pending
 
-  enum :scan_mode, {
-    line_mode: "line_mode",
-    file_mode: "file_mode"
-  }, default: :line_mode
-
   # Single cache key for "latest progress" (phase is stored in payload)
   def progress_key
     "scan_runs:progress:#{id}"

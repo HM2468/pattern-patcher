@@ -51,22 +51,10 @@
         %div
           %label{ for: "lexical_pattern_mode", class: "block text-sm font-medium text-gray-700 mb-1" }
             Mode
-          = form.select :mode,
-            ['line', 'file'],
-            { selected: @lexical_pattern&.mode || "line" },
+          = form.select :scan_mode,
+            ['line_mode', 'file_mode'],
+            { selected: @lexical_pattern&.scan_mode || "line_mode" },
             { id: "lexical_pattern_mode", class: "form-select", required: true }
-
-        %div
-          %label{ for: "lexical_pattern_priority", class: "block text-sm font-medium text-gray-700 mb-1" }
-            Priority
-          = form.number_field :priority,
-            id: "lexical_pattern_priority",
-            class: "form-input",
-            min: 1,
-            max: 1000,
-            required: true
-          %p{ class: "mt-1 text-xs text-gray-500" }
-            Must be between 1 and 1000 (inclusive)
 
       / Enabled
       %div{ class: "flex items-center gap-2" }

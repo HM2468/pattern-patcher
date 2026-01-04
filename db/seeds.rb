@@ -2,17 +2,16 @@
 LexicalPattern.create!(
   name: "Chinese inside single quotes",
   language: "ruby",
-  priority: 10,
   enabled: true,
   pattern: "/'[^']*[\u4e00-\u9fff]+[^']*'/",
 )
 LexicalPattern.create!(
   name: "Chinese inside double quotes",
   language: "ruby",
-  priority: 10,
   enabled: false,
   pattern: '/"[^"]*[\u4e00-\u9fff]+[^"]*"/',
 )
+
 LexemeProcessor.create!(
   name: "Localize Rails",
   key: "localize_rails",

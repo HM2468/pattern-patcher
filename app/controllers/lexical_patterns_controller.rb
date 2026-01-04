@@ -5,16 +5,14 @@ class LexicalPatternsController < ApplicationController
 
   def index
     # Keep ordering predictable for operators:
-    # priority asc, then newest first as a stable tie-breaker
     @lexical_patterns =
       LexicalPattern
-        .order(priority: :asc, created_at: :desc)
         .page(params[:page])
         .per(10)
   end
 
   def new
-    @lexical_pattern = LexicalPattern.new(enabled: true, priority: 100)
+    @lexical_pattern = LexicalPattern.new(enabled: false)
   end
 
   def create
@@ -36,7 +34,6 @@ class LexicalPatternsController < ApplicationController
     # Re-load current page after delete. This is what enables "fill the gap".
     @lexical_patterns =
       LexicalPattern
-        .order(priority: :asc, created_at: :desc)
         .page(params[:page])
         .per(10)
 
@@ -104,6 +101,6 @@ class LexicalPatternsController < ApplicationController
   end
 
   def lexical_pattern_params
-    params.require(:lexical_pattern).permit(:name, :pattern, :language, :mode, :priority, :enabled)
+    params.require(:lexical_pattern).permit(:name, :pattern, :language, :scan_mode, :enabled)
   end
 end

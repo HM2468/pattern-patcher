@@ -2,18 +2,19 @@
 class ScanRunsController < ApplicationController
   include ScanRunsHelper
   include RepositoryWorkspaceContext
+
   layout "repository_workspace", only: %i[index create scanned_files scanned_occurrences]
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
     repo_id = @selected_id || params[:repository_id].presence
     scope = if repo_id.present?
-      ScanRun
-        .joins(:repository_snapshot)
-        .where(repository_snapshots: { repository_id: params[:repository_id] })
-    else
-      ScanRun.all
-    end
+              ScanRun
+                .joins(:repository_snapshot)
+                .where(repository_snapshots: { repository_id: params[:repository_id] })
+            else
+              ScanRun.all
+            end
 
     @scan_runs =
       scope
@@ -51,7 +52,12 @@ class ScanRunsController < ApplicationController
         lexical_pattern_id: @current_pattern.id,
         repository_snapshot_id: snapshot.id,
         started_at: Time.current,
-        pattern_snapshot: @current_pattern.pattern,
+        pattern_snapshot:
+         {
+           name: @current_pattern.name,
+           scan_mode: @current_pattern.scan_mode,
+           regexp: @current_pattern.pattern,
+         },
       )
     if @scan_run.save
       flash[:success] = "Scan created and started."

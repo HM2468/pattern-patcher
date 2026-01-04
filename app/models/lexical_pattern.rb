@@ -4,26 +4,28 @@ class LexicalPattern < ApplicationRecord
   has_many :occurrences, dependent: :restrict_with_error
 
   ALLOWED_FLAGS  = %w[i m x].freeze
-  PRIORITY_RANGE = (1..1000)
 
   validates :name, presence: true
   validates :pattern, presence: true
   validates :language, presence: true
-  validates :mode, presence: true
-  validates :priority, numericality: { only_integer: true, in: PRIORITY_RANGE }, presence: true
+  validates :scan_mode, presence: true
   validate :pattern_must_be_valid_regex
 
-  scope :enabled, -> { where(enabled: true) }
-  scope :by_priority, -> { order(priority: :asc, name: :asc) }
+  scope :enabled_true, -> { where(enabled: true) }
 
-  enum :mode, {
+  enum :scan_mode, {
     line_mode: "line_mode",
     file_mode: "file_mode"
   }, default: :line_mode
 
+  # Ensure only one enabled pattern exists:
+  # - If this record is saved with enabled=true, disable all others in the same transaction.
+  before_save :ensure_single_enabled, if: :will_enable?
+
   class << self
+    # Always returns the single enabled record (if any)
     def current_pattern
-      enabled.by_priority.first
+      enabled_true.first
     end
   end
 
@@ -58,6 +60,18 @@ class LexicalPattern < ApplicationRecord
   end
 
   private
+
+  def will_enable?
+    enabled? && (new_record? || will_save_change_to_enabled?)
+  end
+
+  # When enabling this record, disable all others.
+  # Use update_all to avoid callbacks/validations and keep it fast.
+  def ensure_single_enabled
+    return unless enabled?
+
+    self.class.where(enabled: true).where.not(id: id).update_all(enabled: false, updated_at: Time.current)
+  end
 
   # Require users to input regex literal strings: /pattern/flags
   # - Must start with / and have a closing /
