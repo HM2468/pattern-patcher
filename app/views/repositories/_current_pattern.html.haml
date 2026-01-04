@@ -18,15 +18,25 @@
         = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
 
   -# Body
-  %div{ class: "px-2 py-2 space-y-2" }
-    - name_text = pattern&.name.presence || "—"
-    %div.repo-meta-block
-      %div.repo-meta-label name
-      %div.repo-meta-value{ title: name_text }
-        = name_text
+  -if pattern.nil?
+    %div{ class: "px-2 py-2 space-y-2" }
+      %div{ class: "text-center text-sm text-gray-600" }
+        Select or create a pattern first.
+      %div{ class: "flex items-center justify-center" }
+        = link_to lexical_patterns_path,
+          class: "icon-button",
+          data: { turbo_frame: "repo_right", controller: "tooltip", tooltip_text_value: "All patterns", tooltip_placement_value: "bottom" } do
+          = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
+  -else
+    %div{ class: "px-2 py-2 space-y-2" }
+      - name_text = pattern&.name.presence || "—"
+      %div.repo-meta-block
+        %div.repo-meta-label name
+        %div.repo-meta-value{ title: name_text }
+          = name_text
 
-    - regexp_text = pattern&.pattern.presence || "—"
-    %div.repo-meta-block
-      %div.repo-meta-label regexp
-      %div.repo-meta-value{ title: regexp_text }
-        = regexp_text
+      - regexp_text = pattern&.pattern.presence || "—"
+      %div.repo-meta-block
+        %div.repo-meta-label regexp
+        %div.repo-meta-value{ title: regexp_text }
+          = regexp_text
