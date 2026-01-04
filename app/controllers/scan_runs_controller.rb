@@ -3,7 +3,7 @@ class ScanRunsController < ApplicationController
   include ScanRunsHelper
   include RepositoryWorkspaceContext
 
-  layout "repository_workspace", only: %i[index create scanned_files scanned_occurrences]
+  layout "repository_workspace", only: %i[index create destroy scanned_files scanned_occurrences]
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
