@@ -22,7 +22,7 @@
 
         %div{ class: "shrink-0 flex items-center gap-2" }
           - if pattern.present?
-            = form_with url: scan_runs_path, method: :post, data: { turbo_frame: "repo_right" } do
+            = form_with url: scan_runs_path, method: :post, data: { turbo_frame: "repo_right" }, html: { class: "flex items-center" } do
               = hidden_field_tag :repository_id, repository.id
               %button#bulk_scan_trigger{
                 type: "submit",
@@ -33,7 +33,7 @@
                 = svg_icon("magnifying-glass", class_name: "w-6 h-6")
 
           = link_to edit_repository_path(repository, repository_id: repository.id),
-            class: "icon-button",
+            class: "icon-button flex items-center",
             data: tooltip_data(tip: "Repository Setting", turbo_frame: "repo_right") do
             = svg_icon("cog-6-tooth", class_name: "w-6 h-6")
 
