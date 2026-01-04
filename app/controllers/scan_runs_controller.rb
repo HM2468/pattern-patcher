@@ -2,11 +2,12 @@
 class ScanRunsController < ApplicationController
   include ScanRunsHelper
   include RepositoryWorkspaceContext
-  layout "repository_workspace", only: %i[index scanned_files scanned_occurrences]
+  layout "repository_workspace", only: %i[index create scanned_files scanned_occurrences]
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
-    scope = if params[:repository_id].present?
+    repo_id = @selected_id || params[:repository_id].presence
+    scope = if repo_id.present?
       ScanRun
         .joins(:repository_snapshot)
         .where(repository_snapshots: { repository_id: params[:repository_id] })
@@ -39,44 +40,30 @@ class ScanRunsController < ApplicationController
   end
 
   def create
-    @repository = Repository.find_by(id: params[:repository_id])
-    unless @repository
-      flash[:alert] = "Repository not found."
-      return redirect_to(repositories_path)
-    end
-
-    scan_pattern = LexicalPattern.current_pattern
-    if scan_pattern.nil?
-      flash[:alert] = "No enabled pattern found. Please set up one in Lexical Patterns page."
-      return redirect_to(repositories_path(repository_id: @repository.id))
-    end
-
     file_ids = params[:file_ids].presence || []
-    snapshot = @repository.current_snapshot
+    snapshot = @selected_repository.current_snapshot
     if snapshot.nil?
       flash[:alert] = "No repository snapshot found. Please import the repository first."
-      return redirect_to(repositories_path(repository_id: @repository.id))
+      return redirect_to(repositories_path(repository_id: @selected_repository.id))
     end
     @scan_run =
       ScanRun.new(
-        lexical_pattern_id: scan_pattern.id,
+        lexical_pattern_id: @current_pattern.id,
         repository_snapshot_id: snapshot.id,
-        scan_mode: scan_pattern.mode,
-        status: "pending",
         started_at: Time.current,
-        pattern_snapshot: scan_pattern.pattern,
+        pattern_snapshot: @current_pattern.pattern,
       )
     if @scan_run.save
       flash[:success] = "Scan created and started."
       StartScanJob.perform_later(
         scan_run_id: @scan_run.id,
-        repository_id: @repository.id,
+        repository_id: @selected_repository.id,
         file_ids: file_ids,
       )
-      redirect_to(scan_runs_path(repository_id: @repository.id))
+      redirect_to(scan_runs_path(repository_id: @selected_repository.id))
     else
       flash[:error] = @scan_run.errors.full_messages.join(", ")
-      redirect_to(repositories_path(repository_id: @repository.id))
+      redirect_to(repositories_path(repository_id: @selected_repository.id))
     end
   end
 

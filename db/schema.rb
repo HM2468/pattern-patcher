@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_30_022231) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_04_101302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -56,16 +56,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_30_022231) do
     t.string "name"
     t.text "pattern"
     t.string "language"
-    t.string "pattern_type"
-    t.integer "priority"
     t.boolean "enabled"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "mode", default: "line", null: false
+    t.string "scan_mode", default: "line_mode", null: false
     t.index ["enabled"], name: "index_lexical_patterns_on_enabled"
-    t.index ["language", "pattern_type"], name: "index_lexical_patterns_on_language_and_pattern_type"
-    t.index ["mode"], name: "index_lexical_patterns_on_mode"
-    t.index ["priority"], name: "index_lexical_patterns_on_priority"
+    t.index ["scan_mode"], name: "index_lexical_patterns_on_scan_mode"
   end
 
   create_table "occurrence_reviews", force: :cascade do |t|
@@ -171,17 +167,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_30_022231) do
     t.string "status"
     t.datetime "started_at"
     t.datetime "finished_at"
-    t.text "pattern_snapshot"
     t.text "error"
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "repository_snapshot_id", null: false
-    t.string "scan_mode", default: "line", null: false
     t.jsonb "progress_persisted", default: {}, null: false
+    t.jsonb "pattern_snapshot", default: {}, null: false
     t.index ["lexical_pattern_id"], name: "index_scan_runs_on_lexical_pattern_id"
     t.index ["repository_snapshot_id"], name: "index_scan_runs_on_repository_snapshot_id"
-    t.index ["scan_mode"], name: "index_scan_runs_on_scan_mode"
     t.index ["status"], name: "index_scan_runs_on_status"
   end
 
