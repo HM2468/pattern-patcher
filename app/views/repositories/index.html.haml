@@ -1,6 +1,6 @@
 -# app/views/repositories/index.html.haml
-%div{ class: "p-3 text-sm text-gray-600" }
-  Select a repository on the left, or open:
+%div{ class: "py-5 text-m text-gray-600 flex items-center justify-center" }
+  No repository found yet, please create one first.
   - if @selected_id.present?
     = link_to "Files",
       repository_files_path(repository_id: @selected_id, path_filter: @path_filter),
