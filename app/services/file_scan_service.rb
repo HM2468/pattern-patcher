@@ -21,16 +21,21 @@ class FileScanService
     @regex = @pattern.compiled_regex
     @occ_created = 0
 
-    if @scan_run.scan_mode.to_s == "file"
-      scan_whole_file!
-    else
-      scan_by_line!
-    end
-
+    is_file_mode? ? scan_whole_file! : scan_by_line!
     @occ_created
   end
 
   private
+
+  def is_file_mode?
+    snapshot = @scan_run.pattern_snapshot
+    return false unless snapshot.is_a?(Hash)
+
+    scan_mode = snapshot.fetch('scan_mode')
+    return false unless scan_mode.present?
+
+    scan_mode == 'file_mode'
+  end
 
 
   # Scan modes

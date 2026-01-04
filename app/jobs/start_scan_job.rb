@@ -19,12 +19,11 @@ class StartScanJob < ApplicationJob
   def perform(scan_run_id:, repository_id:, file_ids: [])
     @scan_run = ScanRun.find(scan_run_id)
     @repo     = Repository.find(repository_id)
-    ids = normalize_ids(file_ids)
     @files_scope =
-      if ids.empty?
-        @repo.repository_files
+      if file_ids.present?
+        @repo.repository_files.where(id: file_ids)
       else
-        @repo.repository_files.where(id: ids)
+        @repo.repository_files
       end
     persist_scan_run_files!
     ScanningFileJob.perform_now(scan_run_id: @scan_run.id)
@@ -62,14 +61,6 @@ class StartScanJob < ApplicationJob
     )
     write_progress(total: 0, error: e.message.to_s)
     raise
-  end
-
-  def normalize_ids(file_ids)
-    Array(file_ids)
-      .map { |x| x.to_s.strip }
-      .reject(&:empty?)
-      .map(&:to_i)
-      .uniq
   end
 
   def write_progress(total:, error: nil)
