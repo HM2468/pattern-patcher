@@ -5,6 +5,9 @@
 - repository = @repository
 - return if repository.nil?
 
+- pattern = @current_pattern
+- scan_hint = "Scan all files in <strong>#{repository&.name}</strong> with pattern: <strong>#{pattern&.name}</strong>? Or change <a href='#{lexical_patterns_path}' class='underline'>current pattern</a>."
+
 - inner = capture do
   %div{ class: "flex-1 overflow-y-auto" }
     %div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
@@ -15,9 +18,15 @@
             = repository.name.presence || "—"
 
           %div{ class: "mt-1 text-xs text-gray-600 font-mono truncate" }
-            = repository.current_snapshot&.commit_sha || "N/A"
+            = repository.current_snapshot&.commit_sha&.slice(0, 8) || "N/A"
 
         %div{ class: "shrink-0 flex items-center gap-2" }
+          - if pattern.present?
+            = form_with url: scan_runs_path, method: :post, local: true do
+              = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
+              %button#bulk_scan_trigger{ type: "submit", class: "icon-button", onclick: "return window.PopConfirmLog.open(event, this)", data: {controller: "tooltip", tooltip_text_value: "Repository Scan", tooltip_placement_value: "bottom", confirm_title: "Scan Repository", confirm_message_html: scan_hint, confirm_confirm_label: "Scan", confirm_cancel_label: "Cancel"} }
+                = svg_icon("magnifying-glass", class_name: "w-6 h-6")
+
           = link_to edit_repository_path(repository, repository_id: repository.id),
             class: "icon-button",
             data: tooltip_data(tip: "Repository Setting", turbo_frame: "repo_right") do
