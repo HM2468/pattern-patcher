@@ -1,13 +1,10 @@
 -# frozen_string_literal: true
 -# app/views/repository_files/_file_list.html.haml
--# This partial is rendered inside a Turbo Frame. It must work with locals.
+
 - repository = local_assigns.fetch(:repository, nil) || @repository
 - repository_files = local_assigns.fetch(:repository_files, nil) || @repository_files
 - path_filter = local_assigns.fetch(:path_filter, nil) || @path_filter
-
--# confirm message html (fallback to ivars if you still set them somewhere)
 - scan_hint_message = local_assigns.fetch(:scan_hint_message, nil) || @scan_hint_message
-- scan_all_hint   = local_assigns.fetch(:scan_all_hint, nil) || @scan_all_hint
 
 - if repository.nil?
   %div{ class: "p-6 text-gray-700" }
@@ -17,24 +14,26 @@
     Please import files or check whether the repository is empty.
 - else
   %div#repo_files_panel{
-    class: "flex-1 overflow-auto rounded-2xl bg-white shadow-sm",
+    class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm",
     data: {
-      repo_id: repository.id,
-      scan_hint_empty: scan_all_hint,
-      scan_hint_all: scan_hint_message
+      controller: "repo-files",
+      repo_files_repo_id_value: repository.id,
+      repo_files_scan_hint_message_value: scan_hint_message
     }
   }
-    %table#repo_files_table{ class: "w-full text-sm table-fixed" }
-      %thead{ class: "bg-indigo-100 text-gray-600 sticky top-0 z-10" }
+
+    -# ===== Fixed Header (NOT scroll) =====
+    %table#repo_files_table_head{ class: "w-full text-sm table-fixed repo-files-head" }
+      %thead{ class: "bg-indigo-100 text-gray-600" }
         %tr
           %th{ class: "px-4 py-3 font-semibold" }
             %div#repo_files_toolbar{ class: "flex items-center gap-3" }
               %div{ class: "flex items-start gap-2 shrink-0" }
-                %input#check_all{ type: "checkbox", class: "mt-1 scale-150" }
+                %input#check_all{ type: "checkbox", class: "mt-1 scale-150", data: { repo_files_target: "checkAll" } }
 
                 %div{ class: "flex flex-col items-start text-left leading-tight" }
                   %span{ class: "text-sm" } Select All
-                  %div#bulk_hint{ class: "text-xs text-gray-500" }
+                  %div#bulk_hint{ class: "text-xs text-gray-500", data: { repo_files_target: "hint" } }
                     200/page
 
               %div{ class: "flex-1 px-2" }
@@ -56,180 +55,81 @@
                 }
 
               %div{ class: "ml-auto flex items-center gap-2 shrink-0" }
-                %button#bulk_scan{ type: "button", class: "button-primary" } Scan
-                %button#bulk_delete{ type: "button", class: "button-danger" } Delete
+                %button#bulk_scan{
+                  type: "button",
+                  class: "button-primary",
+                  disabled: true,
+                  data: { action: "repo-files#onBulkScanClick", repo_files_target: "bulkScanBtn" }
+                } Scan
 
-      %tbody#repo_files_tbody{ class: "divide-y divide-gray-300" }
-        - repository_files.each do |f|
-          %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
-            %td{ class: "px-4 py-3" }
-              %div{ class: "flex items-start gap-3" }
-                %input{
-                  id: "file_check_#{f.id}",
-                  type: "checkbox",
-                  value: f.id,
-                  data: { file_check: "1" },
-                  class: "mt-1 scale-150"
-                }
-                %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
-                  %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
-                    = f.path
+                %button#bulk_delete{
+                  type: "button",
+                  class: "button-danger",
+                  disabled: true,
+                  data: { action: "repo-files#onBulkDeleteClick", repo_files_target: "bulkDeleteBtn" }
+                } Delete
 
-  %div{ class: "hidden" }
-    = form_with url: scan_runs_path, method: :post, local: true,
-      html: { id: "bulk_scan_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
-      %div#bulk_scan_file_ids
-      %button#bulk_scan_trigger{
-        type: "submit",
-        onclick: "return window.PopConfirmLog.open(event, this)",
-        data: {
-          confirm_title: "Scan files",
-          confirm_message_html: scan_hint_message,
-          confirm_confirm_label: "Scan",
-          confirm_cancel_label: "Cancel"
-        },
-        class: "button-primary"
-      } Scan
-
-  %div{ class: "hidden" }
-    = form_with url: bulk_delete_repository_files_path, method: :post, local: true,
-      html: { id: "bulk_delete_form", class: "inline-flex" } do
-      = hidden_field_tag :repository_id, repository.id
-      %div#bulk_delete_file_ids
-      %button#bulk_delete_trigger{
-        type: "submit",
-        onclick: "return window.PopConfirmLog.open(event, this)",
-        data: {
-          confirm_title: "Delete files",
-          confirm_message: "Delete selected files? This cannot be undone.",
-          confirm_confirm_label: "Delete",
-          confirm_cancel_label: "Cancel"
-        },
-        class: "button-danger"
-      } Delete
-
-%div#repo_files_pagination{ class: "bottom-pagination" }
-  = render "shared/pagination",
-    collection: repository_files,
-    options: { repository_id: repository&.id, path_filter: path_filter }.compact
-
-:javascript
-  (function() {
-    function initRepoFilesPage() {
-      const panel = document.getElementById("repo_files_panel");
-      if (!panel) return;
-
-      if (panel.dataset.initialized === "1") return;
-      panel.dataset.initialized = "1";
-
-      const checkAll = document.getElementById("check_all");
-      const hint = document.getElementById("bulk_hint");
-
-      const bulkDeleteBtn = document.getElementById("bulk_delete");
-      const bulkScanBtn   = document.getElementById("bulk_scan");
-
-      const deleteIdsBox  = document.getElementById("bulk_delete_file_ids");
-      const deleteTrigger = document.getElementById("bulk_delete_trigger");
-
-      const scanIdsBox    = document.getElementById("bulk_scan_file_ids");
-      const scanTrigger   = document.getElementById("bulk_scan_trigger");
-
-      const checks = () => Array.from(document.querySelectorAll('input[data-file-check="1"]'));
-
-      function selectedIds() {
-        return checks().filter(x => x.checked).map(x => x.value);
-      }
-
-      function setButtonsEnabled() {
-        const count = selectedIds().length;
-        if (bulkScanBtn) bulkScanBtn.disabled = false;
-        if (bulkDeleteBtn) bulkDeleteBtn.disabled = (count === 0);
-      }
-
-      function updateHintAndButtons() {
-        const count = selectedIds().length;
-        if (hint) hint.textContent = count > 0 ? `Selected: ${count}` : "200/page";
-        setButtonsEnabled();
-      }
-
-      function syncCheckAllState() {
-        if (!checkAll) return;
-        const all = checks();
-        checkAll.checked = (all.length > 0 && all.every(x => x.checked));
-      }
-
-      function fillHiddenIds(container, ids) {
-        if (!container) return;
-        container.innerHTML = "";
-        ids.forEach(id => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = "file_ids[]";
-          input.value = id;
-          container.appendChild(input);
-        });
-      }
-
-      function setScanConfirmMessage(idsCount) {
-        if (!scanTrigger) return;
-
-        const msgEmpty = panel.dataset.scanHintEmpty || "";
-        const msgAll   = panel.dataset.scanHintAll || "";
-        const useMsg = (idsCount === 0 ? msgEmpty : msgAll);
-
-        if (useMsg.length > 0) {
-          scanTrigger.dataset.confirmMessageHtml = useMsg;
+    -# ===== Scroll area: ONLY tbody scrolls =====
+    %div#repo_files_body_scroll{ class: "repo-files-body-scroll flex-1 overflow-y-auto" }
+      %table#repo_files_table_body{ class: "w-full text-sm table-fixed" }
+        %tbody#repo_files_tbody{
+          class: "divide-y divide-gray-300",
+          data: { action: "change->repo-files#onTbodyChange" }
         }
-      }
+          - repository_files.each do |f|
+            %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
+              %td{ class: "px-4 py-3" }
+                %div{ class: "flex items-start gap-3" }
+                  %input{
+                    id: "file_check_#{f.id}",
+                    type: "checkbox",
+                    value: f.id,
+                    data: { file_check: "1", repo_files_target: "fileCheck" },
+                    class: "mt-1 scale-150"
+                  }
+                  %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
+                    %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
+                      = f.path
 
-      if (checkAll) {
-        checkAll.addEventListener("change", () => {
-          checks().forEach(c => { c.checked = checkAll.checked; });
-          updateHintAndButtons();
-        });
-      }
+    -# ===== hidden forms MUST be inside #repo_files_panel so repo-files controller can find targets =====
+    %div{ class: "hidden" }
+      = form_with url: scan_runs_path, method: :post, local: true do
+        = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
+        %div#bulk_scan_file_ids{ data: { repo_files_target: "scanIdsBox" } }
+        %button#bulk_scan_trigger{
+          type: "submit",
+          onclick: "return window.PopConfirmLog.open(event, this)",
+          data: {
+            confirm_title: "Scan files",
+            confirm_message_html: scan_hint_message,
+            confirm_confirm_label: "Scan",
+            confirm_cancel_label: "Cancel"
+          },
+          class: "button-primary",
+          data: { repo_files_target: "scanTrigger" }
+        } Scan
 
-      panel.addEventListener("change", (e) => {
-        if (e.target && e.target.matches && e.target.matches('input[data-file-check="1"]')) {
-          syncCheckAllState();
-          updateHintAndButtons();
-        }
-      });
-
-      updateHintAndButtons();
-
-      if (bulkDeleteBtn) {
-        bulkDeleteBtn.addEventListener("click", () => {
-          const ids = selectedIds();
-          if (ids.length === 0) return;
-
-          fillHiddenIds(deleteIdsBox, ids);
-
-          if (!deleteTrigger) {
-            console.warn("[repo_files] bulk_delete_trigger not found");
-            return;
+    %div{ class: "hidden" }
+      = form_with url: bulk_delete_repository_files_path, method: :post, local: true do
+        = hidden_field_tag :repository_id, repository.id
+        %div#bulk_delete_file_ids{ data: { repo_files_target: "deleteIdsBox" } }
+        %button#bulk_delete_trigger{
+          type: "submit",
+          onclick: "return window.PopConfirmLog.open(event, this)",
+          class: "button-danger",
+          data: {
+            repo_files_target: "deleteTrigger",
+            confirm_title: "Delete files",
+            confirm_message_html: "Delete selected files? This cannot be undone.",
+            confirm_confirm_label: "Delete",
+            confirm_cancel_label: "Cancel"
           }
-          deleteTrigger.click();
-        });
-      }
+        } Delete
 
-      if (bulkScanBtn) {
-        bulkScanBtn.addEventListener("click", () => {
-          const ids = selectedIds();
-          fillHiddenIds(scanIdsBox, ids);
-
-          if (!scanTrigger) {
-            console.warn("[repo_files] bulk_scan_trigger not found");
-            return;
-          }
-
-          setScanConfirmMessage(ids.length);
-          scanTrigger.click();
-        });
-      }
+    -# ===== Fixed Footer Pagination =====
+    %div#repo_files_pagination{
+      class: "repo-files-pagination sticky bottom-0 bg-white border-t border-gray-200"
     }
-
-    document.addEventListener("turbo:load", initRepoFilesPage);
-    document.addEventListener("DOMContentLoaded", initRepoFilesPage);
-  })();
+      = render "shared/pagination",
+        collection: repository_files,
+        options: { repository_id: repository&.id, path_filter: path_filter }.compact
