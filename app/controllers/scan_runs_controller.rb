@@ -31,7 +31,7 @@ class ScanRunsController < ApplicationController
         .group("scan_runs.id, repositories.name, repository_snapshots.commit_sha, lexical_patterns.name")
         .order("scan_runs.created_at DESC")
         .page(params[:page])
-        .per(10)
+        .per(5)
 
     # 进度条数据来自 cache（每页 10 次读取）
     @progress_by_id = {}
@@ -78,10 +78,10 @@ class ScanRunsController < ApplicationController
     @scan_run.id
     if @scan_run.destroy!
       flash[:success] = "Scan run deleted."
-      redirect_to scan_runs_path(repository_id: @selected_id)
+      redirect_to scan_runs_path(repository_id: @selected_id, page: 1)
     else
       flash[:error] = @scan_run.errors.full_messages.join(", ")
-      redirect_to scan_runs_path(repository_id: @selected_id)
+      redirect_to scan_runs_path(repository_id: @selected_id, page: 1)
     end
   end
 

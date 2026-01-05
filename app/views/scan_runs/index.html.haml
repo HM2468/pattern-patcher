@@ -4,8 +4,10 @@
   %div{ class: "flex items-center justify-between" }
     %div{ class: "text-lg font-semibold" } Scan Runs
     %div{ class: "text-sm text-gray-600" }
-      Total:
-      %span{ class: "font-mono" }= @scan_runs.total_count
+      = link_to repository_files_path(repository_id: @selected_id),
+        class: "icon-button",
+        data: tooltip_data(tip: "Back") do
+        = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
   %div{
     class: "space-y-3",
