@@ -1,38 +1,51 @@
+-# frozen_string_literal: true
 -# app/views/lexical_patterns/index.html.haml
 -# Lexical Patterns index
--# Shows: Name / Type / Enabled toggle / Priority / Actions
--# Turbo delete (fill-the-gap): tbody/pagination/empty are wrapped with stable DOM ids
+-# Fixed header + scrollable body + fixed pagination (like scan_runs/index)
 
-%main{ class: "mx-auto max-w-6xl px-6 py-8 space-y-6" }
-  %div{ class: "flex items-center justify-between gap-4" }
-    %div
-      %h2{ class: "text-2xl font-semibold tracking-tight" } Lexical Patterns
+%div{ class: "max-w-6xl mx-auto h-[85vh] overflow-hidden" }
+  %div#lexical_patterns_panel{
+    class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
+  }
 
-    %div{ class: "flex gap-2" }
-      = link_to "New Pattern", new_lexical_pattern_path,
-        class: "button-primary"
+    -# ===== Fixed Header (NOT scroll) =====
+    %div{ class: "text-gray-600 border-b border-gray-200" }
+      %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
+        %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
+          %div{ class: "text-lg font-semibold text-gray-900" } Patterns
 
-  .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-    %table{ class: "w-full text-sm" }
-      %thead{ class: "bg-indigo-100 text-gray-600" }
-        %tr
-          %th{ class: "px-4 py-3 text-left font-medium" } Name
-          %th{ class: "px-4 py-3 text-left font-medium" } Type
-          %th{ class: "px-4 py-3 text-left font-medium" } Enabled
-          %th{ class: "pl-4 pr-8 py-3 text-right font-medium" } Actions
+        %div{ class: "shrink-0 flex gap-2" }
+          = link_to "New", new_lexical_pattern_path, class: "button-primary"
 
-      -# IMPORTANT: stable tbody id so Turbo can replace it to fill the gap after delete
-      %tbody{ id: "lexical_patterns_tbody", class: "divide-y divide-gray-300" }
-        - @lexical_patterns.each do |pattern|
-          = render "row", pattern: pattern
+    -# ===== Scroll area: ONLY body scrolls =====
+    %div#lexical_patterns_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
+      %div{ class: "px-6 py-4 space-y-4" }
 
-  -# IMPORTANT: stable empty state container (Turbo replace)
-  %div{ id: "lexical_patterns_empty_state" }
-    - if @lexical_patterns.empty?
-      .rounded-2xl.bg-gray-50.p-8.shadow-sm
-        %div{ class: "text-sm text-gray-600" }
-          No patterns yet. Create your first pattern to start scanning.
+        - if @lexical_patterns.blank?
+          %div#lexical_patterns_empty_state
+            .rounded-2xl.bg-gray-50.p-8.shadow-sm
+              %div{ class: "text-sm text-gray-600" }
+                No patterns yet. Create your first pattern to start scanning.
+        - else
+          .rounded-2xl.bg-white.shadow-sm.overflow-hidden
+            %table{ class: "w-full text-sm" }
+              -# %thead{ class: "bg-indigo-100 text-gray-600" }
+              -#   %tr
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } Name
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } Type
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } Enabled
+              -#     %th{ class: "pl-4 pr-8 py-3 text-right font-medium" } Actions
 
+              -# IMPORTANT: stable tbody id so Turbo can replace it to fill the gap after delete
+              %tbody{ id: "lexical_patterns_tbody", class: "divide-y divide-gray-300" }
+                - @lexical_patterns.each do |pattern|
+                  = render "row", pattern: pattern
 
-  - if @lexical_patterns.any?
-    = render "shared/pagination", collection: @lexical_patterns
+          -# Keep empty state container in DOM for Turbo replace (even when not empty)
+          %div#lexical_patterns_empty_state{ class: "hidden" }
+
+    -# ===== Fixed Footer Pagination =====
+    %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
+      %div{ class: "px-6 py-3" }
+        - if @lexical_patterns.any?
+          = render "shared/pagination", collection: @lexical_patterns

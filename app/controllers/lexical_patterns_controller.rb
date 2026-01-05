@@ -8,7 +8,7 @@ class LexicalPatternsController < ApplicationController
     @lexical_patterns =
       LexicalPattern
         .page(params[:page])
-        .per(10)
+        .per(12)
   end
 
   def new
