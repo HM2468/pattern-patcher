@@ -4,9 +4,9 @@ class LexicalPatternsController < ApplicationController
   before_action :set_lexical_pattern, only: [:test, :run_test, :toggle_enabled, :edit, :update, :destroy]
 
   def index
-    # Keep ordering predictable for operators:
     @lexical_patterns =
       LexicalPattern
+        .order(updated_at: :desc)
         .page(params[:page])
         .per(12)
   end
@@ -53,9 +53,9 @@ class LexicalPatternsController < ApplicationController
     # Reload current page list so Turbo can refresh all toggles shown in UI
     @lexical_patterns =
       LexicalPattern
-        .order(id: :asc)
+        .order(updated_at: :desc)
         .page(page)
-        .per(10)
+        .per(12)
     respond_to do |format|
       format.turbo_stream do
         streams = @lexical_patterns.map do |pattern|
