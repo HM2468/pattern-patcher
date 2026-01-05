@@ -11,15 +11,25 @@ module RepositoryWorkspaceContext
   def prepare_repository_workspace
     # 1) Left sidebar @current_pattern
     @current_pattern = LexicalPattern.current_pattern
+
     # 2) Left sidebar list (1 query)
-    @repositories   = Repository.order(name: :asc).to_a
-    @dropdown_list  = @repositories.map { |r| { id: r.id, name: r.name } }
-    @path_filter    = params[:path_filter].to_s.strip
+    @repositories  = Repository.order(name: :asc).to_a
+    @dropdown_list = @repositories.map { |r| { id: r.id, name: r.name } }
+    @path_filter   = params[:path_filter].to_s.strip
+
+    # IMPORTANT:
+    # params[:id] means different things in different controllers.
+    # - repositories/:id        => repo id
+    # - scan_runs/:id/*         => scan_run id (NOT repo id)
+    #
+    # Only treat params[:id] as repository_id when we are in RepositoriesController.
+    repo_id_from_id_param =
+      controller_name == "repositories" ? params[:id].presence : nil
 
     # 3) Selected repo id (don't override controller's @repository)
     @selected_id =
       params[:repository_id].presence ||
-      params[:id].presence ||            # 让 /repositories/:id/edit 自动选中
+      repo_id_from_id_param ||
       @repository&.id ||
       @repositories.first&.id
 

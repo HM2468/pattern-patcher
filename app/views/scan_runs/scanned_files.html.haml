@@ -16,7 +16,7 @@
 
         %div{ class: "shrink-0" }
           = link_to "Back",
-            scan_runs_path(repository_id: params[:repository_id]),
+            scan_runs_path(repository_id: @selected_id),
             class: "button-secondary"
 
     -# ===== Scroll area: ONLY table body scrolls =====
