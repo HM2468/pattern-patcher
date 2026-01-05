@@ -18,7 +18,6 @@
 - else
   %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No lexemes found.
 
--# IMPORTANT: stable pagination container (Turbo replace)
-%div{ id: "lexical_patterns_pagination" }
-  - if @lexemes.any?
-    = render "shared/pagination", collection: @lexemes
+
+- if @lexemes.any?
+  = render "shared/pagination", collection: @lexemes

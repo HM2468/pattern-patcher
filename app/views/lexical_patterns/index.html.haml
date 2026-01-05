@@ -35,7 +35,6 @@
         %div{ class: "text-sm text-gray-600" }
           No patterns yet. Create your first pattern to start scanning.
 
-  -# IMPORTANT: stable pagination container (Turbo replace)
-  %div{ id: "lexical_patterns_pagination" }
-    - if @lexical_patterns.any? && @lexical_patterns.total_pages > 1
-      = render "shared/pagination", collection: @lexical_patterns
+
+  - if @lexical_patterns.any? && @lexical_patterns.total_pages > 1
+    = render "shared/pagination", collection: @lexical_patterns
