@@ -38,19 +38,18 @@ class LexicalPatternsController < ApplicationController
   # New rule: at most one LexicalPattern can be enabled at any time.
   def toggle_enabled
     page = params[:page].presence || 1
+
     LexicalPattern.transaction do
-      # toggle target state
       to_enabled = !@lexical_pattern.enabled?
+
       if to_enabled
-        # enable current => disable all others
         LexicalPattern.where.not(id: @lexical_pattern.id).where(enabled: true).update_all(enabled: false)
         @lexical_pattern.update!(enabled: true)
       else
-        # disable current only
         @lexical_pattern.update!(enabled: false)
       end
     end
-    # Reload current page list so Turbo can refresh all toggles shown in UI
+    @current_pattern = LexicalPattern.current_pattern
     @lexical_patterns =
       LexicalPattern
         .order(updated_at: :desc)
@@ -58,13 +57,18 @@ class LexicalPatternsController < ApplicationController
         .per(12)
     respond_to do |format|
       format.turbo_stream do
-        streams = @lexical_patterns.map do |pattern|
+        streams = []
+        streams += @lexical_patterns.map do |pattern|
           turbo_stream.replace(
             view_context.dom_id(pattern, :enabled_toggle),
             partial: "lexical_patterns/enabled_toggle",
             locals: { lexical_pattern: pattern }
           )
         end
+        streams << turbo_stream.replace(
+          "current_pattern",
+          partial: "repositories/current_pattern"
+        )
         render turbo_stream: streams
       end
       format.html { redirect_to lexical_patterns_path(page: page) }

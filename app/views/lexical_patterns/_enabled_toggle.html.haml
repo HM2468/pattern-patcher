@@ -7,12 +7,11 @@
 
   = button_to toggle_enabled_lexical_pattern_path(lexical_pattern),
     method: :patch,
+    params: { page: params[:page] },
     form: { class: "inline-block" },
     class: "group inline-flex items-center rounded-full border px-1 py-1 transition #{enabled ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}" do
 
     %span{ class: "sr-only" } Toggle enabled
 
-    -# Track
     %span{ class: "relative inline-flex h-6 w-11 items-center rounded-full transition #{enabled ? 'bg-green-600' : 'bg-gray-300'}" }
-      -# Knob
       %span{ class: "inline-block h-5 w-5 transform rounded-full bg-white shadow transition #{enabled ? 'translate-x-5' : 'translate-x-1'}" }
