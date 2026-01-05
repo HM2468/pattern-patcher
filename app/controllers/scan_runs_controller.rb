@@ -7,38 +7,33 @@ class ScanRunsController < ApplicationController
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
-    repo_id = @selected_id || params[:repository_id].presence
-    scope = if repo_id.present?
-              ScanRun
-                .joins(:repository_snapshot)
-                .where(repository_snapshots: { repository_id: params[:repository_id] })
-            else
-              ScanRun.all
-            end
+    repo_id = @selected_id.presence || params[:repository_id].presence
+
+    base_scope =
+      if repo_id.present?
+        ScanRun
+          .joins(:repository_snapshot)
+          .where(repository_snapshots: { repository_id: repo_id })
+      else
+        ScanRun.all
+      end
 
     @scan_runs =
-      scope
+      base_scope
         .joins(repository_snapshot: :repository)
-        .joins(:lexical_pattern)
-        .left_joins(:occurrences)
         .select(<<~SQL.squish)
           scan_runs.*,
           repositories.name AS repository_name,
-          repository_snapshots.commit_sha AS commit_sha,
-          lexical_patterns.name AS lexical_pattern_name,
-          COUNT(occurrences.id) AS occurrences_count
+          repository_snapshots.commit_sha AS commit_sha
         SQL
-        .group("scan_runs.id, repositories.name, repository_snapshots.commit_sha, lexical_patterns.name")
         .order("scan_runs.created_at DESC")
         .page(params[:page])
         .per(5)
 
-    # 进度条数据来自 cache（每页 10 次读取）
     @progress_by_id = {}
-    @scan_runs.each do |sr|
-      @progress_by_id[sr.id] = sr.read_progress
-    end
+    @scan_runs.each { |sr| @progress_by_id[sr.id] = sr.read_progress }
   end
+
 
   def create
     file_ids = params[:file_ids].presence || []

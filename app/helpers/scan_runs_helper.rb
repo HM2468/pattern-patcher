@@ -10,13 +10,17 @@ module ScanRunsHelper
   # }
   def scan_run_display(scan_run, sha_length: 7)
     status = scan_run.status.to_s
+    pattern = scan_run.pattern_snapshot
+    result = scan_run.progress_persisted
 
     {
       repo_name: scan_run.repository_name,
       sha_short: scan_run.commit_sha.to_s[0, sha_length],
-      lp_name: scan_run.lexical_pattern_name,
-      occ_count: scan_run.occurrences_count.to_i,
+      occ_count: result.fetch('occ_count'),
       bar_class: ScanRun::PROGRESS_COLOR[status],
+      pattern_name: pattern.fetch('name'),
+      scan_mode: pattern.fetch('scan_mode'),
+      regexp: pattern.fetch('regexp'),
     }
   end
 

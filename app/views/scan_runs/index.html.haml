@@ -1,22 +1,36 @@
 -# app/views/scan_runs/index.html.haml
 
-%div{ class: "max-w-6xl mx-auto p-6 space-y-4" }
-  %div{ class: "flex items-center justify-between" }
-    %div{ class: "text-lg font-semibold" } Scan Runs
-    %div{ class: "text-sm text-gray-600" }
-      = link_to repository_files_path(repository_id: @selected_id),
-        class: "icon-button",
-        data: tooltip_data(tip: "Back") do
-        = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
-
-  %div{
-    class: "space-y-3",
-    data: {
-      controller: "scan-runs",
-      scan_runs_channel_value: "ScanRunsChannel"
-    }
+%div{ class: "max-w-6xl mx-auto h-[85vh] overflow-hidden" }
+  %div#scan_runs_panel{
+    class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
   }
-    - @scan_runs.each do |sr|
-      = render partial: "scan_run", locals: { scan_run: sr, progress: @progress_by_id[sr.id] }
 
-  = render "shared/pagination", collection: @scan_runs
+    -# ===== Fixed Header (NOT scroll) =====
+    %div{ class: "text-gray-600 border-b border-gray-200" }
+      %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
+        %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
+          %div{ class: "text-lg font-semibold text-gray-900" } Scan Runs
+        %div{ class: "shrink-0" }
+          = link_to repository_files_path(repository_id: @selected_id),
+            class: "icon-button",
+            data: tooltip_data(tip: "Back") do
+            = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
+
+    -# ===== Scroll area: ONLY body scrolls =====
+    %div#scan_runs_body_scroll{
+      class: "pp-scroll-gutter-stable flex-1 overflow-y-auto",
+      data: { controller: "scan-runs", scan_runs_channel_value: "ScanRunsChannel" }
+    }
+      %div{ class: "px-6 py-4 space-y-3" }
+        - if @scan_runs.blank?
+          %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No scan runs found.
+        - else
+          - @scan_runs.each do |sr|
+            = render partial: "scan_run", locals: { scan_run: sr, progress: @progress_by_id[sr.id] }
+
+    -# ===== Fixed Footer Pagination =====
+    %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
+      %div{ class: "px-6 py-3" }
+        = render "shared/pagination",
+          collection: @scan_runs,
+          options: { repository_id: @selected_id }.compact

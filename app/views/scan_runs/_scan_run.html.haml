@@ -4,6 +4,7 @@
 - p = scan_run_progress_display(progress)
 - pattern = scan_run.pattern_snapshot
 
+
 %div{
   id: "scan_run_#{scan_run.id}",
   class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-3",
@@ -24,16 +25,15 @@
           %span{ class: "font-medium" } Started:
           %span= scan_run.started_at ? l(scan_run.started_at, format: :short) : "-"
 
-      - if pattern.present? && pattern.is_a?(Hash)
         %div{ class: "text-sm text-gray-700" }
           %span{ class: "font-medium" } Scanned mode:
-          %span= pattern.fetch("scan_mode")
+          %span= d[:scan_mode]
         %div{ class: "text-sm text-gray-700" }
           %span{ class: "font-medium" } Pattern name:
-          %span= pattern.fetch("name")
+          %span= d[:pattern_name]
         %div{ class: "text-sm text-gray-700" }
           %span{ class: "font-medium" } Scanned regexp:
-          %span= pattern.fetch("regexp")
+          %span= d[:regexp]
 
     %div{ class: "flex items-center gap-2 flex-shrink-0" }
       = form_with url: scan_run_path(scan_run),
