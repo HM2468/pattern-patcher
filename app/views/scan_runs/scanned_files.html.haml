@@ -4,20 +4,17 @@
   %div#scan_run_files_panel{
     class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
   }
-
     -# ===== Fixed Header (NOT scroll) =====
     %div{ class: "bg-indigo-100 text-gray-600 px-4 py-3 border-b border-gray-200" }
       %div{ class: "flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
-          %div{ class: "text-sm font-semibold text-gray-900" } Scanned Files
-          %div{ class: "text-xs text-gray-600" }
-            ScanRun:
-            %span{ class: "font-mono" }= @scan_run.id
+          = "\##{@scan_run.id} Scanned Files"
 
         %div{ class: "shrink-0" }
-          = link_to "Back",
-            scan_runs_path(repository_id: @selected_id),
-            class: "button-secondary"
+          = link_to scan_runs_path(repository_id: @selected_id),
+            class: "icon-button",
+            data: tooltip_data(tip: "Back") do
+            = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
     -# ===== Scroll area: ONLY table body scrolls =====
     - if @scan_run_files.blank?
