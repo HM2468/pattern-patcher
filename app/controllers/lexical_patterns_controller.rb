@@ -35,21 +35,52 @@ class LexicalPatternsController < ApplicationController
   end
 
   # Toggle enabled via a tiny PATCH request (Turbo compatible)
+  # New rule: at most one LexicalPattern can be enabled at any time.
   def toggle_enabled
-    @lexical_pattern.update!(enabled: !@lexical_pattern.enabled)
-
+    page = params[:page].presence || 1
+    LexicalPattern.transaction do
+      # toggle target state
+      to_enabled = !@lexical_pattern.enabled?
+      if to_enabled
+        # enable current => disable all others
+        LexicalPattern.where.not(id: @lexical_pattern.id).where(enabled: true).update_all(enabled: false)
+        @lexical_pattern.update!(enabled: true)
+      else
+        # disable current only
+        @lexical_pattern.update!(enabled: false)
+      end
+    end
+    # Reload current page list so Turbo can refresh all toggles shown in UI
+    @lexical_patterns =
+      LexicalPattern
+        .order(id: :asc)
+        .page(page)
+        .per(10)
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          view_context.dom_id(@lexical_pattern, :enabled_toggle),
-          partial: "lexical_patterns/enabled_toggle",
-          locals: { lexical_pattern: @lexical_pattern }
-        )
+        streams = @lexical_patterns.map do |pattern|
+          turbo_stream.replace(
+            view_context.dom_id(pattern, :enabled_toggle),
+            partial: "lexical_patterns/enabled_toggle",
+            locals: { lexical_pattern: pattern }
+          )
+        end
+        render turbo_stream: streams
       end
-      format.html { redirect_to lexical_patterns_path }
+      format.html { redirect_to lexical_patterns_path(page: page) }
     end
   end
 
+  def update
+    if @lexical_pattern.update(lexical_pattern_params)
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to lexical_patterns_path, notice: "Pattern updated successfully." }
+      end
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
 
   def test
   end
