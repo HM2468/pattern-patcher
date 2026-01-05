@@ -3,37 +3,34 @@
 - d = scan_run_display(scan_run)
 - p = scan_run_progress_display(progress)
 - pattern = scan_run.pattern_snapshot
-
+- started_at = scan_run.started_at ? l(scan_run.started_at, format: :short) : "-"
 
 %div{
   id: "scan_run_#{scan_run.id}",
-  class: "rounded-2xl bg-gray-50 p-4 shadow-sm space-y-3",
+  class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden p-5",
   data: { "scan-run-id": scan_run.id }
 }
   %div{ class: "flex items-start justify-between gap-4" }
-    %div{ class: "min-w-0 space-y-2" }
-      -# Row 1: #ID + repo + sha
-      %div{ class: "bg-indigo-100 flex items-center gap-2 min-w-0" }
-        %div{ class: "font-mono text-sm font-semibold text-gray-900" }= "##{scan_run.id}"
-        %div{ class: "text-gray-400" } ·
-        %div{ class: "font-semibold text-gray-900 truncate" }= d[:repo_name]
-        %div{ class: "text-gray-400" } ·
-        %div{ class: "font-mono text-sm text-gray-700" }= d[:sha_short]
+    %div{ class: "min-w-0 space-y-3" }
+      -# Row 1: #ID + started_at
+      %div{ class: "bg-indigo-100 flex items-center gap-2 min-w-0 rounded-lg px-3 py-2" }
+        %div{ class: "font-mono text-sm font-semibold text-gray-900" }
+          = "##{scan_run.id} -> #{started_at}"
 
-      %div{ class: "text-xs text-gray-600" }
-        %div{ class: "text-sm text-gray-700" }
-          %span{ class: "font-medium" } Started:
-          %span= scan_run.started_at ? l(scan_run.started_at, format: :short) : "-"
+      -# Scanned meta (2-column, left-aligned)
+      %div{ class: "text-gray-700 space-y-2" }
+        -# 2 cols: left is title (bold), right is value (smaller)
+        %div{ class: "grid grid-cols-[160px_1fr] gap-x-3 items-start" }
+          %div{ class: "text-sm font-semibold text-gray-800" } Scanned mode:
+          %div{ class: "text-xs font-mono text-gray-700 break-words" }= d[:scan_mode]
 
-        %div{ class: "text-sm text-gray-700" }
-          %span{ class: "font-medium" } Scanned mode:
-          %span= d[:scan_mode]
-        %div{ class: "text-sm text-gray-700" }
-          %span{ class: "font-medium" } Pattern name:
-          %span= d[:pattern_name]
-        %div{ class: "text-sm text-gray-700" }
-          %span{ class: "font-medium" } Scanned regexp:
-          %span= d[:regexp]
+        %div{ class: "grid grid-cols-[160px_1fr] gap-x-3 items-start" }
+          %div{ class: "text-sm font-semibold text-gray-800" } Pattern name:
+          %div{ class: "text-xs font-mono text-gray-700 break-words" }= d[:pattern_name]
+
+        %div{ class: "grid grid-cols-[160px_1fr] gap-x-3 items-start" }
+          %div{ class: "text-sm font-semibold text-gray-800" } Scanned regexp:
+          %div{ class: "text-xs font-mono text-gray-700 break-words" }= d[:regexp]
 
     %div{ class: "flex items-center gap-2 flex-shrink-0" }
       = form_with url: scan_run_path(scan_run),
@@ -49,13 +46,14 @@
           = svg_icon("trash", class_name: "w-6 h-6")
 
   -# Progress header (phase + counters) — counters become a link to scanned_files
-  %div{ class: "flex items-center justify-between text-xs text-gray-600" }
+  %div{ class: "mt-4 p-4 flex items-center justify-between text-xs text-gray-600" }
     %div{ class: "flex items-center gap-2" }
       %div{ class: "text-sm font-medium", data: { scan_runs_target: "phase" } }= p[:phase]
 
     = link_to scanned_files_scan_run_path(scan_run),
       class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-      title: "Open scanned files (progress details)" do
+      title: "Open scanned files (progress details)",
+      data: { turbo_prefetch: false } do
       %span{ data: { scan_runs_target: "done" } }= p[:done]
       %span /
       %span{ data: { scan_runs_target: "total" } }= p[:total]
@@ -65,8 +63,9 @@
       %span{ class: "text-gray-400" } →
 
     = link_to scanned_occurrences_scan_run_path(scan_run),
-      class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-      title: "View scanned matches" do
+      class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
+      title: "View scanned matches",
+      data: { turbo_prefetch: false } do
       %span Matches
       %span{ class: "font-mono", data: { scan_runs_target: "occCount" } }= d[:occ_count]
       %span{ class: "text-indigo-400" } →

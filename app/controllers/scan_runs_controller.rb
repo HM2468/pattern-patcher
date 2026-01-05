@@ -69,15 +69,16 @@ class ScanRunsController < ApplicationController
   end
 
   def destroy
-    @scan_run = ScanRun.find(params[:id])
-    @scan_run.id
-    if @scan_run.destroy!
-      flash[:success] = "Scan run deleted."
-      redirect_to scan_runs_path(repository_id: @selected_id, page: 1)
-    else
-      flash[:error] = @scan_run.errors.full_messages.join(", ")
-      redirect_to scan_runs_path(repository_id: @selected_id, page: 1)
-    end
+    repo_id =
+      params[:repository_id].presence ||
+      @scan_run.repository_snapshot&.repository_id
+
+    @scan_run.destroy!
+    flash[:success] = "Scan run deleted."
+    redirect_to scan_runs_path(repository_id: repo_id)
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotDestroyed => e
+    flash[:error] = e.message
+    redirect_to scan_runs_path(repository_id: repo_id)
   end
 
   def scanned_occurrences

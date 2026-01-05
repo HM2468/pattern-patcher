@@ -9,7 +9,8 @@
     %div{ class: "text-gray-600 border-b border-gray-200" }
       %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
-          %div{ class: "text-lg font-semibold text-gray-900" } Scan Runs
+          %div{ class: "text-lg font-semibold text-gray-900" }
+            = "Scan Runs - #{@selected_repository.name}"
         %div{ class: "shrink-0" }
           = link_to repository_files_path(repository_id: @selected_id),
             class: "icon-button",
