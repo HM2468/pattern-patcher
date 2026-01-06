@@ -14,7 +14,7 @@
           = link_to lexeme_processor_path(id: processor.id),
             class: "icon-button",
             data: tooltip_data(tip: "Detail", turbo_frame: "processor_right") do
-            = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
+            = svg_icon("eye", class_name: "w-6 h-6")
     - if processor.nil?
       %div{ class: "px-2 py-2 space-y-2" }
         %div{ class: "text-center text-sm text-gray-600" }

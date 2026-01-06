@@ -24,6 +24,13 @@
 
   %td{ class: "px-4 py-3 align-top rounded-r-xl" }
     %div{ class: "flex flex-wrap items-center gap-2 justify-end" }
+
+      -# Detail
+      = link_to lexeme_processor_path(processor),
+        class: "icon-button",
+        data: tooltip_data(tip: "Detail", turbo_frame: "processor_right") do
+        = svg_icon("eye", class_name: "w-6 h-6")
+
       -# Edit
       = link_to edit_lexeme_processor_path(processor),
         class: "icon-button",
