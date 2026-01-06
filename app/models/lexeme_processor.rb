@@ -13,12 +13,35 @@ class LexemeProcessor < ApplicationRecord
   validate :default_config_must_be_valid
   validate :output_schema_must_be_valid
 
-  scope :enabled, -> { where(enabled: true) }
+  scope :enabled_true, -> { where(enabled: true) }
 
   # Allowed type collection for output_schema (easy to extend later)
   ALLOWED_SCHEMA_TYPES = %w[string integer number boolean object array].freeze
 
+  # Ensure only one enabled processor exists:
+  # - If this record is saved with enabled=true, disable all others in the same transaction.
+  before_save :ensure_single_enabled, if: :will_enable?
+
+  class << self
+    # Always returns the single enabled record (if any)
+    def current_processor
+      enabled_true.first
+    end
+  end
+
   private
+
+  def will_enable?
+    enabled? && (new_record? || will_save_change_to_enabled?)
+  end
+
+  # When enabling this record, disable all others.
+  # Use update_all to avoid callbacks/validations and keep it fast.
+  def ensure_single_enabled
+    return unless enabled?
+
+    self.class.where(enabled: true).where.not(id: id).update_all(enabled: false, updated_at: Time.current)
+  end
 
   # entrypoint validations
   # Requirement: valid Ruby class name (supports module namespaces)
