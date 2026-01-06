@@ -13,7 +13,7 @@ module RepositoryWorkspaceContext
     @current_pattern = LexicalPattern.current_pattern
 
     # 2) Left sidebar list (1 query)
-    @repositories  = Repository.order(name: :asc).to_a
+    @repositories  = Repository.order(created_at: :desc).to_a
     @dropdown_list = @repositories.map { |r| { id: r.id, name: r.name } }
     @path_filter   = params[:path_filter].to_s.strip
 
