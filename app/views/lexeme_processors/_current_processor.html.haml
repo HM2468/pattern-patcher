@@ -10,7 +10,7 @@
         %div{ class: "text-sm font-semibold text-gray-900 truncate" }
           Current Processor
       %div{ class: "shrink-0 flex items-center gap-2" }
-        = link_to lexeme_processors_path,
+        = link_to lexeme_processor_path(id: processor.id),
           class: "icon-button",
           data: tooltip_data(tip: "All processors", turbo_frame: "processor_right") do
           = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
@@ -34,18 +34,6 @@
 
         - entrypoint_text = processor&.entrypoint.presence || "—"
         %div.repo-meta-block
-          %div.repo-meta-label regexp
+          %div.repo-meta-label Entrupoint
           %div.repo-meta-value{ title: entrypoint_text }
             = entrypoint_text
-
-        - config_json = processor&.default_config.presence || "{}"
-        %div.repo-meta-block
-          %div.repo-meta-label regexp
-          %div.repo-meta-value{ title: config_json }
-            = config_json
-
-        - output_schema_json = processor&.output_schema.presence || "{}"
-        %div.repo-meta-block
-          %div.repo-meta-label regexp
-          %div.repo-meta-value{ title: output_schema_json }
-            = output_schema_json

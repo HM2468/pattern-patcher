@@ -1,1 +1,68 @@
-%h1 show
+-# app/views/lexeme_processors/show.html.haml
+
+- processor = LexemeProcessor.find_by(id: params[:id])
+
+%div{ class: "space-y-6 max-w-4xl" }
+  %div
+    %h2{ class: "text-2xl font-semibold tracking-tight text-gray-900" }
+      Current Processor
+
+  %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm space-y-6" }
+
+    / Name
+    %div
+      %div{ class: "text-sm font-medium text-gray-700 mb-1" } Name
+      %div{ class: "text-sm text-gray-900" }
+        = processor.name.presence || "—"
+
+    %div{ class: "grid grid-cols-2 gap-6" }
+      / Key
+      %div
+        %div{ class: "text-sm font-medium text-gray-700 mb-1" } Key
+        %div{ class: "text-sm font-mono text-gray-900" }
+          = processor.key.presence || "—"
+
+      / Entrypoint
+      %div
+        %div{ class: "text-sm font-medium text-gray-700 mb-1" } Entrypoint
+        %div{ class: "text-sm font-mono text-gray-900" }
+          = processor.entrypoint.presence || "—"
+
+    / Default config (JSON)
+    %div
+      %div{ class: "text-sm font-medium text-gray-700 mb-1" }
+        Default Config (JSON)
+
+      - if processor.default_config.present?
+        %pre{ class: "pp-json-view" }
+          = JSON.pretty_generate(processor.default_config)
+      - else
+        %div{ class: "text-sm text-gray-500 italic" }
+          No default config
+
+    / Output schema (JSON)
+    %div
+      %div{ class: "text-sm font-medium text-gray-700 mb-1" }
+        Output Schema (JSON)
+
+      - if processor.output_schema.present?
+        %pre{ class: "pp-json-view" }
+          = JSON.pretty_generate(processor.output_schema)
+      - else
+        %div{ class: "text-sm text-gray-500 italic" }
+          No output schema
+
+:css
+  .pp-json-view {
+    background: #ffffff;
+    border: 1px solid rgb(209, 213, 219);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    color: rgb(31, 41, 55);
+    overflow-x: auto;
+    white-space: pre;
+  }
