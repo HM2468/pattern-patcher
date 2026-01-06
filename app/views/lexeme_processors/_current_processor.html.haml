@@ -1,0 +1,51 @@
+-# app/views/lexeme_processors/_current_processor.html.haml
+-# Left sidebar card: Current Processor
+
+= turbo_frame_tag "current_processor" do
+  - processor = @current_processor
+
+  %div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
+    %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
+      %div{ class: "min-w-0" }
+        %div{ class: "text-sm font-semibold text-gray-900 truncate" }
+          Current Processor
+      %div{ class: "shrink-0 flex items-center gap-2" }
+        = link_to lexeme_processors_path,
+          class: "icon-button",
+          data: tooltip_data(tip: "All processors", turbo_frame: "processor_right") do
+          = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
+
+    - if processor.nil?
+      %div{ class: "px-2 py-2 space-y-2" }
+        %div{ class: "text-center text-sm text-gray-600" }
+          Select or create a processor first.
+        %div{ class: "flex items-center justify-center" }
+          = link_to lexeme_processors_path,
+            class: "icon-button",
+            data: tooltip_data(tip: "All processors", turbo_frame: "processor_right") do
+            = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
+    - else
+      %div{ class: "px-2 py-2 space-y-2" }
+        - name_text = processor&.name.presence || "—"
+        %div.repo-meta-block
+          %div.repo-meta-label name
+          %div.repo-meta-value{ title: name_text }
+            = name_text
+
+        - entrypoint_text = processor&.entrypoint.presence || "—"
+        %div.repo-meta-block
+          %div.repo-meta-label regexp
+          %div.repo-meta-value{ title: entrypoint_text }
+            = entrypoint_text
+
+        - config_json = processor&.default_config.presence || "{}"
+        %div.repo-meta-block
+          %div.repo-meta-label regexp
+          %div.repo-meta-value{ title: config_json }
+            = config_json
+
+        - output_schema_json = processor&.output_schema.presence || "{}"
+        %div.repo-meta-block
+          %div.repo-meta-label regexp
+          %div.repo-meta-value{ title: output_schema_json }
+            = output_schema_json

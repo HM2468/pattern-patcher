@@ -8,16 +8,12 @@
     %div{ class: "w-[25%] rounded-lg bg-white overflow-hidden flex flex-col" }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
 
-        -# 1) Current processor dropdown card (fixed)
-        = render "lexeme_processors/processor_dropdown"
+        -# 1) Current processor
+        = render "lexeme_processors/current_processor"
 
         -# 2) Scrollable processor show area
         %div{ class: "flex-1 min-h-0 overflow-y-auto space-y-3" }
-          - if @selected_id.present?
-            = turbo_frame_tag "processor_show",
-                src: lexeme_processor_path(@selected_id),
-                loading: "eager",
-                class: "block"
+
 
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
