@@ -1,7 +1,7 @@
 # app/controllers/lexeme_processors_controller.rb
 class LexemeProcessorsController < ApplicationController
-  include LexemeWorkspaceSection
-
+  include ProcessorWorkspaceContext
+  layout "processor_workspace", only: %i[index new show edit update guide]
   before_action :set_lexeme_processor, only: %i[edit update destroy]
 
   def index
@@ -9,6 +9,12 @@ class LexemeProcessorsController < ApplicationController
     if @lexeme_processors.blank?
       @lexeme_processor = LexemeProcessor.new
     end
+  end
+
+  def guide
+  end
+
+  def show
   end
 
   def new

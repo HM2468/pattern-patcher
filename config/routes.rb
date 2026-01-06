@@ -49,7 +49,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :lexeme_processors
+  resources :lexeme_processors do
+    collection do
+      get :guide
+    end
+  end
   resources :occurrence_reviews
   resources :process_runs, only: %i[index create destroy]
   resources :settings, only: %i[index edit update destroy]

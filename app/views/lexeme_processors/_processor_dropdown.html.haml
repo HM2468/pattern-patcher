@@ -1,0 +1,42 @@
+-# app/views/lexeme_processors/_processor_dropdown.html.haml
+%div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
+  %div{ class: "bg-indigo-100 px-4 py-3 flex items-center justify-between gap-3" }
+    %div{ class: "min-w-0" }
+      %h1{ class: "text-sm font-semibold text-gray-900 truncate" } Current Processor
+
+    %div{ class: "shrink-0" }
+      = link_to new_lexeme_processor_path,
+        class: "icon-button",
+        data: tooltip_data(tip: "New Processor") do
+        = svg_icon("folder-plus", class_name: "w-6 h-6")
+
+  %div{ class: "px-4 py-4 space-y-4" }
+    - if @processors.nil? || @processors.empty?
+      %div{ class: "px-2 py-2 space-y-2" }
+        %div{ class: "text-center text-sm text-gray-600" }
+          No processor found, create one.
+        %div{ class: "flex items-center justify-center" }
+          = link_to new_processor_path,
+            class: "icon-button",
+            data: tooltip_data(tip: "New Processor") do
+            = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
+    - else
+      %div{ class: "space-y-2" }
+        %label{ class: "block text-xs font-semibold text-gray-700" }
+          Select a processor
+
+        - selected_id = @selected_id || @processors.first.id
+
+        %div{
+          data: {
+            controller: "content-switcher",
+            content_switcher_show_frame_id_value: "processor_show",
+            content_switcher_show_url_template_value: "/lexeme_processors/__ID__",
+            content_switcher_main_frame_id_value: "processor_right",
+            content_switcher_main_url_template_value: "/lexeme_processors/guide"
+          }
+        }
+          = select_tag :processor_id,
+              options_for_select(@dropdown_list.map { |r| [r[:name], r[:id]] }, selected_id),
+              class: "dropdown-select w-full",
+              data: { action: "change->content-switcher#change" }
