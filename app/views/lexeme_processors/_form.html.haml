@@ -24,28 +24,29 @@
           class: "form-input",
           placeholder: "Customized Processor"
 
-      / Key
-      %div
-        %label{ for: "lexeme_processor_key", class: "block text-sm font-medium text-gray-700 mb-1" }
-          Key
-        = form.text_field :key,
-          id: "lexeme_processor_key",
-          class: "form-input",
-          placeholder: "customized_processor"
-        %div{ class: "text-xs text-gray-600 mt-1" }
-          Stable identifier (lowercase, underscores). Used as filename:
-          %span{ class: "font-mono" } localize_rails.rb
+      %div{ class: "grid grid-cols-2 gap-4" }
+        / Key
+        %div
+          %label{ for: "lexeme_processor_key", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Key
+          = form.text_field :key,
+            id: "lexeme_processor_key",
+            class: "form-input",
+            placeholder: "customized_processor"
+          %div{ class: "text-xs text-gray-600 mt-1" }
+            Stable identifier (lowercase, underscores). Used as filename:
+            %span{ class: "font-mono" } localize_rails.rb
 
-      / Entrypoint
-      %div
-        %label{ for: "lexeme_processor_entrypoint", class: "block text-sm font-medium text-gray-700 mb-1" }
-          Entrypoint
-        = form.text_field :entrypoint,
-          id: "lexeme_processor_entrypoint",
-          class: "form-input",
-          placeholder: "CustomizedProcessor"
-        %div{ class: "text-xs text-gray-600 mt-1" }
-          Ruby class name.
+        / Entrypoint
+        %div
+          %label{ for: "lexeme_processor_entrypoint", class: "block text-sm font-medium text-gray-700 mb-1" }
+            Entrypoint
+          = form.text_field :entrypoint,
+            id: "lexeme_processor_entrypoint",
+            class: "form-input",
+            placeholder: "CustomizedProcessor"
+          %div{ class: "text-xs text-gray-600 mt-1" }
+            Ruby class name.
 
       / Default config (JSON)
       %div
@@ -90,9 +91,6 @@
 
   / Actions
   %div{ class: "flex items-center justify-end gap-4" }
-    - if defined?(new_action?) && new_action?
-      %a{ href: "javascript:history.back()", class: "button-secondary" }
-        Back
     = form.submit "Save", class: "button-primary"
 
   :css
