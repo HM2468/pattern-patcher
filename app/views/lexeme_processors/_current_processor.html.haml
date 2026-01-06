@@ -12,7 +12,7 @@
       %div{ class: "shrink-0 flex items-center gap-2" }
         = link_to lexeme_processor_path(id: processor.id),
           class: "icon-button",
-          data: tooltip_data(tip: "All processors", turbo_frame: "processor_right") do
+          data: tooltip_data(tip: "Detail", turbo_frame: "processor_right") do
           = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
 
     - if processor.nil?

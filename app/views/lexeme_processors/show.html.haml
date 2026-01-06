@@ -3,12 +3,17 @@
 - processor = LexemeProcessor.find_by(id: params[:id])
 
 %div{ class: "space-y-6 max-w-4xl" }
-  %div
+
+
+  %div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
     %h2{ class: "text-2xl font-semibold tracking-tight text-gray-900" }
       Current Processor
+    = link_to lexeme_processors_path,
+      class: "icon-button",
+      data: tooltip_data(tip: "Back") do
+      = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
   %div{ class: "rounded-2xl bg-gray-50 p-6 shadow-sm space-y-6" }
-
     / Name
     %div
       %div{ class: "text-sm font-medium text-gray-700 mb-1" } Name

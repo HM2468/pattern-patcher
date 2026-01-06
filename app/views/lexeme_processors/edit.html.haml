@@ -1,7 +1,8 @@
 - content_for :title, "Editing lexeme processor"
 
 %div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
-  %h1 Editing processor
+  %h2{ class: "text-2xl font-semibold tracking-tight text-gray-900" }
+    Editing processor
   = link_to lexeme_processors_path,
     class: "icon-button",
     data: tooltip_data(tip: "Back") do
