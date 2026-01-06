@@ -67,7 +67,7 @@ class LexicalPatternsController < ApplicationController
         end
         streams << turbo_stream.replace(
           "current_pattern",
-          partial: "repositories/current_pattern"
+          partial: "lexical_patterns/current_pattern"
         )
         render turbo_stream: streams
       end
