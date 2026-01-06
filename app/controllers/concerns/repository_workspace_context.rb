@@ -57,7 +57,11 @@ module RepositoryWorkspaceContext
 
     # Two count queries (stable and clear)
     @file_count = RepositoryFile.where(repository_id: repo_id).count
-    @scan_count = ScanRun
+    @scan_count = get_scan_count(repo_id)
+  end
+
+  def get_scan_count(repo_id)
+    ScanRun
       .joins(:repository_snapshot)
       .where(repository_snapshots: { repository_id: repo_id })
       .count

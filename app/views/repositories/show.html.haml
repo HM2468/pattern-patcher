@@ -46,14 +46,16 @@
             class: "repo-stat-card" do
             %div.repo-stat-label Files
             %div.repo-stat-value
-              = (@file_count || 0)
+              %span{ id: dom_id(repository, :file_count) }
+                = (@file_count || 0)
 
           = link_to scan_runs_path(repository_id: repository.id),
             data: { turbo_frame: "repo_right" },
             class: "repo-stat-card" do
             %div.repo-stat-label Scans
             %div.repo-stat-value
-              = (@scan_count || 0)
+              %span{ id: dom_id(repository, :scan_count) }
+                = (@scan_count || 0)
 
         -# Root Path
         - root_path_text = repository.root_path.presence || "—"

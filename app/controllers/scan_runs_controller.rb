@@ -8,7 +8,6 @@ class ScanRunsController < ApplicationController
 
   def index
     repo_id = @selected_id.presence || params[:repository_id].presence
-
     base_scope =
       if repo_id.present?
         ScanRun
@@ -38,30 +37,48 @@ class ScanRunsController < ApplicationController
   def create
     file_ids = params[:file_ids].presence || []
     snapshot = @selected_repository.current_snapshot
+
     if snapshot.nil?
       flash[:alert] = "No repository snapshot found. Please import the repository first."
       return redirect_to(repositories_path(repository_id: @selected_repository.id))
     end
+
     @scan_run =
       ScanRun.new(
         lexical_pattern_id: @current_pattern.id,
         repository_snapshot_id: snapshot.id,
         started_at: Time.current,
-        pattern_snapshot:
-         {
-           name: @current_pattern.name,
-           scan_mode: @current_pattern.scan_mode,
-           regexp: @current_pattern.pattern,
-         },
+        pattern_snapshot: {
+          name: @current_pattern.name,
+          scan_mode: @current_pattern.scan_mode,
+          regexp: @current_pattern.pattern,
+        },
       )
     if @scan_run.save
-      flash[:success] = "Scan created and started."
       StartScanJob.perform_later(
         scan_run_id: @scan_run.id,
         repository_id: @selected_repository.id,
         file_ids: file_ids,
       )
-      redirect_to(scan_runs_path(repository_id: @selected_repository.id))
+      repo_id = @selected_repository.id
+      repository = @selected_repository
+      scan_count = get_scan_count(repo_id)
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: [
+            turbo_stream.replace(
+              view_context.dom_id(repository, :scan_count),
+              partial: "repositories/scan_count",
+              locals: { repository: repository, scan_count: scan_count }
+            ),
+            view_context.turbo_stream_action_tag("redirect", url: scan_runs_path(repository_id: repo_id))
+          ]
+        end
+        format.html do
+          flash[:success] = "Scan created and started."
+          redirect_to scan_runs_path(repository_id: repo_id)
+        end
+      end
     else
       flash[:error] = @scan_run.errors.full_messages.join(", ")
       redirect_to(repositories_path(repository_id: @selected_repository.id))
@@ -73,9 +90,27 @@ class ScanRunsController < ApplicationController
       params[:repository_id].presence ||
       @scan_run.repository_snapshot&.repository_id
 
+    repository = Repository.find(repo_id)
     @scan_run.destroy!
-    flash[:success] = "Scan run deleted."
-    redirect_to scan_runs_path(repository_id: repo_id)
+    scan_count = get_scan_count(repo_id)
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(
+            view_context.dom_id(repository, :scan_count),
+            partial: "repositories/scan_count",
+            locals: { repository: repository, scan_count: scan_count }
+          ),
+          view_context.turbo_stream_action_tag("redirect", url: scan_runs_path(repository_id: repo_id))
+        ]
+      end
+
+      format.html do
+        flash[:success] = "Scan run deleted."
+        redirect_to scan_runs_path(repository_id: repo_id)
+      end
+    end
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotDestroyed => e
     flash[:error] = e.message
     redirect_to scan_runs_path(repository_id: repo_id)

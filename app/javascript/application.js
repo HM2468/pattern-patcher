@@ -6,3 +6,5 @@ import "controllers"
 
 // Load all global libs in one place
 import "lib/index"
+
+import "turbo_stream_actions/redirect"
