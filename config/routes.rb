@@ -53,6 +53,9 @@ Rails.application.routes.draw do
     collection do
       get :guide
     end
+    member do
+      patch :toggle_enabled
+    end
   end
   resources :occurrence_reviews
   resources :process_runs, only: %i[index create destroy]

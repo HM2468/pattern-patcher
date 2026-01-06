@@ -9,8 +9,11 @@ module ProcessorWorkspaceContext
   private
 
   def prepare_processor_workspace
-    # 1) Left sidebar @current_processor
     @current_processor = LexemeProcessor.current_processor
-    @process_run_count = @current_processor.process_runs.count
+    if @current_processor
+      @process_run_count = @current_processor.process_runs.count
+    else
+      0
+    end
   end
 end

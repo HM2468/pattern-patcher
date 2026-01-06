@@ -2,13 +2,13 @@
 class LexemeProcessorsController < ApplicationController
   include ProcessorWorkspaceContext
   layout "processor_workspace", only: %i[index new show edit update guide]
-  before_action :set_lexeme_processor, only: %i[edit update destroy]
+  before_action :set_lexeme_processor, only: %i[edit toggle_enabled update destroy]
 
   def index
-    @lexeme_processors = LexemeProcessor.order(created_at: :desc)
-    if @lexeme_processors.blank?
-      @lexeme_processor = LexemeProcessor.new
-    end
+    @lexeme_processors = LexemeProcessor
+                           .order(created_at: :desc)
+                           .page(params[:page])
+                           .per(12)
   end
 
   def guide
@@ -19,6 +19,47 @@ class LexemeProcessorsController < ApplicationController
 
   def new
     @lexeme_processor = LexemeProcessor.new
+  end
+
+  # New rule: at most one LexemeProcessor can be enabled at any time.
+  def toggle_enabled
+    page = params[:page].presence || 1
+    LexemeProcessor.transaction do
+      to_enabled = !@lexeme_processor.enabled?
+      if to_enabled
+        LexemeProcessor.where.not(id: @lexeme_processor.id).where(enabled: true).update_all(enabled: false)
+        @lexeme_processor.update!(enabled: true)
+      else
+        @lexeme_processor.update!(enabled: false)
+      end
+    end
+    # refresh sidebar & current page list
+    @current_processor = LexemeProcessor.current_processor
+    @lexeme_processors =
+      LexemeProcessor
+        .order(updated_at: :desc)
+        .page(page)
+        .per(12)
+    respond_to do |format|
+      format.turbo_stream do
+        streams = []
+        # 1) refresh all toggles shown on current page
+        streams += @lexeme_processors.map do |p|
+          turbo_stream.replace(
+            view_context.dom_id(p, :enabled_toggle),
+            partial: "lexeme_processors/enabled_toggle",
+            locals: { lexeme_processor: p }
+          )
+        end
+        # 2) refresh current processor card (left sidebar)
+        streams << turbo_stream.replace(
+          "current_processor",
+          partial: "lexeme_processors/current_processor"
+        )
+        render turbo_stream: streams
+      end
+      format.html { redirect_to lexeme_processors_path(page: page) }
+    end
   end
 
   def edit; end
