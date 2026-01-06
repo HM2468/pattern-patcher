@@ -37,7 +37,27 @@ class RepositoryFilesController < ApplicationController
     @repository = Repository.find(params[:repository_id])
     @repository_files = @repository.repository_files.where(id: params[:file_ids])
     @repository_files.destroy_all
-    flash[:success] = "Files deleted successfully."
+    file_count = @repository.repository_files.count
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: [
+          turbo_stream.replace(
+            view_context.dom_id(@repository, :file_count),
+            partial: "repositories/file_count",
+            locals: { repository: @repository, file_count: file_count }
+          ),
+          view_context.turbo_stream_action_tag("redirect", url: repositories_path(repository_id: @repository.id))
+        ]
+      end
+
+      format.html do
+        flash[:success] = "Files deleted successfully."
+        redirect_to repositories_path(repository_id: @repository.id)
+      end
+    end
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotDestroyed => e
+    flash[:error] = e.message
     redirect_to repositories_path(repository_id: @repository.id)
   end
 
