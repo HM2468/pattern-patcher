@@ -1,1 +1,12 @@
-= render "new"
+-# app/views/lexeme_processors/new.html.haml
+
+- content_for :title, "New lexeme processor"
+
+%div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
+  %h1 New Processor
+  = link_to lexeme_processors_path,
+    class: "icon-button",
+    data: tooltip_data(tip: "Back") do
+    = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
+
+= render "form", lexeme_processor: @lexeme_processor

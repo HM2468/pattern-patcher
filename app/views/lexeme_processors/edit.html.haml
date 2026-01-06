@@ -1,10 +1,10 @@
 - content_for :title, "Editing lexeme processor"
 
-%h1 Editing lexeme processor
+%div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
+  %h1 Editing processor
+  = link_to lexeme_processors_path,
+    class: "icon-button",
+    data: tooltip_data(tip: "Back") do
+    = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
 = render "form", lexeme_processor: @lexeme_processor
-
-%br
-
-%div
-  = link_to "Show this lexeme processor", @lexeme_processor
