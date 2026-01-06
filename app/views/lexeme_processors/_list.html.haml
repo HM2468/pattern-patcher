@@ -31,19 +31,17 @@
               - else
                 %span{ class: "inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700" } disabled
             %td{ class: "py-2 pr-0 text-right space-x-2" }
-              = button_to "Run",
-                process_runs_path,
-                method: :post,
-                params: { lexeme_processor_id: lp.id },
-                form: { class: "inline-flex" },
-                onclick: "return window.PopConfirmLog.open(event, this)",
-                data: { confirm_title: "Start process", confirm_message: "Run this processor?" },
-                class: "button-secondary"
-              = link_to "Edit", edit_lexeme_processor_path(lp), class: "button-secondary"
-              = button_to "Delete",
-                lexeme_processor_path(lp),
+              -# Edit
+              = link_to edit_lexeme_processor_path(lp),
+                class: "icon-button",
+                data: tooltip_data(tip: "Edit") do
+                = svg_icon("pencil-square", class_name: "w-5 h-5")
+
+              -# Delete
+              = button_to lexeme_processor_path(lp),
                 method: :delete,
                 form: { class: "inline-flex" },
+                class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
-                data: { confirm_title: "Delete processor", confirm_message: "Delete this processor? This cannot be undone." },
-                class: "button-danger"
+                data: delete_tip(title: "Delete processor", msg: "Delete this processor? This cannot be undone.") do
+                = svg_icon("trash", class_name: "w-5 h-5")

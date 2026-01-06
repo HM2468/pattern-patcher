@@ -37,3 +37,12 @@
           %div.repo-meta-label Entrupoint
           %div.repo-meta-value{ title: entrypoint_text }
             = entrypoint_text
+        -# Run
+        = button_to process_runs_path,
+          method: :post,
+          params: { lexeme_processor_id: processor&.id },
+          form: { class: "inline-flex" },
+          class: "icon-button",
+          onclick: "return window.PopConfirmLog.open(event, this)",
+          data: tooltip_data(tip: "Run") do
+          = svg_icon("play", class_name: "w-5 h-5")
