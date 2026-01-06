@@ -1,13 +1,14 @@
-%div{ class: "flex items-center justify-between mb-4" }
+%div{ class: "flex items-center justify-between mb-4 mr-4 ml-4" }
   %div
     %div{ class: "text-lg font-semibold text-gray-900" }
       Processors
     %div{ class: "text-sm text-gray-600" }
       Define how lexemes are processed.
-  - if @section == "processors" && defined?(@lexeme_processors) && @lexeme_processors.present?
-    = link_to "New Processor",
-      new_lexeme_processor_path,
-      class: "button-primary"
+  %div
+    = link_to new_lexeme_processor_path,
+      class: "icon-button",
+      data: tooltip_data(tip: "New Processor") do
+      = svg_icon("plus-circle", class_name: "w-6 h-6")
 %div{ class: "rounded-2xl bg-gray-50 p-4 shadow-sm" }
   %div{ class: "overflow-x-auto" }
     %table{ class: "min-w-full text-sm" }

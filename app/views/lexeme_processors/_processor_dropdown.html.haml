@@ -4,11 +4,6 @@
     %div{ class: "min-w-0" }
       %h1{ class: "text-sm font-semibold text-gray-900 truncate" } Current Processor
 
-    %div{ class: "shrink-0" }
-      = link_to new_lexeme_processor_path,
-        class: "icon-button",
-        data: tooltip_data(tip: "New Processor") do
-        = svg_icon("folder-plus", class_name: "w-6 h-6")
 
   %div{ class: "px-4 py-4 space-y-4" }
     - if @processors.nil? || @processors.empty?
