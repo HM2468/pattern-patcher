@@ -3,6 +3,7 @@
 
 = turbo_frame_tag "current_processor" do
   - processor = @current_processor
+  - run_count = processor&.process_runs&.count || 0
 
   %div{ class: "rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden" }
     %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
@@ -15,6 +16,16 @@
             class: "icon-button",
             data: tooltip_data(tip: "Detail", turbo_frame: "processor_right") do
             = svg_icon("eye", class_name: "w-6 h-6")
+
+          = button_to process_runs_path,
+            method: :post,
+            params: { lexeme_processor_id: processor.id },
+            form: { class: "inline-flex" },
+            class: "icon-button",
+            onclick: "return window.PopConfirmLog.open(event, this)",
+            data: tooltip_data(tip: "Run") do
+            = svg_icon("play", class_name: "w-6 h-6")
+
     - if processor.nil?
       %div{ class: "px-2 py-2 space-y-2" }
         %div{ class: "text-center text-sm text-gray-600" }
@@ -36,12 +47,11 @@
           %div.repo-meta-label Entrupoint
           %div.repo-meta-value{ title: entrypoint_text }
             = entrypoint_text
-        -# Run
-        = button_to process_runs_path,
-          method: :post,
-          params: { lexeme_processor_id: processor&.id },
-          form: { class: "inline-flex" },
-          class: "icon-button",
-          onclick: "return window.PopConfirmLog.open(event, this)",
-          data: tooltip_data(tip: "Run") do
-          = svg_icon("play", class_name: "w-5 h-5")
+
+        = link_to process_runs_path(processor_id: processor&.id),
+          data: { turbo_frame: "processor_right" },
+          class: "repo-stat-card" do
+          %div.repo-stat-label Process Runs
+          %div.repo-stat-value
+            %span{ id: dom_id(processor, :run_count) }
+              = run_count

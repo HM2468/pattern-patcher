@@ -1,4 +1,6 @@
 class ProcessRunsController < ApplicationController
+  include ProcessorWorkspaceContext
+  layout "processor_workspace", only: %i[index]
   before_action :set_lexeme_processor, only: %i[create]
   before_action :set_process_run, only: %i[destroy]
 

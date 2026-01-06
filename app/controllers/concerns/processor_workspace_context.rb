@@ -3,17 +3,12 @@ module ProcessorWorkspaceContext
   extend ActiveSupport::Concern
 
   included do
-    before_action :prepare_processor_workspace
+    before_action :init_current_processo
   end
 
   private
 
-  def prepare_processor_workspace
+  def init_current_processo
     @current_processor = LexemeProcessor.current_processor
-    if @current_processor
-      @process_run_count = @current_processor.process_runs.count
-    else
-      0
-    end
   end
 end
