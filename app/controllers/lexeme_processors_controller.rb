@@ -1,21 +1,20 @@
 # app/controllers/lexeme_processors_controller.rb
 class LexemeProcessorsController < ApplicationController
   include ProcessorWorkspaceContext
+
   layout "processor_workspace", only: %i[index new show edit update guide]
   before_action :set_lexeme_processor, only: %i[edit toggle_enabled update destroy]
 
   def index
     @lexeme_processors = LexemeProcessor
-                           .order(created_at: :desc)
-                           .page(params[:page])
-                           .per(12)
+      .order(created_at: :desc)
+      .page(params[:page])
+      .per(12)
   end
 
-  def guide
-  end
+  def guide; end
 
-  def show
-  end
+  def show; end
 
   def new
     @lexeme_processor = LexemeProcessor.new
@@ -48,13 +47,13 @@ class LexemeProcessorsController < ApplicationController
           turbo_stream.replace(
             view_context.dom_id(p, :enabled_toggle),
             partial: "lexeme_processors/enabled_toggle",
-            locals: { lexeme_processor: p }
+            locals: { lexeme_processor: p },
           )
         end
         # 2) refresh current processor card (left sidebar)
         streams << turbo_stream.replace(
           "current_processor",
-          partial: "lexeme_processors/current_processor"
+          partial: "lexeme_processors/current_processor",
         )
         render turbo_stream: streams
       end
