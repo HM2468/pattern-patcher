@@ -7,12 +7,13 @@
     %meta{ content: "width=device-width,initial-scale=1", name: "viewport" }/
     %meta{ content: "yes", name: "apple-mobile-web-app-capable" }/
     %meta{ content: "yes", name: "mobile-web-app-capable" }/
+
     = csrf_meta_tags
     = csp_meta_tag
     = yield :head
-    %link{ href: "/icon.png", rel: "icon", type: "image/png" }/
-    %link{ href: "/icon.svg", rel: "icon", type: "image/svg+xml" }/
-    %link{ href: "/icon.png", rel: "apple-touch-icon" }/
+
+    = favicon_link_tag "icons/clipboard-document-check.svg", type: "image/svg+xml"
+
     = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
     = stylesheet_link_tag_all
     = javascript_importmap_tags
@@ -23,7 +24,7 @@
       = render "shared/flash"
 
       %main{ class: "px-6" }
-        -# ✅ allow nested layouts to override main content without duplicating <head>/<body>
+        -# allow nested layouts to override main content without duplicating <head>/<body>
         = content_for?(:layout_main) ? yield(:layout_main) : yield
 
         = render "shared/confirm_log"
