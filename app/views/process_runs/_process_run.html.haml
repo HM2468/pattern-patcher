@@ -1,0 +1,98 @@
+-# frozen_string_literal: true
+-# app/views/process_runs/_process_run.html.haml
+
+- pr = process_run
+- p = (progress || {}).with_indifferent_access
+
+- status = pr.status
+- total = p[:total].to_i
+- succeeded = p[:succeeded].to_i
+- failed = p[:failed].to_i
+- processed = p[:processed].to_i
+- percent = p[:percent].to_f
+- batches_total = p[:batches_total].to_i
+- batches_done = p[:batches_done].to_i
+- occ_revc = p[:occ_revc].to_i
+
+- created_at = pr.created_at ? l(pr.created_at, format: :short) : "-"
+
+%div{
+  id: "process_run_#{pr.id}",
+  class: "rounded-2xl border border-indigo-200 bg-gray-100 shadow-sm overflow-hidden p-5",
+  data: {
+    "process-run-id": pr.id,
+    "process-run-status": status
+  }
+}
+
+  %div{ class: "flex items-start justify-between gap-4" }
+    %div{ class: "min-w-0 space-y-3" }
+
+      -# Header badge row (copied vibe from scan_runs/_scan_run)
+      %div{ class: "bg-indigo-100 flex items-center gap-2 min-w-0 rounded-lg px-3 py-2" }
+        %div{ class: "font-mono text-sm font-semibold text-gray-900" }= "##{pr.id}"
+        %div{ class: "text-gray-400" } ·
+        %div{ class: "font-semibold text-gray-900 truncate" }= pr.lexeme_processor&.name || pr.lexeme_processor&.entrypoint || "-"
+        %div{ class: "text-gray-400" } ·
+        %div{ class: "text-xs text-gray-700" }= created_at
+
+      -# 2 rows × 2 columns info grid (same style family as scan_run meta grid)
+      %div{ class: "grid grid-cols-[160px_1fr] gap-x-3 gap-y-2 text-gray-700" }
+        %div{ class: "text-sm font-semibold text-gray-800" } Status:
+        %div{ class: "text-xs font-mono text-gray-700 break-words", data: { process_runs_target: "status" } }= status
+
+        %div{ class: "text-sm font-semibold text-gray-800" } Batches:
+        %div{ class: "text-xs font-mono text-gray-700 break-words" }
+          %span{ data: { process_runs_target: "batchesDone" } }= batches_done
+          %span /
+          %span{ data: { process_runs_target: "batchesTotal" } }= batches_total
+
+    %div{ class: "flex items-center gap-2 flex-shrink-0" }
+      -# keep your PopConfirmLog behavior; match scan_run delete button style
+      = form_with url: process_run_path(pr),
+        method: :delete,
+        html: { class: "inline-flex" } do
+        %button{
+          type: "submit",
+          class: "icon-button",
+          onclick: "return window.PopConfirmLog.open(event, this)",
+          data: { confirm_title: "Delete process run", confirm_message: "Delete this process run? This cannot be undone." }
+        }
+          = svg_icon("trash", class_name: "w-6 h-6")
+
+  -# Add spacing between meta and progress section (same as scan_run)
+  %div{ class: "p-3 flex items-center justify-between text-xs text-gray-600" }
+    %div{ class: "flex items-center gap-2" }
+      %div{ class: "text-sm font-medium" }
+        Progress:
+        %span{ class: "font-mono", data: { process_runs_target: "percent" } }= "#{percent.round(2)}%"
+
+    -# Link 1: progress details (kept from your original; you can fill URL later)
+    = link_to "",
+      class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
+      title: "Open progress details",
+      data: { turbo_prefetch: false } do
+      %span{ data: { process_runs_target: "processed" } }= processed
+      %span /
+      %span{ data: { process_runs_target: "total" } }= total
+      %span{ class: "text-gray-400" } (failed:
+      %span{ data: { process_runs_target: "failed" } }= failed
+      %span{ class: "text-gray-400" } )
+      %span{ class: "text-gray-400" } →
+
+    -# Link 2: reviews (kept from your original; you can fill URL later)
+    = link_to "",
+      class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
+      title: "New review rows (OccurrenceReviewResult)",
+      data: { turbo_prefetch: false } do
+      %span Reviews
+      %span{ class: "font-mono", data: { process_runs_target: "occRevc" } }= occ_revc
+      %span{ class: "text-indigo-400" } →
+
+  -# Progress bar (same structure as scan_run)
+  %div{ class: "w-full h-3 rounded-full bg-gray-200 overflow-hidden" }
+    %div{
+      class: "h-3 bg-indigo-500",
+      style: "width: #{percent.clamp(0,100)}%",
+      data: { process_runs_target: "bar" }
+    }
