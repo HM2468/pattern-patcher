@@ -1,0 +1,32 @@
+-# app/views/lexemes/_row.html.haml
+-# locals: lexeme
+
+%tr{
+  id: dom_id(lexeme),
+  class: "group bg-white transition
+          hover:bg-indigo-50/60
+          focus-within:bg-indigo-50/60"
+}
+  -# ID
+  %td{ class: "px-4 py-3 align-top rounded-l-xl" }
+    %div{ class: "font-mono text-xs text-gray-700" }
+      = lexeme.id
+
+  -# Source Text
+  %td{ class: "px-4 py-3 align-top" }
+    - text = lexeme.source_text.to_s
+    %div{ class: "max-w-[520px] truncate font-mono text-xs text-gray-800", title: text }
+      = text
+
+  -# Metadata (JSON)
+  %td{ class: "px-4 py-3 align-top" }
+    - meta = lexeme.metadata
+
+    %div{ class: "max-w-[360px] truncate font-mono text-[11px] text-gray-600", title: meta }
+      = meta.to_json
+
+  -# Status
+  %td{ class: "px-4 py-3 align-top rounded-r-xl" }
+    - badge_class = process_status_badge_class(lexeme)
+    %span{ class: "inline-flex items-center rounded-full border px-2 py-1 text-xs #{badge_class}" }
+      = lexeme.process_status.presence || "unknown"

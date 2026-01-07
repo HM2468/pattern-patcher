@@ -1,23 +1,57 @@
-- if defined?(@lexemes) && @lexemes.present?
-  %div{ class: "rounded-2xl bg-gray-50 p-4 shadow-sm" }
-    %div{ class: "overflow-x-auto" }
-      %table{ class: "min-w-full text-sm" }
-        %thead
-          %tr{ class: "text-left text-gray-600" }
-            %th{ class: "py-2 pr-4" } ID
-            %th{ class: "py-2 pr-4" } Source Text
-            %th{ class: "py-2 pr-4" } Metadata
-            %th{ class: "py-2 pr-0" } Status
-        %tbody
-          - @lexemes.limit(50).each do |lx|
-            %tr{ class: "border-t border-gray-200" }
-              %td{ class: "py-2 pr-4 font-mono" }= lx.id
-              %td{ class: "py-2 pr-4 font-mono text-gray-700" }= lx.source_text
-              %td{ class: "py-2 pr-4" }= lx.metadata
-              %td{ class: "py-2 pr-0 text-gray-700" }= lx.process_status
-- else
-  %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" } No lexemes found.
+-# frozen_string_literal: true
+-# app/views/lexemes/index.html.haml
+-# Lexemes index
+-# Fixed header + scrollable body + fixed pagination (like lexical_patterns/index)
 
+%div{ class: "max-w-6xl mx-auto h-[85vh] overflow-hidden" }
+  %div#lexemes_panel{
+    class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
+  }
 
-- if @lexemes.any?
-  = render "shared/pagination", collection: @lexemes
+    -# ===== Fixed Header (NOT scroll) =====
+    %div{ class: "text-gray-600 border-b border-gray-200" }
+      %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
+        %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
+          %div{ class: "text-lg font-semibold text-gray-900" } All Lexemes
+
+        -# Right actions (optional)
+        %div{ class: "shrink-0 flex items-center gap-2" }
+          -# Example: filter/status indicator (keep simple)
+          -# You can add dropdowns/search here later
+          - if params[:status].present?
+            %span{ class: "text-xs rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1" }
+              = "Status: #{params[:status]}"
+
+    -# ===== Scroll area: ONLY body scrolls =====
+    %div#lexemes_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
+      %div{ class: "px-6 py-4 space-y-4" }
+
+        - if !defined?(@lexemes) || @lexemes.blank?
+          %div#lexemes_empty_state
+            .rounded-2xl.bg-gray-50.p-8.shadow-sm
+              %div{ class: "text-sm text-gray-600" }
+                No lexemes found.
+        - else
+          .rounded-2xl.bg-white.shadow-sm.overflow-hidden
+            %table{ class: "w-full text-sm" }
+              -# Optional: if you want the header row, uncomment
+              %thead{ class: "bg-indigo-50 text-gray-600" }
+                %tr
+                  %th{ class: "px-4 py-3 text-left font-medium" } ID
+                  %th{ class: "px-4 py-3 text-left font-medium" } Source Text
+                  %th{ class: "px-4 py-3 text-left font-medium" } Metadata
+                  %th{ class: "pl-4 pr-8 py-3 text-left font-medium" } Status
+
+              -# IMPORTANT: stable tbody id so Turbo can replace it
+              %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-300" }
+                - @lexemes.each do |lexeme|
+                  = render "row", lexeme: lexeme
+
+          -# Keep empty state container in DOM for Turbo replace (even when not empty)
+          %div#lexemes_empty_state{ class: "hidden" }
+
+    -# ===== Fixed Footer Pagination =====
+    %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
+      %div{ class: "px-6 py-3" }
+        - if defined?(@lexemes) && @lexemes.respond_to?(:current_page) && @lexemes.any?
+          = render "shared/pagination", collection: @lexemes
