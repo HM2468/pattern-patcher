@@ -44,7 +44,6 @@ Rails.application.routes.draw do
 
   resources :scan_runs, only: %i[index create destroy] do
     member do
-      get :scanned_occurrences
       get :scanned_files
     end
   end

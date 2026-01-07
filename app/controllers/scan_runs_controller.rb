@@ -4,7 +4,7 @@ class ScanRunsController < ApplicationController
   include RepositoryWorkspaceContext
 
   layout "repository_workspace", only: %i[index create destroy scanned_files]
-  before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
+  before_action :set_scan_run, only: %i[destroy scanned_files]
 
   def index
     repo_id = @selected_id.presence || params[:repository_id].presence
