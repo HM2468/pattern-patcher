@@ -16,22 +16,9 @@
           = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
 
     %div{ class: "px-2 py-2" }
-      %div{ class: "grid grid-cols-2 gap-2" }
-
-        -# Pending (top-left)
-        %div.repo-meta-block
-          %div.repo-meta-label Pending
-          %div.repo-meta-value{ title: @pending_occ_rev }
-            = link_to occurrence_reviews_path(status: "pending"),
-              data: { turbo_frame: "processor_right" },
-              class: "repo-stat-card" do
-              %div.repo-stat-value= @pending_occ_rev
-
-        -# Processed (top-right)
-        %div.repo-meta-block
-          %div.repo-meta-label Reviewed
-          %div.repo-meta-value{ title: @reviewed_occ_rev }
-            = link_to occurrence_reviews_path(status: "reviewed"),
-              data: { turbo_frame: "processor_right" },
-              class: "repo-stat-card" do
-              %div.repo-stat-value= @reviewed_occ_rev
+      %div.repo-meta-block
+        %div.repo-meta-value{ title: @occ_rev_count }
+          = link_to occurrence_reviews_path,
+            data: { turbo_frame: "processor_right" },
+            class: "repo-stat-card" do
+            %div.repo-stat-value= @occ_rev_count

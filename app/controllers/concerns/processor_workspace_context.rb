@@ -15,12 +15,10 @@ module ProcessorWorkspaceContext
   end
 
   def init_lexeme_count
-    @pending_lc = Lexeme.pending.count
-    @processed_lc = Lexeme.processed.count
+    @lexeme_count = Lexeme.count
   end
 
   def init_occ_rev_count
-    @pending_occ_rev = OccurrenceReview.pending.count
-    @reviewed_occ_rev = OccurrenceReview.reviewed.count
+    @occ_rev_count = OccurrenceReview.count
   end
 end

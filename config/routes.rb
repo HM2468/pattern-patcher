@@ -36,12 +36,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :lexemes, only: %i[index show] do
-    collection do
-      post :process_unprocessed
-    end
-  end
-
   resources :scan_runs, only: %i[index create destroy] do
     member do
       get :scanned_files
@@ -56,6 +50,13 @@ Rails.application.routes.draw do
       patch :toggle_enabled
     end
   end
+
+  resources :lexemes do
+    member do
+      patch :toggle_ignore
+    end
+  end
+
   resources :occurrence_reviews
   resources :process_runs, only: %i[index create destroy]
   resources :settings, only: %i[index edit update destroy]

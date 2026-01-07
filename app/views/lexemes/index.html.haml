@@ -33,14 +33,14 @@
                 No lexemes found.
         - else
           .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-            %table{ class: "w-full text-sm" }
+            %table{ class: "w-full table-fixed text-sm" }
               -# Optional: if you want the header row, uncomment
-              %thead{ class: "bg-indigo-50 text-gray-600" }
-                %tr
-                  %th{ class: "px-4 py-3 text-left font-medium" } ID
-                  %th{ class: "px-4 py-3 text-left font-medium" } Source Text
-                  %th{ class: "px-4 py-3 text-left font-medium" } Metadata
-                  %th{ class: "pl-4 pr-8 py-3 text-left font-medium" } Status
+              -# %thead{ class: "bg-indigo-50 text-gray-600" }
+              -#   %tr
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } ID
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } Source Text
+              -#     %th{ class: "px-4 py-3 text-left font-medium" } Metadata
+              -#     %th{ class: "pl-4 pr-8 py-3 text-left font-medium" } Status
 
               -# IMPORTANT: stable tbody id so Turbo can replace it
               %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-300" }
