@@ -5,13 +5,19 @@ class ProcessRunsController < ApplicationController
   before_action :set_process_run, only: %i[destroy]
 
   def index
+    processor_id = @current_processor.id || params[:processor_id].presence
+    base_scope =
+      if processor_id.present?
+        ProcessRun.where(lexeme_processor_id: processor_id)
+      else
+        ProcessRun.all
+      end
     @process_runs =
-      ProcessRun
+      base_scope
         .includes(:lexeme_processor)
         .order(created_at: :desc)
         .page(params[:page])
         .per(10)
-    # 进度条数据来自 cache（每页 10 次读取）
     @progress_by_id = {}
     @process_runs.each do |pr|
       @progress_by_id[pr.id] = pr.read_progress
