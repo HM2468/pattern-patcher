@@ -1,9 +1,10 @@
+-# app/views/shared/_header.html.haml
 %header{ class: "sticky top-0 z-20 h-[65px] bg-white/80 backdrop-blur border-b border-gray-200" }
-  %div{ class: "mx-auto max-w-6xl px-6 h-full flex items-center justify-between" }
+  %div{ class: "w-full px-6 h-full flex items-center justify-between" }
 
     -# Brand
     %div{ class: "flex items-center gap-3" }
-      %div{ class: "h-9 w-9 rounded-xl bg-gray-900 text-white flex items-center justify-center font-semibold shadow-sm" }
+      %div{ class: "h-9 w-9 rounded-xl bg-indigo-800 text-white flex items-center justify-center font-semibold shadow-sm" }
         PP
       %div{ class: "leading-tight" }
         %div{ class: "text-sm font-semibold text-gray-900" } PatternPatcher
@@ -11,7 +12,6 @@
 
     -# Nav
     %nav{ class: "hidden md:flex items-center gap-1 text-sm bg-gray-50 border border-gray-200 rounded-2xl p-1" }
-      -# 你可以用 current_page? 做 active 高亮
       - dash_active = current_page?(root_path)
       - repo_active = request.path.start_with?(repositories_path)
       - proc_active = request.path.start_with?(lexeme_processors_path)
@@ -25,7 +25,6 @@
       = link_to "Processing", lexeme_processors_path,
         class: "px-3 py-2 rounded-xl #{proc_active ? 'bg-white shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
-    -# Right actions (optional)
     %div{ class: "flex items-center gap-2" }
       %div{ class: "hidden md:block text-xs text-gray-500" }
         %span{ class: "font-mono" }= Time.current.strftime("%Y-%m-%d")
