@@ -19,11 +19,11 @@
     = javascript_importmap_tags
 
   %body
-    %div{ class: "mx-auto max-w-6xl flex flex-col gap-[16px]" }
+    %div{ class: "w-full min-h-screen flex flex-col gap-[16px]" }
       = render "shared/header"
       = render "shared/flash"
 
-      %main{ class: "px-6" }
+      %main{ class: "px-6 flex-1" }
         -# allow nested layouts to override main content without duplicating <head>/<body>
         = content_for?(:layout_main) ? yield(:layout_main) : yield
 
