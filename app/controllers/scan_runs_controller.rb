@@ -3,7 +3,7 @@ class ScanRunsController < ApplicationController
   include ScanRunsHelper
   include RepositoryWorkspaceContext
 
-  layout "repository_workspace", only: %i[index create destroy scanned_files scanned_occurrences]
+  layout "repository_workspace", only: %i[index create destroy scanned_files]
   before_action :set_scan_run, only: %i[destroy scanned_occurrences scanned_files]
 
   def index
@@ -114,15 +114,6 @@ class ScanRunsController < ApplicationController
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotDestroyed => e
     flash[:error] = e.message
     redirect_to scan_runs_path(repository_id: repo_id)
-  end
-
-  def scanned_occurrences
-    @occurrences =
-      @scan_run.occurrences
-        .includes(:repository_file)
-        .order(:repository_file_id, :line_at, :line_char_start, :id)
-        .page(params[:page])
-        .per(10)
   end
 
   def scanned_files
