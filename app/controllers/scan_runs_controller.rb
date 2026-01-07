@@ -36,11 +36,11 @@ class ScanRunsController < ApplicationController
 
   def create
     file_ids = params[:file_ids].presence || []
-    snapshot = @selected_repository.current_snapshot
+    snapshot = @current_repository.current_snapshot
 
     if snapshot.nil?
       flash[:alert] = "No repository snapshot found. Please import the repository first."
-      return redirect_to(repositories_path(repository_id: @selected_repository.id))
+      return redirect_to(repositories_path(repository_id: @current_repository.id))
     end
 
     @scan_run =
@@ -57,11 +57,11 @@ class ScanRunsController < ApplicationController
     if @scan_run.save
       StartScanJob.perform_later(
         scan_run_id: @scan_run.id,
-        repository_id: @selected_repository.id,
+        repository_id: @current_repository.id,
         file_ids: file_ids,
       )
-      repo_id = @selected_repository.id
-      repository = @selected_repository
+      repo_id = @current_repository.id
+      repository = @current_repository
       scan_count = get_scan_count(repo_id)
       respond_to do |format|
         format.turbo_stream do
@@ -81,7 +81,7 @@ class ScanRunsController < ApplicationController
       end
     else
       flash[:error] = @scan_run.errors.full_messages.join(", ")
-      redirect_to(repositories_path(repository_id: @selected_repository.id))
+      redirect_to(repositories_path(repository_id: @current_repository.id))
     end
   end
 
