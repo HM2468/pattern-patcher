@@ -1,13 +1,21 @@
 class OccurrenceReviewsController < ApplicationController
+  include ProcessorWorkspaceContext
+  layout "processor_workspace", only: %i[index show]
   before_action :set_occurrence_review, only: %i[ show edit update destroy ]
 
-  # GET /occurrence_reviews or /occurrence_reviews.json
   def index
-    @occurrence_reviews = OccurrenceReview.all
-      .includes(:occurrence)
-      .order(created_at: :desc)
-      .page(params[:page])
-      .per(20)
+    @status = params[:status].presence
+    base = OccurrenceReview.order(created_at: :desc)
+
+    @occurrence_reviews =
+      case @status
+      when "pending" then base.pending
+      when "reviewed"   then base.reviewed
+      when "approved" then base.approved
+      when "rejected" then base.rejected
+      else
+        base
+      end.page(params[:page]).per(10)
   end
 
   # GET /occurrence_reviews/1 or /occurrence_reviews/1.json

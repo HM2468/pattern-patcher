@@ -11,9 +11,9 @@
         -# 1) Current processor
         = render "lexeme_processors/current_processor"
 
-        -# 2) Scrollable processor show area
-        %div{ class: "flex-1 min-h-0 overflow-y-auto space-y-3" }
-          = render "lexemes/count"
+        = render "lexemes/count"
+
+        = render "occurrence_reviews/count"
 
 
     -# Divider

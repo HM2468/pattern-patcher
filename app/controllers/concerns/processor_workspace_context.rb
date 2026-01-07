@@ -5,6 +5,7 @@ module ProcessorWorkspaceContext
   included do
     before_action :init_current_processor
     before_action :init_lexeme_count
+    before_action :init_occ_rev_count
   end
 
   private
@@ -16,7 +17,10 @@ module ProcessorWorkspaceContext
   def init_lexeme_count
     @pending_lc = Lexeme.pending.count
     @processed_lc = Lexeme.processed.count
-    @ignored_lc = Lexeme.ignored.count
-    @failed_lc = Lexeme.failed.count
+  end
+
+  def init_occ_rev_count
+    @pending_occ_rev = OccurrenceReview.pending.count
+    @reviewed_occ_rev = OccurrenceReview.reviewed.count
   end
 end
