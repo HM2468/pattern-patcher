@@ -4,9 +4,11 @@
 %div{ class: "max-w-6xl mx-auto p-6 space-y-4" }
   %div{ class: "flex items-center justify-between" }
     %div{ class: "text-lg font-semibold" } Process Runs
-    %div{ class: "text-sm text-gray-600" }
-      Total:
-      %span{ class: "font-mono" }= @process_runs.total_count
+    %div{ class: "text-sm text-gray-600 mr-4 ml-4" }
+      = link_to lexeme_processors_path,
+        class: "icon-button",
+        data: tooltip_data(tip: "Back") do
+        = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
   %div{
     class: "space-y-3",

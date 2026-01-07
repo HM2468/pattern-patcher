@@ -48,10 +48,12 @@
           %div.repo-meta-value{ title: entrypoint_text }
             = entrypoint_text
 
-        = link_to process_runs_path(processor_id: processor&.id),
-          data: { turbo_frame: "processor_right" },
-          class: "repo-stat-card" do
-          %div.repo-stat-label Process Runs
-          %div.repo-stat-value
-            %span{ id: dom_id(processor, :run_count) }
-              = run_count
+        %div.repo-meta-block
+          %div.repo-meta-label Process Runs
+          %div.repo-meta-value{ title: run_count }
+            = link_to process_runs_path(processor_id: processor&.id),
+              data: { turbo_frame: "processor_right" },
+              class: "repo-stat-card" do
+              %div.repo-stat-value
+                %span{ id: dom_id(processor, :run_count) }
+                  = run_count

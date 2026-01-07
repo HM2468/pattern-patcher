@@ -83,12 +83,6 @@
           Must include
           %span{ class: "font-mono" } processed_text
 
-      / Enabled
-      %div{ class: "flex items-center gap-2" }
-        = form.check_box :enabled, id: "lexeme_processor_enabled", class: "h-4 w-4 rounded border-gray-300"
-        %label{ for: "lexeme_processor_enabled", class: "text-sm font-medium text-gray-700" }
-          Enabled
-
   / Actions
   %div{ class: "flex items-center justify-end gap-4" }
     = form.submit "Save", class: "button-primary"
