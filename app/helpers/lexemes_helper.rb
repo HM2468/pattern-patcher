@@ -3,7 +3,7 @@
 # app/helpers/lexemes_helper.rb
 module LexemesHelper
 
-  def process_status_badge_class(lexeme)
+  def lexeme_status_badge_class(lexeme)
     case lexeme.process_status.to_s
     when "processed"
       "bg-emerald-50 text-emerald-700 border-emerald-200"

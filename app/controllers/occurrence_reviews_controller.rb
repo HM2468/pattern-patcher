@@ -5,7 +5,8 @@ class OccurrenceReviewsController < ApplicationController
 
   def index
     @status = params[:status].presence
-    base = OccurrenceReview.includes(:occurrence).order(created_at: :desc)
+    base = OccurrenceReview
+      .includes(occurrence: :repository_file).order(created_at: :desc)
 
     @occurrence_reviews =
       case @status
@@ -15,7 +16,7 @@ class OccurrenceReviewsController < ApplicationController
       when "rejected" then base.rejected
       else
         base
-      end.page(params[:page]).per(10)
+      end.page(params[:page]).per(15)
   end
 
   # GET /occurrence_reviews/1 or /occurrence_reviews/1.json

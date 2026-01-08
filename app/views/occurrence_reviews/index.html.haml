@@ -13,17 +13,19 @@
           %div{ class: "text-lg font-semibold text-gray-900" } All Reviews
 
     -# ===== Scroll area: ONLY body scrolls =====
-    %div#lexemes_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
+    %div#occ_revs_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
       %div{ class: "px-6 py-4 space-y-4" }
         - if !defined?(@occurrence_reviews) || @occurrence_reviews.blank?
-          %div#lexemes_empty_state
+          %div#occ_revs_empty_state
             .rounded-2xl.bg-gray-50.p-8.shadow-sm
               %div{ class: "text-sm text-gray-600" }
                 No Records found.
         - else
           .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-            - @occurrence_reviews.each do |occurrence_review|
-              = render "occurrence_review", occurrence_review: occurrence_review
+            %table{ class: "w-full table-fixed text-sm" }
+              %tbody{ id: "occurrence_reviews_tbody", class: "divide-y divide-gray-300" }
+                - @occurrence_reviews.each do |occ_rev|
+                  = render "row", occ_rev: occ_rev
 
     -# ===== Fixed Footer Pagination =====
     %div{ class: "sticky bottom-0" }
