@@ -2,12 +2,13 @@
 -# app/views/occurrence_reviews/show.html.haml
 
 - diff = @diff
+- review = @occurrence_review
 .pp-diff
   .pp-diff-file
     .pp-diff-header
       .pp-diff-header-left
         %span.pp-file-icon
-          📄
+          = "##{review.id}"
         %span.pp-file-path= diff.path
 
       .pp-diff-header-right
