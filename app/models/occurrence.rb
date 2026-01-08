@@ -27,4 +27,11 @@ class Occurrence < ApplicationRecord
     highlighted = "<span class=\"ppmatchhi\">#{matched_text}</span>"
     context[0..(line_char_start - 1)] + highlighted + context[(line_char_end + 1)..]
   end
+
+  def replaced_text
+    reviewed = occurrence_review
+    return context if reviewed.nil? || reviewed.rendered_code.blank?
+
+    context[0..(line_char_start - 1)] + reviewed.rendered_code + context[(line_char_end + 1)..]
+  end
 end

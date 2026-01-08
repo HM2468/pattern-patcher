@@ -1,10 +1,51 @@
-%p{style: "color: green"}= notice
+-# frozen_string_literal: true
+- diff = @diff
 
-= render @occurrence_review
+.pp-diff
+  .pp-diff-file
+    .pp-diff-header
+      .pp-diff-header-left
+        %span.pp-file-icon
+          📄
+        %span.pp-file-path= diff.path
 
-%div
-  = link_to "Edit this occurrence review", edit_occurrence_review_path(@occurrence_review)
-  |
-  = link_to "Back to occurrence reviews", occurrence_reviews_path
+      .pp-diff-header-right
+        - if diff.additions.to_i.positive? || diff.deletions.to_i.positive?
+          %span.pp-diff-stats
+            %span.pp-add= "+#{diff.additions}"
+            %span.pp-del= "-#{diff.deletions}"
+        - else
+          %span.pp-diff-stats
+            %span.pp-neutral No changes
 
-  = button_to "Destroy this occurrence review", @occurrence_review, method: :delete
+    .pp-diff-body
+      %table.pp-diff-table{ cellspacing: 0, cellpadding: 0 }
+        %tbody
+          - diff.rows.each do |row|
+            - case row.type
+            - when :hunk
+              %tr.pp-hunk
+                %td.pp-blob-num{ colspan: 2 }
+                %td.pp-blob-code
+                  %span.pp-blob-code-inner= row.content
+
+            - when :context
+              %tr.pp-context
+                %td.pp-blob-num.pp-blob-num-context= row.old_lineno
+                %td.pp-blob-num.pp-blob-num-context= row.new_lineno
+                %td.pp-blob-code.pp-blob-code-context
+                  %span.pp-blob-code-inner= h(row.content)
+
+            - when :del
+              %tr.pp-del
+                %td.pp-blob-num.pp-blob-num-del= row.old_lineno
+                %td.pp-blob-num.pp-blob-num-empty
+                %td.pp-blob-code.pp-blob-code-del
+                  %span.pp-blob-code-inner.pp-line-del= h(row.content)
+
+            - when :add
+              %tr.pp-add
+                %td.pp-blob-num.pp-blob-num-empty
+                %td.pp-blob-num.pp-blob-num-add= row.new_lineno
+                %td.pp-blob-code.pp-blob-code-add
+                  %span.pp-blob-code-inner.pp-line-add= h(row.content)

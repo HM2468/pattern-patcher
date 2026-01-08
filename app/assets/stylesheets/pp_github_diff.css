@@ -1,0 +1,159 @@
+/* app/assets/stylesheets/pp_github_diff.css */
+
+/* ===== container ===== */
+.pp-diff {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12.5px;
+  color: #1f2328;
+}
+
+.pp-diff-file {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+/* ===== header ===== */
+.pp-diff-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #f6f8fa;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.pp-diff-header-left {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pp-file-path {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  font-size: 13px;
+  font-weight: 600;
+  color: #0969da;
+}
+
+.pp-diff-stats {
+  display: inline-flex;
+  gap: 8px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font-size: 12px;
+}
+
+.pp-diff-stats .pp-add { color: #1a7f37; font-weight: 600; }
+.pp-diff-stats .pp-del { color: #cf222e; font-weight: 600; }
+.pp-diff-stats .pp-neutral { color: #57606a; }
+
+/* ===== table base ===== */
+.pp-diff-body {
+  background: #ffffff;
+}
+
+.pp-diff-table {
+  width: 100%;
+  border-collapse: collapse; /* 关键：避免 border spacing 带来的“缝” */
+  table-layout: fixed;
+}
+
+.pp-diff-table td {
+  padding: 0;
+  border: 0; /* 不要行级 border，避免“明显边框” */
+  vertical-align: top;
+}
+
+/* ===== gutter (line numbers) ===== */
+.pp-blob-num {
+  width: 1%;
+  min-width: 52px;
+  padding: 0 10px;
+  text-align: right;
+  user-select: none;
+  color: #656d76;
+  background: #ffffff;
+
+  /* GitHub 风格：淡竖线分隔 */
+  border-right: 1px solid #d8dee4;
+
+  /* 行高一致：与 code-inner 同一行高 */
+  line-height: 20px;
+}
+
+.pp-blob-num-empty {
+  color: transparent;
+  background: #ffffff;
+}
+
+/* ===== code cell ===== */
+.pp-blob-code {
+  width: 99%;
+  background: #ffffff;
+}
+
+.pp-blob-code-inner {
+  display: block;
+
+  /* 行高一致的关键：所有类型行都用这套 */
+  line-height: 20px;
+  padding: 2px 12px;
+
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* hover（只让 context 更像 GitHub） */
+.pp-diff-table tr:hover .pp-blob-code-context {
+  background: #f6f8fa;
+}
+
+/* ===== hunk header ===== */
+.pp-hunk td {
+  background: #ddf4ff;
+}
+
+.pp-hunk .pp-blob-code-inner {
+  color: #0969da;
+  font-weight: 600;
+}
+
+/* ===== deletion / addition backgrounds ===== */
+.pp-blob-num-del,
+.pp-blob-code-del {
+  background: #ffebe9;
+}
+
+.pp-blob-num-add,
+.pp-blob-code-add {
+  background: #dafbe1;
+}
+
+/*
+  不要用 border-top/bottom，否则会出现“行高不一致”和“粗边框感”
+  用 very light inset shadow 模拟 GitHub 的轻微分隔感
+*/
+.pp-del .pp-blob-code,
+.pp-del .pp-blob-num,
+.pp-add .pp-blob-code,
+.pp-add .pp-blob-num {
+  box-shadow:
+    inset 0 1px 0 rgba(27, 31, 36, 0.04),
+    inset 0 -1px 0 rgba(27, 31, 36, 0.04);
+}
+
+/* ===== +/- sign via pseudo element =====
+   用伪元素固定宽度，不引入额外 inline 影响行高
+*/
+.pp-line-del::before,
+.pp-line-add::before {
+  display: inline-block;
+  width: 14px;
+  margin-right: 6px;
+  font-weight: 700;
+  color: #656d76;
+}
+
+.pp-line-del::before { content: "-"; }
+.pp-line-add::before { content: "+"; }
