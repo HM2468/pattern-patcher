@@ -1,49 +1,48 @@
 -# app/views/lexemes/_row.html.haml
 -# locals: lexeme
 
-- source_text = lexeme.source_text.to_s
-- meta_obj = lexeme.metadata
-- meta_text = meta_obj.is_a?(String) ? meta_obj : meta_obj.to_json
+- meta_text = lexeme.metadata_pretty.to_s
 - ignored = (lexeme.process_status.to_s == "ignored")
 - eye_class = ignored ? "text-gray-700 hover:text-indigo-700" : "text-gray-300 hover:text-indigo-500"
-- row_height = "h-16" # 固定行高，可按需改成 h-18 / h-20
+- row_height = "h-14" # 更紧凑：原来 h-16
 
 %tr{
   id: dom_id(lexeme),
   class: "group bg-white transition hover:bg-indigo-50/60 focus-within:bg-indigo-50/60 #{row_height}"
 }
   -# 1) ID列 10%：ID在上、status在下，居中排列
-  %td{ class: "w-[10%] px-4 py-3 align-middle" }
+  %td{ class: "w-[10%] px-4 py-0.5 align-middle" }
     %div{ class: "h-full flex flex-col items-center justify-center text-center leading-tight" }
       %div{ class: "font-mono text-xs text-gray-800" }= lexeme.id
       - badge_class = process_status_badge_class(lexeme)
-      %span{ class: "mt-1 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] #{badge_class}" }
+      %span{ class: "mt-1 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] #{badge_class}" }
         = lexeme.process_status.presence || "unknown"
 
-  -# 2) Source Text 50%：自动换行 + 固定高度内裁剪 + hover title 展示完整
-  %td{ class: "w-[50%] px-4 py-3 align-middle" }
-    %div{
-      class: "h-full flex items-center",
-      title: source_text
-    }
-      %div{ class: "w-full text-xs font-mono text-gray-800 whitespace-pre-wrap break-words overflow-hidden max-h-12" }
-        = source_text
+  -# 2) Source Text 60%：单行显示，超出裁剪，hover 显示完整
+  %td{ class: "w-[60%] px-4 py-0.5 align-middle" }
+    %div{ class: "h-full flex flex-col justify-center text-left leading-tight gap-1" }
+      %div{
+        class: "w-full text-xs font-mono text-blue-800 truncate",
+        title: lexeme.source_text.to_s
+      }
+        = lexeme.source_text
+      %div{
+        class: "w-full text-xs font-mono text-green-800 truncate",
+        title: lexeme.normalized_text.to_s
+      }
+        = lexeme.normalized_text
 
-  -# 3) Metadata 30%：自动换行 + 固定高度内裁剪 + hover title 展示完整
-  %td{ class: "w-[30%] px-4 py-3 align-middle" }
-    %div{
-      class: "h-full flex items-center",
-      title: meta_text
-    }
-      %div{ class: "w-full font-mono text-[11px] text-gray-600 whitespace-pre-wrap break-words overflow-hidden max-h-12" }
-        = meta_text
+  -# 3) Metadata 20%：垂直居中 + 单行省略 + hover title 展示完整（JSON更小字体）
+  %td{ class: "w-[20%] px-4 py-0.5 align-middle" }
+    %div{ class: "h-full flex items-center", title: meta_text }
+      %div{ class: "w-full font-mono text-[10px] text-blue-800 truncate" }
+        %pre
+          = meta_text
 
-  -# 4) Actions列 10%：两个 icon，eye-slash 左，trash 右；垂直居中
-  %td{ class: "w-[10%] px-4 py-3 align-middle" }
+  -# 4) Actions列 10%：eye-slash 左，trash 右；垂直居中
+  %td{ class: "w-[10%] px-4 py-0.5 align-middle" }
     %div{ class: "h-full flex items-center justify-center" }
       %div{ class: "flex items-center gap-2" }
-
-        -# 7) 点击 eye-slash 在 pending/ignored 间切换
         = button_to toggle_ignore_lexeme_path(lexeme),
           method: :patch,
           params: { page: params[:page], status: params[:status] },

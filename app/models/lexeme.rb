@@ -22,4 +22,8 @@ class Lexeme < ApplicationRecord
       Digest::SHA256.hexdigest(text.to_s)[0, 16]
     end
   end
+
+  def metadata_pretty
+    prettier_json(metadata)
+  end
 end

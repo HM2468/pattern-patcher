@@ -3,21 +3,18 @@
 -# Lexemes index
 -# Fixed header + scrollable body + fixed pagination (like lexical_patterns/index)
 
-%div{ class: "h-[85vh] overflow-hidden" }
+%div{ class: "h-full overflow-hidden" }
   %div#lexemes_panel{
     class: "repo-files-panel flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
   }
 
     -# ===== Fixed Header (NOT scroll) =====
-    %div{ class: "text-gray-600 border-b border-gray-200" }
+    %div{ class: "text-gray-600 border-b border-gray-100" }
       %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
           %div{ class: "text-lg font-semibold text-gray-900" } All Lexemes
 
-        -# Right actions (optional)
         %div{ class: "shrink-0 flex items-center gap-2" }
-          -# Example: filter/status indicator (keep simple)
-          -# You can add dropdowns/search here later
           - if params[:status].present?
             %span{ class: "text-xs rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2 py-1" }
               = "Status: #{params[:status]}"
@@ -34,24 +31,13 @@
         - else
           .rounded-2xl.bg-white.shadow-sm.overflow-hidden
             %table{ class: "w-full table-fixed text-sm" }
-              -# Optional: if you want the header row, uncomment
-              -# %thead{ class: "bg-indigo-50 text-gray-600" }
-              -#   %tr
-              -#     %th{ class: "px-4 py-3 text-left font-medium" } ID
-              -#     %th{ class: "px-4 py-3 text-left font-medium" } Source Text
-              -#     %th{ class: "px-4 py-3 text-left font-medium" } Metadata
-              -#     %th{ class: "pl-4 pr-8 py-3 text-left font-medium" } Status
-
-              -# IMPORTANT: stable tbody id so Turbo can replace it
               %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-300" }
                 - @lexemes.each do |lexeme|
                   = render "row", lexeme: lexeme
 
-          -# Keep empty state container in DOM for Turbo replace (even when not empty)
           %div#lexemes_empty_state{ class: "hidden" }
 
     -# ===== Fixed Footer Pagination =====
-    %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
-      %div{ class: "px-6 py-3" }
-        - if defined?(@lexemes) && @lexemes.respond_to?(:current_page) && @lexemes.any?
-          = render "shared/pagination", collection: @lexemes
+    %div{ class: "sticky bottom-0" }
+      - if defined?(@lexemes) && @lexemes.respond_to?(:current_page) && @lexemes.any?
+        = render "shared/pagination", collection: @lexemes

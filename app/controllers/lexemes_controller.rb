@@ -16,7 +16,7 @@ class LexemesController < ApplicationController
       when "failed"    then base.failed
       else
         base
-      end.page(params[:page]).per(10)
+      end.page(params[:page]).per(15)
   end
 
   def toggle_ignore
