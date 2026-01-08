@@ -8,19 +8,21 @@ class OccurrenceReviewsController < ApplicationController
     @status = params[:status].presence
     base = OccurrenceReview
       .joins(occurrence: :repository_file)
-      .includes(occurrence: :repository_file) # 保留 includes 防止 N+1
+      .includes(occurrence: { repository_file: :repository })
       .order("repository_files.path ASC, occurrences.byte_start DESC")
-
-    @occurrence_reviews =
+    scoped =
       case @status
-      when "pending" then base.pending
-      when "reviewed"   then base.reviewed
+      when "pending"  then base.pending
+      when "reviewed" then base.reviewed
       when "approved" then base.approved
       when "rejected" then base.rejected
       else
         base
-      end.page(params[:page]).per(15)
+      end
+    @occurrence_reviews = scoped.page(params[:page]).per(10)
+    @diffs_by_review_id = OccurrenceReviewDiffBatch.build(@occurrence_reviews)
   end
+
 
   def show
     @occurrence = @occurrence_review.occurrence

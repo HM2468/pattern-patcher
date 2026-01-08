@@ -22,10 +22,10 @@
                 No Records found.
         - else
           .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-            %table{ class: "w-full table-fixed text-sm" }
-              %tbody{ id: "occurrence_reviews_tbody", class: "divide-y divide-gray-300" }
-                - @occurrence_reviews.each do |occ_rev|
-                  = render "row", occ_rev: occ_rev
+            - @occurrence_reviews.each do |occ_rev|
+              - diff = @diffs_by_review_id[occ_rev.id]
+              - next if diff.nil?
+              = render "diff", occ_rev: occ_rev, occ_rev_diff: diff
 
     -# ===== Fixed Footer Pagination =====
     %div{ class: "sticky bottom-0" }
