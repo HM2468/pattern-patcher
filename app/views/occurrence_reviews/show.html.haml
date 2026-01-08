@@ -21,6 +21,11 @@
 
     .pp-diff-body
       %table.pp-diff-table{ cellspacing: 0, cellpadding: 0 }
+        %colgroup
+          %col.pp-col-lineno
+          %col.pp-col-lineno
+          %col.pp-col-code
+
         %tbody
           - diff.rows.each do |row|
             - case row.type

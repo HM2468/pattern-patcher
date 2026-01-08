@@ -32,6 +32,6 @@ class Occurrence < ApplicationRecord
     reviewed = occurrence_review
     return context if reviewed.nil? || reviewed.rendered_code.blank?
 
-    context[0..(line_char_start - 1)] + reviewed.rendered_code + context[(line_char_end + 1)..]
+    context[0...line_char_start] + reviewed.rendered_code + context[line_char_end ..]
   end
 end
