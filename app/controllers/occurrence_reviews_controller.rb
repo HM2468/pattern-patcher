@@ -6,7 +6,9 @@ class OccurrenceReviewsController < ApplicationController
   def index
     @status = params[:status].presence
     base = OccurrenceReview
-      .includes(occurrence: :repository_file).order(created_at: :desc)
+      .joins(occurrence: :repository_file)
+      .includes(occurrence: :repository_file) # 保留 includes 防止 N+1
+      .order("repository_files.path ASC, occurrences.byte_start DESC")
 
     @occurrence_reviews =
       case @status
