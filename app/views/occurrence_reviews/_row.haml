@@ -1,8 +1,5 @@
 -# app/views/occurence_revies/_row.html.haml
 -# locals: occ_rev
-
-- ignored = (occ_rev.status.to_s == "ignored")
-- eye_class = ignored ? "text-gray-700 hover:text-indigo-700" : "text-gray-300 hover:text-indigo-500"
 - row_height = "h-14"
 
 %tr{
@@ -35,13 +32,12 @@
   %td{ class: "w-[10%] px-4 py-0.5 align-middle" }
     %div{ class: "h-full flex items-center justify-center" }
       %div{ class: "flex items-center gap-2" }
-        = button_to '',
-          method: :patch,
+        = button_to occurrence_review_path(occ_rev),
+          method: :get,
           params: { page: params[:page], status: params[:status] },
           form: { class: "inline-flex" },
-          class: "icon-button",
-          data: tooltip_data(tip: ignored ? "Unignore (set to pending)" : "Ignore") do
-          = svg_icon("eye-slash", class_name: "w-5 h-5 #{eye_class}")
+          class: "icon-button" do
+          = svg_icon("eye", class_name: "w-5 h-5")
 
         = button_to occurrence_review_path(occ_rev),
           method: :delete,
