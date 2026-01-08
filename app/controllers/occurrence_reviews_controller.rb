@@ -5,7 +5,7 @@ class OccurrenceReviewsController < ApplicationController
 
   def index
     @status = params[:status].presence
-    base = OccurrenceReview.order(created_at: :desc)
+    base = OccurrenceReview.includes(:occurrence).order(created_at: :desc)
 
     @occurrence_reviews =
       case @status
