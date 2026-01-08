@@ -1,6 +1,6 @@
 /* app/assets/stylesheets/repository-files.css */
 
-.repo-files-panel {
+.{
   /* 关键：panel 内部自己管理滚动，外部不要再滚这个区域 */
   overflow: hidden;
 }
