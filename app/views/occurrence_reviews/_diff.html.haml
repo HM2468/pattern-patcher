@@ -14,8 +14,26 @@
       .pp-diff-header-right
         - if diff.additions.to_i.positive? || diff.deletions.to_i.positive?
           %span.pp-diff-stats
-            %span.pp-add= "+#{diff.additions}"
-            %span.pp-del= "-#{diff.deletions}"
+            -# %span.pp-add= "+#{diff.additions}"
+            -# %span.pp-del= "-#{diff.deletions}"
+            %span.pp-add
+              = button_to approve_occurrence_review_path(review),
+                method: :post,
+                params: { id: review.id },
+                form: { class: "inline-flex" },
+                class: "icon-button",
+                onclick: "return window.PopConfirmLog.open(event, this)",
+                data: tooltip_data(tip: "Approve") do
+                = svg_icon("hand-thumb-up", class_name: "w-5 h-5")
+            %span.pp-del
+              = button_to reject_occurrence_review_path(review),
+                method: :post,
+                params: { id: review.id },
+                form: { class: "inline-flex" },
+                class: "icon-button",
+                onclick: "return window.PopConfirmLog.open(event, this)",
+                data: tooltip_data(tip: "Reject") do
+                = svg_icon("hand-thumb-down", class_name: "w-5 h-5")
         - else
           %span.pp-diff-stats
             %span.pp-neutral No changes

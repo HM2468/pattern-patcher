@@ -2,7 +2,7 @@ class OccurrenceReviewsController < ApplicationController
   include ProcessorWorkspaceContext
   layout "processor_workspace", only: %i[index show]
   before_action :set_occurrence_review, only: %i[edit update destroy]
-  before_action :set_occ_rev, only: %i[show]
+  before_action :set_occ_rev, only: %i[show approve reject]
 
   def index
     @status = params[:status].presence
