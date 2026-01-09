@@ -2,9 +2,9 @@
 -# app/views/lexeme_processors/index.html.haml
 -# Fixed header + scrollable body + fixed pagination (like lexical_patterns/index)
 
-%div{ class: "h-screen overflow-hidden" }
+%div{ class: "h-screen max-w-4xl mx-auto overflow-hidden" }
   %div#lexeme_processors_panel{
-    class: "flex flex-col h-full overflow-hidden rounded-2xl bg-white shadow-sm"
+    class: "flex flex-col h-full overflow-hidden rounded-2xl"
   }
     -# ===== Fixed Header (NOT scroll) =====
     %div{ class: "text-gray-600 border-b border-gray-200" }

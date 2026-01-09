@@ -1,11 +1,12 @@
 - content_for :title, "Editing lexeme processor"
 
-%div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
-  %h2{ class: "text-2xl font-semibold tracking-tight text-gray-900" }
-    Editing processor
-  = link_to lexeme_processors_path,
-    class: "icon-button",
-    data: tooltip_data(tip: "Back") do
-    = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
+%div.max-w-4xl.mx-auto
+  %div{ class: "flex items-center justify-between mb-4 mr-3 ml-3" }
+    %h2{ class: "text-2xl font-semibold tracking-tight text-gray-900 py-6" }
+      Editing processor
+    = link_to lexeme_processors_path,
+      class: "icon-button",
+      data: tooltip_data(tip: "Back") do
+      = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
-= render "form", lexeme_processor: @lexeme_processor
+  = render "form", lexeme_processor: @lexeme_processor

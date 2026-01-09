@@ -2,7 +2,7 @@
 -# app/views/shared/_rev_nav.html.haml
 
 = link_to lexemes_path,
-  class: "block rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-indigo-300",
+  class: "block rounded-2xl border border-indigo-200 overflow-hidden transition-all hover:shadow-md hover:border-indigo-300",
   data: { turbo_frame: "processor_right" } do
   %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
     %div{ class: "min-w-0" }
@@ -16,7 +16,7 @@
         = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
 
 = link_to occurrence_reviews_path,
-  class: "block rounded-2xl border border-indigo-200 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-indigo-300",
+  class: "block rounded-2xl border border-indigo-200 overflow-hidden transition-all hover:shadow-md hover:border-indigo-300",
   data: { turbo_frame: "processor_right" } do
   %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
     %div{ class: "min-w-0" }
