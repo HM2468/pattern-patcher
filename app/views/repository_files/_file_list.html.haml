@@ -22,6 +22,9 @@
     }
   }
 
+    %div{ class: "text-lg font-semibold text-gray-900 px-6 py-3" }
+      = "#{@repository.name} files"
+
     -# ===== Fixed Header (NOT scroll) =====
     %table#repo_files_table_head{ class: "w-full text-sm table-fixed repo-files-head" }
       %thead{ class: "bg-indigo-100 text-gray-600" }
