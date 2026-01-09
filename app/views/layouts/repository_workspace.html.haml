@@ -5,9 +5,14 @@
   %div{ class: "flex h-[85vh]" }
     -# Left: repositories (18%)
     %div{ class: "w-[18%] rounded-lg bg-white overflow-hidden flex flex-col" }
+
+      -# Left header (brand + nav)
+      = render "shared/header"
+
       -# Stack ALL left elements with spacing
-      %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
+      %div{ class: "flex-1 min-h-0 flex flex-col space-y-3 p-3" }
         = render "lexical_patterns/current_pattern"
+
         -# Top: repo dropdown (fixed)
         = render "repositories/repo_dropdown"
 
@@ -18,6 +23,7 @@
                 src: repository_path(@selected_id),
                 loading: "eager",
                 class: "block"
+
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
 

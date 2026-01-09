@@ -8,6 +8,8 @@
     %div{ class: "w-[18%] rounded-lg bg-white overflow-hidden flex flex-col" }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
 
+        -# Left header (brand + nav)
+        = render "shared/header"
         -# 1) Current processor
         = render "lexeme_processors/current_processor"
 
