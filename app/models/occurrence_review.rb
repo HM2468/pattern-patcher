@@ -8,7 +8,6 @@ class OccurrenceReview < ApplicationRecord
 
   enum :status, {
     pending: "pending",
-    reviewed: "reviewed",
     approved: "approved",
     rejected: "rejected"
   }, default: :pending

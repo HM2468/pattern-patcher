@@ -13,7 +13,6 @@ class OccurrenceReviewsController < ApplicationController
     scoped =
       case @status
       when "pending"  then base.pending
-      when "reviewed" then base.reviewed
       when "approved" then base.approved
       when "rejected" then base.rejected
       else
