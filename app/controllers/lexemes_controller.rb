@@ -8,6 +8,11 @@ class LexemesController < ApplicationController
     @status = params[:status].presence
     base = Lexeme.order(created_at: :desc)
 
+    @pending_count = Lexeme.pending.count
+    @processed_count = Lexeme.processed.count
+    @ignored_count = Lexeme.ignored.count
+    @failed_count = Lexeme.failed.count
+
     @lexemes =
       case @status
       when "pending"   then base.pending
