@@ -13,13 +13,27 @@
   -# 1) ID列 10%：ID在上、status在下，居中排列
   %td{ class: "w-[10%] px-4 py-0.5 align-middle" }
     %div{ class: "h-full flex flex-col items-center justify-center text-center leading-tight" }
-      %div{ class: "font-mono text-xs text-gray-800" }= lexeme.id
-      - badge_class = lexeme_status_badge_class(lexeme)
-      %span{ class: "mt-1 inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] #{badge_class}" }
-        = lexeme.process_status.presence || "unknown"
+      %div{ class: "font-mono text-xs text-gray-800" }= "##{lexeme.id}"
+      %span{ class: "mt-1 inline-flex items-center px-2 py-0.5 text-[10px]" }
+        = button_to toggle_ignore_lexeme_path(lexeme),
+          method: :patch,
+          params: { page: params[:page], status: params[:status] },
+          form: { class: "inline-flex" },
+          class: "icon-button",
+          data: tooltip_data(tip: ignored ? "Unignore (set to pending)" : "Ignore") do
+          = svg_icon("eye-slash", class_name: "w-5 h-5 #{eye_class}")
+
+        = button_to lexeme_path(lexeme),
+          method: :delete,
+          params: { page: params[:page], status: params[:status] },
+          form: { class: "inline-flex" },
+          class: "icon-button",
+          onclick: "return window.PopConfirmLog.open(event, this)",
+          data: delete_tip(title: "Delete Lexeme", msg: "Delete this lexeme? This cannot be undone.") do
+          = svg_icon("trash", class_name: "w-5 h-5")
 
   -# 2) Source Text 60%：单行显示，超出裁剪，hover 显示完整
-  %td{ class: "w-[60%] px-4 py-0.5 align-middle" }
+  %td{ class: "w-[70%] px-4 py-0.5 align-middle" }
     %div{ class: "h-full flex flex-col justify-center text-left leading-tight gap-1" }
       %div{
         class: "w-full text-xs font-mono text-blue-800 truncate",
@@ -38,24 +52,3 @@
       %div{ class: "w-full font-mono text-[10px] text-blue-800 truncate" }
         %pre
           = meta_text
-
-  -# 4) Actions列 10%：eye-slash 左，trash 右；垂直居中
-  %td{ class: "w-[10%] px-4 py-0.5 align-middle" }
-    %div{ class: "h-full flex items-center justify-center" }
-      %div{ class: "flex items-center gap-2" }
-        = button_to toggle_ignore_lexeme_path(lexeme),
-          method: :patch,
-          params: { page: params[:page], status: params[:status] },
-          form: { class: "inline-flex" },
-          class: "icon-button",
-          data: tooltip_data(tip: ignored ? "Unignore (set to pending)" : "Ignore") do
-          = svg_icon("eye-slash", class_name: "w-5 h-5 #{eye_class}")
-
-        = button_to lexeme_path(lexeme),
-          method: :delete,
-          params: { page: params[:page], status: params[:status] },
-          form: { class: "inline-flex" },
-          class: "icon-button",
-          onclick: "return window.PopConfirmLog.open(event, this)",
-          data: delete_tip(title: "Delete Lexeme", msg: "Delete this lexeme? This cannot be undone.") do
-          = svg_icon("trash", class_name: "w-5 h-5")
