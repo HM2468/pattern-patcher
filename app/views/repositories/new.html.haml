@@ -1,13 +1,10 @@
 -# app/views/repositories/new.html.haml
 %div{ class: "max-w-3xl mx-auto p-6" }
-  %div{ class: "mb-4" }
-    %div{ class: "flex items-center justify-between" }
-      %h1{ class: "text-xl font-semibold" } New repository
-      = link_to repositories_path,
-        class: "icon-button",
-        data: tooltip_data(tip: "Back") do
-        = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
-    %div{ class: "text-sm text-gray-600 mt-1" }
-      Paste an absolute folder path as root_path (local tool).
+  %div{ class: "flex items-center justify-between px-3 my-8" }
+    %h1{ class: "text-xl font-semibold" } New repository
+    = link_to repositories_path,
+      class: "icon-button",
+      data: tooltip_data(tip: "Back") do
+      = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
-    = render "repositories/form"
+  = render "repositories/form"

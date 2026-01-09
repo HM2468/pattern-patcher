@@ -24,6 +24,7 @@ class Lexeme < ApplicationRecord
   end
 
   def metadata_pretty
+    return '-' unless metadata.present?
     prettier_json(metadata)
   end
 end
