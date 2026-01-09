@@ -2,28 +2,19 @@
 -# Reuse layouts/application.html.haml (no duplicated <head>/<body>)
 
 - content_for :layout_main do
-  %div{ class: "flex h-[85vh]" }
+  %div{ class: "flex h-screen" }
 
     -# Left: processors (18%)
     %div{ class: "w-[18%] rounded-lg bg-white overflow-hidden flex flex-col" }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
-
-        -# Left header (brand + nav)
         = render "shared/header"
-        -# 1) Current processor
         = render "lexeme_processors/current_processor"
-
         = render "lexemes/count"
-
         = render "occurrence_reviews/count"
-
-
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
-
     -# Right: dynamic area (82%)
     %div{ class: "w-[82%] rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "processor_right", class: "flex-1 overflow-y-auto" do
         = yield
-
 = render template: "layouts/application"
