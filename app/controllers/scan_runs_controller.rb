@@ -62,7 +62,7 @@ class ScanRunsController < ApplicationController
       )
       repo_id = @current_repository.id
       repository = @current_repository
-      scan_count = get_scan_count(repo_id)
+      scan_count = scan_count_for(repo_id)
       respond_to do |format|
         format.turbo_stream do
           render turbo_stream: [
@@ -92,7 +92,7 @@ class ScanRunsController < ApplicationController
 
     repository = Repository.find(repo_id)
     @scan_run.destroy!
-    scan_count = get_scan_count(repo_id)
+    scan_count = scan_count_for(repo_id)
 
     respond_to do |format|
       format.turbo_stream do

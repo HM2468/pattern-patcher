@@ -5,7 +5,6 @@ class Occurrence < ApplicationRecord
   belongs_to :lexical_pattern
   belongs_to :repository_file
 
-  has_many :replacement_actions, dependent: :destroy
   has_one :occurrence_review, dependent: :destroy
 
   enum :status, {

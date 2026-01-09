@@ -1,6 +1,6 @@
 # app/models/lexeme.rb
 class Lexeme < ApplicationRecord
-  has_many :occurrences, dependent: :delete_all
+  has_many :occurrences, dependent: :destroy
   has_one :lexeme_process_result, dependent: :delete
 
   validates :source_text, presence: true
