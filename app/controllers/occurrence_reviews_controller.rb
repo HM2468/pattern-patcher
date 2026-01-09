@@ -6,6 +6,8 @@ class OccurrenceReviewsController < ApplicationController
 
   def index
     @status = params[:status].presence
+    @pending_count = OccurrenceReview.pending.count
+    @rejected_count = OccurrenceReview.rejected.count
     base = OccurrenceReview
       .joins(occurrence: :repository_file)
       .includes(occurrence: { repository_file: :repository })
@@ -16,7 +18,7 @@ class OccurrenceReviewsController < ApplicationController
       when "approved" then base.approved
       when "rejected" then base.rejected
       else
-        base
+        base.pending
       end
     @occurrence_reviews = scoped.page(params[:page]).per(10)
     @diffs_by_review_id = OccurrenceReviewDiffBatch.build(@occurrence_reviews)
