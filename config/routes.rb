@@ -28,14 +28,6 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :occurrences, only: %i[index show] do
-    member do
-      post :apply
-      post :reject
-      post :ignore
-    end
-  end
-
   resources :scan_runs, only: %i[index create destroy] do
     member do
       get :scanned_files
@@ -57,7 +49,14 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :occurrence_reviews
+  resources :occurrence_reviews do
+    member do
+      post :approve
+      post :reject
+    end
+  end
+
+  resources :occurrences, only: %i[index show]
   resources :process_runs, only: %i[index create destroy]
   resources :settings, only: %i[index edit update destroy]
 end

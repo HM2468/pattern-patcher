@@ -110,6 +110,12 @@ class OccurrenceReviewsController < ApplicationController
     end
   end
 
+  def approve
+  end
+
+  def reject
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_occurrence_review
