@@ -68,7 +68,7 @@
         %span{ class: "font-mono", data: { process_runs_target: "percent" } }= "#{percent.round(2)}%"
 
     -# Link 1: progress details (kept from your original; you can fill URL later)
-    = link_to "",
+    = link_to lexemes_path,
       class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
       title: "Open progress details",
       data: { turbo_prefetch: false } do
@@ -81,7 +81,7 @@
       %span{ class: "text-gray-400" } →
 
     -# Link 2: reviews (kept from your original; you can fill URL later)
-    = link_to "",
+    = link_to occurrence_reviews_path,
       class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
       title: "New review rows (OccurrenceReviewResult)",
       data: { turbo_prefetch: false } do
