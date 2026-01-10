@@ -28,11 +28,11 @@ module LexemeProcessors
     end
 
     def generate_rendered_code(
-      config: {},
-      lexeme_metadata: {},
-      lps_output: {},
-      file_path: ""
-    )
+        config: {},
+        lexeme_metadata: {},
+        lps_output: {},
+        file_path: ""
+      )
       full_key = get_full_key(
         config: config,
         lps_output: lps_output,
@@ -47,7 +47,7 @@ module LexemeProcessors
       #   "params4" => "UsersProject::MEMBER_NAMES[access_level]"}}
       # 期望 interpolation 结构：
       # {"params1"=>"user_display","params2"=>"target_user.username",...}
-      interpolation = lexeme_metadata["interpolation"]
+      interpolation = lexeme_metadata["interpolations"]
       params_code = ""
       if interpolation.present?
         pairs = interpolation.map do |k, v|
@@ -55,7 +55,7 @@ module LexemeProcessors
         end
         params_code = ", #{pairs.join(', ')}"
       end
-      rendered_code = "I18n.t(\"#{full_key}#{params_code}\")"
+      rendered_code = "I18n.t(\"#{full_key}\"#{params_code})"
       metadata = { full_key: full_key}
       [rendered_code, metadata]
     end
@@ -63,10 +63,10 @@ module LexemeProcessors
     private
 
     def get_full_key(
-      config: {},
-      lps_output: {},
-      file_path: ""
-    )
+        config: {},
+        lps_output: {},
+        file_path: ""
+      )
       key_prefix = config.fetch("key_prefix", nil)
       last_key = lps_output["i18n_key"]
 

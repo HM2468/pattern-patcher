@@ -5,11 +5,13 @@
 - repository_files = local_assigns.fetch(:repository_files, nil) || @repository_files
 - path_filter = local_assigns.fetch(:path_filter, nil) || @path_filter
 - scan_hint_message = local_assigns.fetch(:scan_hint_message, nil) || @scan_hint_message
+- no_files = path_filter.blank? && (repository_files.blank? || repository_files.empty?)
+- no_match = path_filter.present? && (repository_files.blank? || repository_files.empty?)
 
 - if repository.nil?
   %div{ class: "p-6 text-gray-700" }
     Please select a repository.
-- elsif repository_files.blank? || repository_files.empty?
+- elsif no_files
   %div{ class: "p-6 text-gray-700" }
     Please import files or check whether the repository is empty.
 - else
@@ -70,26 +72,31 @@
                 } Delete
 
     -# ===== Scroll area: ONLY tbody scrolls =====
-    %div#repo_files_body_scroll{ class: "repo-files-body-scroll flex-1 overflow-y-auto" }
-      %table#repo_files_table_body{ class: "w-full text-sm table-fixed" }
-        %tbody#repo_files_tbody{
-          class: "divide-y divide-gray-300",
-          data: { action: "change->repo-files#onTbodyChange" }
-        }
-          - repository_files.each do |f|
-            %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
-              %td{ class: "px-4 py-3" }
-                %div{ class: "flex items-start gap-3" }
-                  %input{
-                    id: "file_check_#{f.id}",
-                    type: "checkbox",
-                    value: f.id,
-                    data: { file_check: "1", repo_files_target: "fileCheck" },
-                    class: "mt-1 scale-150"
-                  }
-                  %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
-                    %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
-                      = f.path
+    - if no_match
+      %div#repo_files_body_scroll{ class: "repo-files-body-scroll flex-1 overflow-y-auto" }
+        %div{ class: "bg-gray-100 rounded-2xl p-6 text-sm text-gray-600" }
+          No matched data.
+    - else
+      %div#repo_files_body_scroll{ class: "repo-files-body-scroll flex-1 overflow-y-auto" }
+        %table#repo_files_table_body{ class: "w-full text-sm table-fixed" }
+          %tbody#repo_files_tbody{
+            class: "divide-y divide-gray-300",
+            data: { action: "change->repo-files#onTbodyChange" }
+          }
+            - repository_files.each do |f|
+              %tr{ class: "hover:bg-indigo-50/60 transition", data: { file_id: f.id } }
+                %td{ class: "px-4 py-3" }
+                  %div{ class: "flex items-start gap-3" }
+                    %input{
+                      id: "file_check_#{f.id}",
+                      type: "checkbox",
+                      value: f.id,
+                      data: { file_check: "1", repo_files_target: "fileCheck" },
+                      class: "mt-1 scale-150"
+                    }
+                    %label{ for: "file_check_#{f.id}", class: "flex-1 min-w-0 cursor-pointer" }
+                      %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
+                        = f.path
 
     -# ===== hidden forms MUST be inside #repo_files_panel so repo-files controller can find targets =====
     %div{ class: "hidden" }
