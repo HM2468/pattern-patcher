@@ -50,19 +50,6 @@ class Occurrence < ApplicationRecord
     safe_prefix + "<span class=\"highlighted_addition\">#{safe_new}</span>" + safe_suffix
   end
 
-  def replaced_text
-    reviewed = occurrence_review
-    return context.to_s if reviewed.nil? || reviewed.rendered_code.blank?
-    return context.to_s if line_char_start.nil? || line_char_end.nil?
-
-    raw = context.to_s
-    s = line_char_start.to_i
-    e = line_char_end.to_i
-    return raw if s.negative? || e < s || s > raw.length
-
-    raw[0...s].to_s + reviewed.rendered_code.to_s + raw[(e + 1)..].to_s
-  end
-
   private
 
   def highlight_in_context(raw_context, raw_matched, css_class:)
