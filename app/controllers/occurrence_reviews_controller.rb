@@ -37,7 +37,7 @@ class OccurrenceReviewsController < ApplicationController
     end
 
     @occurrence_reviews = scoped.page(params[:page]).per(10)
-    @diffs_by_review_id = OccurrenceReviewDiffBatch.build(@occurrence_reviews)
+    @diffs_by_review_id = DiffBatch.build(@occurrence_reviews)
   end
 
   def show

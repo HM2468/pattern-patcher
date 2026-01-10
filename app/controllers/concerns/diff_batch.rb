@@ -1,7 +1,7 @@
 # app/services/occurrence_review_diff_batch.rb
 # frozen_string_literal: true
 
-class OccurrenceReviewDiffBatch
+class DiffBatch
   # 返回：{ review_id => GithubLikeDiff instance }
   def self.build(reviews, context_lines: 3)
     new(reviews, context_lines: context_lines).build
