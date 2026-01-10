@@ -1,7 +1,8 @@
 -# frozen_string_literal: true
 -# app/views/lexemes/index.html.haml
--# Lexemes index
--# Fixed header + scrollable body + fixed pagination (like lexical_patterns/index)
+
+- current_status = (@status.presence || "pending").to_s
+- status_options = [["Pending (#{@pending_count})", "pending"], ["Processed (#{@processed_count})", "processed"], ["Ignored (#{@ignored_count})", "ignored"]]
 
 %div{ class: "h-full overflow-hidden" }
   %div#lexemes_panel{ class: "flex flex-col h-full overflow-hidden rounded-2xl" }
@@ -10,32 +11,17 @@
     %div{ class: "bg-indigo-100 text-gray-600 border-b border-gray-100 mx-5 rounded-2xl" }
       %div{ class: "px-6 py-3 flex items-center justify-left gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
-          %div{ class: "text-lg font-semibold text-gray-900" }
-            = "Lexemes(#{@status || 'all'})"
+          %div{ class: "text-lg font-semibold text-gray-900" } Lexemes
 
-        = link_to lexemes_path(status: 'pending'),
-          class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-          title: "New review rows (OccurrenceReviewResult)",
-          data: { turbo_prefetch: false } do
-          %span Pending:
-          %span{ class: "font-mono" }= @pending_count
-          %span{ class: "text-indigo-400" }= svg_icon("arrow-uturn-right", class_name: "w-4 h-4")
-
-        = link_to lexemes_path(status: 'processed'),
-          class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-          title: "New review rows (OccurrenceReviewResult)",
-          data: { turbo_prefetch: false } do
-          %span Processed:
-          %span{ class: "font-mono" }= @processed_count
-          %span{ class: "text-indigo-400" }= svg_icon("arrow-uturn-right", class_name: "w-4 h-4")
-
-        = link_to lexemes_path(status: 'ignored'),
-          class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 font-mono text-xs text-gray-800 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50 hover:ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500",
-          title: "New review rows (OccurrenceReviewResult)",
-          data: { turbo_prefetch: false } do
-          %span Ignored:
-          %span{ class: "font-mono" }= @ignored_count
-          %span{ class: "text-indigo-400" }= svg_icon("arrow-uturn-right", class_name: "w-4 h-4")
+        -# ===== Compact dropdown filter =====
+        = form_with url: lexemes_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
+          = hidden_field_tag :page, nil
+          %div{ class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500" }
+            %span{ class: "font-mono text-xs text-gray-600" }
+            = select_tag :status,
+              options_for_select(status_options, current_status),
+              class: "font-mono text-xs text-gray-900 bg-transparent border-0 p-0 pr-6 focus:ring-0 focus:outline-none cursor-pointer",
+              onchange: "this.form.submit()"
 
     -# ===== Scroll area: ONLY body scrolls =====
     %div#lexemes_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
