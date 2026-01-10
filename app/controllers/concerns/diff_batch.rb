@@ -14,10 +14,9 @@ class DiffBatch
   end
 
   def build
-    # 这里的 reviews 已经 includes 过 occurrence -> repository_file -> repository
     diffs = {}
 
-    # ✅ 按 repository_file 聚合：同文件只 read_file 一次
+    # reviews 已经 includes occurrence -> repository_file -> repository
     @reviews.group_by { |r| r.occurrence&.repository_file }.each do |file, file_reviews|
       next if file.nil?
 
@@ -28,14 +27,16 @@ class DiffBatch
         occ = review.occurrence
         next if occ.nil?
 
-        old_line_from_blob, new_line = compute_old_and_new_line(raw_lines, occ, review)
+        old_line_from_blob, old_line_highlighted, new_line_highlighted =
+          compute_old_and_new_line_highlighted(raw_lines, occ, review)
 
         diffs[review.id] = GithubLikeDiff.new(
           path: file.path,
           raw_lines: raw_lines,
           target_lineno: occ.line_at,
-          old_line_override: old_line_from_blob,
-          new_line: new_line,
+          old_line_override: old_line_highlighted,
+          old_line_override: old_line_highlighted,
+          new_line: new_line_highlighted,
           context_lines: @context_lines
         )
       end
@@ -55,33 +56,33 @@ class DiffBatch
     @raw_lines_cache[key] = content.lines.map { |l| l.chomp("\n").chomp("\r") }
   end
 
-  def compute_old_and_new_line(raw_lines, occ, review)
+  # 让 DiffBatch 生成的 old/new 行与 OccurrenceReviewsController#show 完全一致：
+  # - old_line_override / new_line 使用“带高亮的 HTML span”
+  # - char range 对齐 blob 原始行
+  def compute_old_and_new_line_highlighted(raw_lines, occ, review)
     idx = [occ.line_at.to_i - 1, 0].max
     idx = [idx, raw_lines.length - 1].min if raw_lines.any?
+    old_line_from_blob = raw_lines[idx].to_s
 
-    old_line = raw_lines[idx].to_s
+    # old: deletion highlight
+    old_line_highlighted =
+      if occ.line_char_start && occ.line_char_end
+        occ.context = old_line_from_blob if occ.respond_to?(:context=)
+        occ.highlighted_deletion.to_s
+      else
+        ERB::Util.html_escape(old_line_from_blob)
+      end
 
-    # 没有 rendered_code 或者缺少 range：视为无变化
-    rendered = review.rendered_code.to_s
-    s = occ.line_char_start
-    e = occ.line_char_end
+    # new: addition highlight (rendered_code)
+    new_line_highlighted =
+      if review.rendered_code.present? && occ.line_char_start && occ.line_char_end
+        occ.context = old_line_from_blob if occ.respond_to?(:context=)
+        occ.occurrence_review = review if occ.respond_to?(:occurrence_review=)
+        occ.highlighted_addition.to_s
+      else
+        ERB::Util.html_escape(old_line_from_blob)
+      end
 
-    if rendered.blank? || s.nil? || e.nil?
-      return [old_line, old_line]
-    end
-
-    s = s.to_i
-    e = e.to_i
-
-    # 防御：越界就 fallback 到 snapshot 替换（至少能展示）
-    if s < 0 || e < s || s > old_line.length
-      return [old_line, occ.replaced_text.to_s]
-    end
-
-    prefix = old_line[0...s].to_s
-    suffix = old_line[(e + 1)..].to_s
-    new_line = prefix + rendered + suffix
-
-    [old_line, new_line]
+    [old_line_from_blob, old_line_highlighted, new_line_highlighted]
   end
 end
