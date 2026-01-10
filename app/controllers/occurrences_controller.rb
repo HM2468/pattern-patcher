@@ -22,7 +22,7 @@ class OccurrencesController < ApplicationController
         .includes(:repository_file)
         .order(:repository_file_id, :line_at, :line_char_start, :id)
         .page(params[:page])
-        .per(10)
+        .per(15)
   end
 
   def show

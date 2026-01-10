@@ -1,6 +1,6 @@
 -# app/views/scan_runs/scanned_files.html.haml
 
-%div{ class: "h-screen overflow-hidden" }
+%div{ class: "max-w-5xl mx-auto h-screen overflow-hidden" }
   %div#scan_run_files_panel{
     class: "flex flex-col h-full overflow-hidden rounded-2xl"
   }
@@ -11,7 +11,8 @@
           = "\##{@scan_run.id} Scanned Files"
 
         %div{ class: "shrink-0" }
-          = link_to scan_runs_path(repository_id: @selected_id),
+          - repo_id = @scan_run&.repository_snapshot&.repository_id
+          = link_to scan_runs_path(repository_id: repo_id),
             class: "icon-button",
             data: tooltip_data(tip: "Back") do
             = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")

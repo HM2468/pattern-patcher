@@ -7,13 +7,13 @@
 
     -# ===== Fixed Header (NOT scroll) =====
     -if @scan_run.present?
-      %div{ class: "text-gray-600 border-b border-gray-200" }
+      %div{ class: "bg-indigo-100 mx-5 rounded-2xl text-gray-600" }
         %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
           %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
             %div{ class: "text-sm font-mono text-gray-600" }
               = "\##{@scan_run.id} Scan Matches"
           %div{ class: "shrink-0" }
-            - repo_id = @scan_run.repository_snapshot.repository_id
+            - repo_id = @scan_run&.repository_snapshot&.repository_id
             = link_to scan_runs_path(repository_id: repo_id),
               class: "icon-button",
               data: tooltip_data(tip: "Back") do
