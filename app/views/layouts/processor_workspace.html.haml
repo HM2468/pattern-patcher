@@ -1,18 +1,43 @@
 -# app/views/layouts/processor_workspace.html.haml
 
 - content_for :layout_main do
-  %div{ class: "flex h-screen" }
-    -# Left: flex-basis-[22rem]
-    %div{ class: "w-[20rem] shrink-0 rounded-lg bg-white overflow-hidden flex flex-col" }
+  %div{ class: "flex h-screen", data: { controller: "sidebar" } }
+
+    -# Left sidebar
+    %div{
+      data: { sidebar_target: "left" },
+      class: "w-[20rem] shrink-0 rounded-lg bg-white overflow-hidden flex flex-col"
+    }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
         = render "shared/header"
         = render "lexeme_processors/current_processor"
         = render "shared/rev_nav"
-    -# Divider
-    %div{ class: "w-px bg-gray-300 mx-4" }
+
+    -# Divider/Handle (ALWAYS visible)
+    %div{
+      data: { sidebar_target: "handle" },
+      class: "relative w-10 shrink-0 flex items-stretch"
+    }
+      -# The vertical line (can be hidden when collapsed)
+      %div{
+        data: { sidebar_target: "line" },
+        class: "w-px bg-gray-300 mx-auto"
+      }
+
+      -# Toggle button (always clickable)
+      %button{
+        type: "button",
+        aria: { label: "Toggle sidebar" },
+        data: { action: "sidebar#toggle" },
+        class: "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+               h-8 w-8 rounded-full bg-white border border-gray-300 shadow
+               flex items-center justify-center hover:bg-gray-50"
+      }
+        %span{ data: { sidebar_target: "icon" }, class: "text-gray-600 select-none" } ◀
 
     -# Right: fill remaining width
     %div{ class: "flex-1 min-w-0 rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "processor_right", class: "flex-1 overflow-y-auto" do
         = yield
+
 = render template: "layouts/application"
