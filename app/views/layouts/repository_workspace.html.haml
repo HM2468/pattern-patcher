@@ -2,9 +2,13 @@
 -# Reuse layouts/application.html.haml (no duplicated <head>/<body>)
 
 - content_for :layout_main do
-  %div{ class: "flex h-screen" }
-    -# Left: flex-basis-[22rem]
-    %div{ class: "w-[20rem] shrink-0 rounded-lg bg-white overflow-hidden flex flex-col" }
+  %div{ class: "flex h-screen", data: { controller: "sidebar" } }
+
+    -# Left sidebar (collapsible)
+    %div{
+      data: { sidebar_target: "left" },
+      class: "w-[20rem] shrink-0 rounded-lg bg-white overflow-hidden flex flex-col"
+    }
       = render "shared/header"
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3 p-3" }
         = render "lexical_patterns/current_pattern"
@@ -16,11 +20,38 @@
                 loading: "eager",
                 class: "block"
 
-    -# Divider
-    %div{ class: "w-px bg-gray-300 mx-4" }
+    -# Divider/Handle (ALWAYS visible)
+    %div{
+      data: { sidebar_target: "handle" },
+      class: "relative w-10 shrink-0 flex items-stretch"
+    }
+      -# The vertical line (can be hidden when collapsed)
+      %div{
+        data: { sidebar_target: "line" },
+        class: "w-px bg-gray-300 mx-auto"
+      }
+
+      -# Toggle button (always clickable)
+      %button{
+        type: "button",
+        aria: { label: "Toggle sidebar" },
+        data: { action: "sidebar#toggle" },
+        class: "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
+               h-8 w-8 rounded-full bg-white border border-gray-300 shadow
+               flex items-center justify-center hover:bg-gray-50"
+      }
+        %span{ class: "text-gray-600" }
+          -# Expanded state: show collapse icon (chevron-double-left)
+          %span{ data: { sidebar_target: "collapseIcon" } }
+            = svg_icon("chevron-double-left", class_name: "w-6 h-6")
+
+          -# Collapsed state: show expand icon (chevron-double-right)
+          %span{ data: { sidebar_target: "expandIcon" }, class: "hidden" }
+            = svg_icon("chevron-double-right", class_name: "w-6 h-6")
 
     -# Right: fill remaining width
     %div{ class: "flex-1 min-w-0 rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "repo_right", class: "flex-1 min-w-0 overflow-y-auto" do
         = yield
+
 = render template: "layouts/application"
