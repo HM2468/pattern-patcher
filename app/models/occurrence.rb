@@ -27,11 +27,25 @@ class Occurrence < ApplicationRecord
     context[0...line_char_start] + highlighted + context[(line_char_end + 1)..]
   end
 
+  def highlighted_deletion
+    highlighted = "<span class=\"highlighted_deletion\">#{matched_text}</span>"
+    context[0...line_char_start] + highlighted + context[(line_char_end + 1)..]
+  end
+
+  def highlighted_addition
+    reviewed = occurrence_review
+    return context if reviewed.nil? || reviewed.rendered_code.blank?
+    return context if line_char_start.nil? || line_char_end.nil?
+    highlighted = "<span class=\"highlighted_addition\">#{reviewed.rendered_code}</span>"
+
+    context[0...line_char_start] + highlighted + context[(line_char_end + 1)..]
+  end
+
   def replaced_text
     reviewed = occurrence_review
     return context if reviewed.nil? || reviewed.rendered_code.blank?
     return context if line_char_start.nil? || line_char_end.nil?
 
-    context[0...line_char_start] + reviewed.rendered_code + context[(line_char_end + 1)..].to_s
+    context[0...line_char_start] + reviewed.rendered_code + context[(line_char_end + 1)..]
   end
 end
