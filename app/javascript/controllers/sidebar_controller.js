@@ -1,7 +1,9 @@
+// app/javascript/controllers/sidebar_controller.js
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["left", "line", "icon"]
+  static targets = ["left", "line", "collapseIcon", "expandIcon"]
 
   connect() {
     const collapsed = window.localStorage.getItem(this.storageKey()) === "1"
@@ -18,11 +20,14 @@ export default class extends Controller {
     // Hide/show the left sidebar
     this.leftTarget.classList.toggle("hidden", collapsed)
 
-    // Optional: hide the divider line when collapsed (cleaner "full screen" feel)
+    // Hide/show the divider line for a cleaner "full screen" feel
     this.lineTarget.classList.toggle("hidden", collapsed)
 
-    // Update arrow: collapsed => show expand ▶, expanded => show collapse ◀
-    this.iconTarget.textContent = collapsed ? "▶" : "◀"
+    // Toggle icons:
+    // expanded  => show collapse icon (<<), hide expand icon (>>)
+    // collapsed => hide collapse icon (<<), show expand icon (>>)
+    this.collapseIconTarget.classList.toggle("hidden", collapsed)
+    this.expandIconTarget.classList.toggle("hidden", !collapsed)
   }
 
   isCollapsed() {

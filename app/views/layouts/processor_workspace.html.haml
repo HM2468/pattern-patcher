@@ -33,7 +33,14 @@
                h-8 w-8 rounded-full bg-white border border-gray-300 shadow
                flex items-center justify-center hover:bg-gray-50"
       }
-        %span{ data: { sidebar_target: "icon" }, class: "text-gray-600 select-none" } ◀
+        %span{ class: "text-gray-600" }
+          -# Expanded state: show collapse icon (chevron-double-left)
+          %span{ data: { sidebar_target: "collapseIcon" } }
+            = svg_icon("chevron-double-left", class_name: "w-6 h-6")
+
+          -# Collapsed state: show expand icon (chevron-double-right)
+          %span{ data: { sidebar_target: "expandIcon" }, class: "hidden" }
+            = svg_icon("chevron-double-right", class_name: "w-6 h-6")
 
     -# Right: fill remaining width
     %div{ class: "flex-1 min-w-0 rounded-lg bg-white overflow-hidden flex flex-col" }
