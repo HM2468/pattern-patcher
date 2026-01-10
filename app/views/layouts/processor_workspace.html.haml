@@ -1,19 +1,18 @@
 -# app/views/layouts/processor_workspace.html.haml
--# Reuse layouts/application.html.haml (no duplicated <head>/<body>)
 
 - content_for :layout_main do
   %div{ class: "flex h-screen" }
-
-    -# Left: processors (18%)
-    %div{ class: "w-[18%] rounded-lg bg-white overflow-hidden flex flex-col" }
+    -# Left: flex-basis-[22rem]
+    %div{ class: "w-[20rem] shrink-0 rounded-lg bg-white overflow-hidden flex flex-col" }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
         = render "shared/header"
         = render "lexeme_processors/current_processor"
         = render "shared/rev_nav"
     -# Divider
     %div{ class: "w-px bg-gray-300 mx-4" }
-    -# Right: dynamic area (82%)
-    %div{ class: "w-[82%] rounded-lg bg-white overflow-hidden flex flex-col" }
+
+    -# Right: fill remaining width
+    %div{ class: "flex-1 min-w-0 rounded-lg bg-white overflow-hidden flex flex-col" }
       = turbo_frame_tag "processor_right", class: "flex-1 overflow-y-auto" do
         = yield
 = render template: "layouts/application"
