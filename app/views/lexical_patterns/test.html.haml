@@ -4,13 +4,18 @@
   / Header
   %div{ class: "mb-4" }
     %div{ class: "text-lg font-semibold" }
-      = @lexical_pattern.name
-    %div{ class: "mt-2 font-mono text-xs bg-indigo-50 border border-indigo-100 rounded p-3 break-all" }
+      %div{ class: "flex items-center justify-between gap-2 p-3" }
+        = @lexical_pattern.name
+        = link_to lexical_patterns_path,
+          class: "icon-button",
+          data: tooltip_data(tip: "Back") do
+          = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
+    %div{ class: "mt-2 font-mono text-xs bg-gray-50 rounded p-3 break-all" }
       = @lexical_pattern.pattern
 
   / Editor section
   %div{ class: "mt-6" }
-    %div{ class: "text-sm font-semibold mb-2" }
+    %div{ class: "text-sm mb-2" }
       Scan based on the pattern above line by line
 
     -# Rich text input (contenteditable)
@@ -26,7 +31,7 @@
       %div#scan_error{ class: "mt-1 text-sm text-red-700 hidden" }
 
     / Actions
-    %div{ class: "mt-4 flex items-center justify-between gap-2" }
+    %div{ class: "mt-4 flex items-center justify-end gap-2" }
       %div{ class: "flex items-center gap-2" }
         %button#scan_btn{ type: "button", class: "button-primary" }
           Scan
@@ -34,10 +39,6 @@
           Prev
         %button#next_btn{ type: "button", class: "button-secondary", disabled: true }
           Next
-
-      %div{ class: "flex items-center gap-2" }
-        %a{ href: "javascript:history.back()", class: "button-secondary" }
-          Back
 
 :javascript
   window.RegexTestPage = {
