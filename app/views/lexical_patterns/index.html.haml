@@ -25,11 +25,10 @@
               %div{ class: "text-sm text-gray-600" }
                 No patterns yet. Create your first pattern to start scanning.
         - else
-          .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-            %table{ class: "w-full text-sm" }
-              %tbody{ id: "lexical_patterns_tbody", class: "divide-y divide-gray-300" }
-                - @lexical_patterns.each do |pattern|
-                  = render "row", pattern: pattern
+          %table{ class: "w-full text-sm" }
+            %tbody{ id: "lexical_patterns_tbody", class: "divide-y divide-gray-300" }
+              - @lexical_patterns.each do |pattern|
+                = render "row", pattern: pattern
 
           -# Keep empty state container in DOM for Turbo replace (even when not empty)
           %div#lexical_patterns_empty_state{ class: "hidden" }

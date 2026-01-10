@@ -4,9 +4,7 @@
 -# Fixed header + scrollable body + fixed pagination (like lexical_patterns/index)
 
 %div{ class: "h-full overflow-hidden" }
-  %div#lexemes_panel{
-    class: "flex flex-col h-full overflow-hidden rounded-2xl"
-  }
+  %div#lexemes_panel{ class: "flex flex-col h-full overflow-hidden rounded-2xl" }
 
     -# ===== Fixed Header (NOT scroll) =====
     %div{ class: "bg-indigo-100 text-gray-600 border-b border-gray-100 mx-5 rounded-2xl" }
@@ -50,6 +48,13 @@
                 No lexemes found.
         - else
           %table{ class: "w-full table-fixed text-sm" }
+            %thead
+              %tr{ class: "bg-gray-50 text-gray-600" }
+                %th{ class: "w-20 px-4 py-2 text-left font-semibold" } ID
+                %th{ class: "px-4 py-2 text-left font-semibold" } Source text and Normalized text
+                %th{ class: "w-40 px-4 py-2 text-left font-semibold" } Metadata
+                %th{ class: "w-80 px-4 py-2 text-left font-semibold" } Occurrences
+                %th{ class: "w-20 px-4 py-2 text-left font-semibold" } Actions
             %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-200" }
               - @lexemes.each do |lexeme|
                 = render "row", lexeme: lexeme
