@@ -3,6 +3,10 @@
 
 - current_status = (@status.presence || "pending").to_s
 - status_options = [["Pending (#{@pending_count})", "pending"], ["Rejected (#{@rejected_count})", "rejected"]]
+- filter_type = (params[:filter_type].presence || (params[:path_filter].present? ? "file_path" : "lexeme_text")).to_s
+- input_value = (filter_type == "file_path" ? params[:path_filter].to_s : params[:text_filter].to_s)
+- pagination_options = { status: params[:status], text_filter: params[:text_filter], path_filter: params[:path_filter], filter_type: params[:filter_type] }
+- search_param_name = (filter_type == "file_path" ? "path_filter" : "text_filter")
 
 %div{ class: "h-full overflow-hidden" }
   %div#occurrence_reviews_panel{ class: "flex flex-col h-full overflow-hidden rounded-2xl" }
@@ -13,15 +17,48 @@
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
           %div{ class: "text-lg font-semibold text-gray-900" } Reviews
 
-        -# ===== Compact dropdown filter =====
+        -# ===== Status dropdown =====
         = form_with url: occurrence_reviews_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
           = hidden_field_tag :page, nil
+          = hidden_field_tag :text_filter, params[:text_filter]
+          = hidden_field_tag :path_filter, params[:path_filter]
+          = hidden_field_tag :filter_type, params[:filter_type]
           %div{ class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500" }
             %span{ class: "font-mono text-xs text-gray-600" }
             = select_tag :status,
               options_for_select(status_options, current_status),
               class: "font-mono text-xs text-gray-900 bg-transparent border-0 p-0 pr-6 focus:ring-0 focus:outline-none cursor-pointer",
               onchange: "this.form.submit()"
+
+        -# ===== Combined filter dropdown + input (single control) =====
+        %div{ class: "inline-flex items-center" }
+          %div{ class: "inline-flex items-center rounded-md bg-white shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500 overflow-hidden" }
+            = form_with url: occurrence_reviews_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
+              = hidden_field_tag :status, params[:status]
+              = hidden_field_tag :page, nil
+              = hidden_field_tag :text_filter, (filter_type == "lexeme_text" ? input_value : "")
+              = hidden_field_tag :path_filter, (filter_type == "file_path" ? input_value : "")
+
+              = select_tag :filter_type,
+                options_for_select([["Lexeme context", "lexeme_text"], ["File path", "file_path"]], filter_type),
+                class: "h-full font-mono text-xs text-gray-900 bg-transparent border-0 px-1 py-1 focus:ring-0 focus:outline-none cursor-pointer border-r border-gray-200",
+                onchange: "var f=this.form; var v=this.value; var raw=f.dataset.searchValue||''; if(v==='lexeme_text'){f.querySelector('input[name=path_filter]').value=''; f.querySelector('input[name=text_filter]').value=raw;} else {f.querySelector('input[name=text_filter]').value=''; f.querySelector('input[name=path_filter]').value=raw;} f.submit();"
+
+            %input{
+              type: "text",
+              value: input_value,
+              placeholder: (filter_type == "file_path" ? "Search file path..." : "Search lexeme context..."),
+              class: "w-[22rem] px-3 py-1 font-mono text-xs text-gray-900 bg-transparent focus:outline-none",
+              data: {
+                controller: "live-search",
+                "live-search-delay-value": 600,
+                "live-search-url-template-value": occurrence_reviews_path(status: params[:status], filter_type: filter_type),
+                "live-search-param-name-value": search_param_name,
+                "live-search-frame-id-value": "processor_right",
+                "live-search-min-length-value": 0
+              },
+              oninput: "var form=this.previousElementSibling; if(form){form.dataset.searchValue=this.value||''}"
+            }
 
     -# ===== Scroll area: ONLY body scrolls =====
     %div#occ_revs_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
@@ -40,4 +77,4 @@
     -# ===== Fixed Footer Pagination =====
     %div{ class: "sticky bottom-0" }
       - if defined?(@occurrence_reviews) && @occurrence_reviews.respond_to?(:current_page) && @occurrence_reviews.any?
-        = render "shared/pagination", collection: @occurrence_reviews
+        = render "shared/pagination", collection: @occurrence_reviews, options: pagination_options

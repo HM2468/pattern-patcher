@@ -6,12 +6,17 @@ class OccurrenceReviewsController < ApplicationController
 
   def index
     @status = params[:status].presence
+    @text_filter = params[:text_filter].to_s.strip
+    @path_filter = params[:path_filter].to_s.strip
+
     @pending_count = OccurrenceReview.pending.count
     @rejected_count = OccurrenceReview.rejected.count
+
     base = OccurrenceReview
       .joins(occurrence: :repository_file)
       .includes(occurrence: { repository_file: :repository })
       .order("repository_files.path ASC, occurrences.byte_start DESC")
+
     scoped =
       case @status
       when "pending"  then base.pending
@@ -20,10 +25,20 @@ class OccurrenceReviewsController < ApplicationController
       else
         base.pending
       end
+
+    if @text_filter.present?
+      escaped = ActiveRecord::Base.sanitize_sql_like(@text_filter)
+      scoped = scoped.where("occurrences.matched_text ILIKE ?", "%#{escaped}%")
+    end
+
+    if @path_filter.present?
+      escaped = ActiveRecord::Base.sanitize_sql_like(@path_filter)
+      scoped = scoped.where("repository_files.path ILIKE ?", "%#{escaped}%")
+    end
+
     @occurrence_reviews = scoped.page(params[:page]).per(10)
     @diffs_by_review_id = OccurrenceReviewDiffBatch.build(@occurrence_reviews)
   end
-
 
   def show
     @occurrence = @occurrence_review.occurrence
