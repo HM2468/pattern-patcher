@@ -67,7 +67,7 @@
 
 /* ===== colgroup：固定两列行号宽度，防止重叠 ===== */
 .pp-diff-table col.pp-col-lineno {
-  width: 56px;
+  width: 40px;
 }
 
 .pp-diff-table col.pp-col-code {
@@ -76,12 +76,12 @@
 
 /* ===== gutter (line numbers) ===== */
 .pp-blob-num {
-  width: 56px;
-  min-width: 56px;
-  max-width: 56px;
+  width: 40px;
+  min-width: 40px;
+  max-width: 40px;
   box-sizing: border-box;
-  padding: 0 10px;
-  text-align: right;
+  padding: 0 6px;
+  text-align: center;
   user-select: none;
   color: #656d76;
   background: #ffffff;
@@ -160,9 +160,7 @@
 .pp-line-del::before { content: "-"; }
 .pp-line-add::before { content: "+"; }
 
-/* ===== inline highlight for changed segment =====
-   仅高亮行内的“变化片段”，背景保持 GitHub diff 的行底色
-*/
+/* ===== inline highlight for changed segment ===== */
 .highlighted_deletion,
 .highlighted_addition {
   display: inline;
@@ -172,13 +170,11 @@
   -webkit-box-decoration-break: clone;
 }
 
-/* deletion: slightly darker red within deletion row */
 .highlighted_deletion {
   background: rgba(207, 34, 46, 0.18);
   color: inherit;
 }
 
-/* addition: slightly darker green within addition row */
 .highlighted_addition {
   background: rgba(26, 127, 55, 0.18);
   color: inherit;

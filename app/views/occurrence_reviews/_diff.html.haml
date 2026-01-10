@@ -62,13 +62,13 @@
             - when :del
               %tr.pp-del
                 %td.pp-blob-num.pp-blob-num-del= row.old_lineno
-                %td.pp-blob-num.pp-blob-num-empty
+                %td.pp-blob-num.pp-blob-code-del
                 %td.pp-blob-code.pp-blob-code-del
                   %span.pp-blob-code-inner.pp-line-del= sanitize(CGI.unescapeHTML(row.content.to_s), tags: %w[span], attributes: %w[class])
 
             - when :add
               %tr.pp-add
-                %td.pp-blob-num.pp-blob-num-empty
+                %td.pp-blob-num.pp-blob-code-add
                 %td.pp-blob-num.pp-blob-num-add= row.new_lineno
                 %td.pp-blob-code.pp-blob-code-add
                   %span.pp-blob-code-inner.pp-line-add= sanitize(CGI.unescapeHTML(row.content.to_s), tags: %w[span], attributes: %w[class])
