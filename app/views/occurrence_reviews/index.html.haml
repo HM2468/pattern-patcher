@@ -40,14 +40,14 @@
               = hidden_field_tag :path_filter, (filter_type == "file_path" ? input_value : "")
 
               = select_tag :filter_type,
-                options_for_select([["Lexeme context", "lexeme_text"], ["File path", "file_path"]], filter_type),
+                options_for_select([["Lexeme content", "lexeme_text"], ["File path", "file_path"]], filter_type),
                 class: "h-full font-mono text-xs text-gray-900 bg-transparent border-0 px-1 py-1 focus:ring-0 focus:outline-none cursor-pointer border-r border-gray-200",
                 onchange: "var f=this.form; var v=this.value; var raw=f.dataset.searchValue||''; if(v==='lexeme_text'){f.querySelector('input[name=path_filter]').value=''; f.querySelector('input[name=text_filter]').value=raw;} else {f.querySelector('input[name=text_filter]').value=''; f.querySelector('input[name=path_filter]').value=raw;} f.submit();"
 
             %input{
               type: "text",
               value: input_value,
-              placeholder: (filter_type == "file_path" ? "Search file path..." : "Search lexeme context..."),
+              placeholder: (filter_type == "file_path" ? "Search file path..." : "Search lexeme content..."),
               class: "w-[22rem] px-3 py-1 font-mono text-xs text-gray-900 bg-transparent focus:outline-none",
               data: {
                 controller: "live-search",
