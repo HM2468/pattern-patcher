@@ -65,11 +65,20 @@ export default class extends Controller {
 
     // 拼 query
     const u = new URL(url, window.location.origin)
+
+    // 清理分页，避免搜索仍停留在旧页
+    u.searchParams.delete("page")
+
+    // 保证互斥：如果当前是 text_filter，就清掉 path_filter；反之亦然
+    const pn = (this.paramNameValue || "q")
+    if (pn === "text_filter") u.searchParams.delete("path_filter")
+    if (pn === "path_filter") u.searchParams.delete("text_filter")
+
     if (value.length > 0) {
-      u.searchParams.set(this.paramNameValue || "q", value)
+      u.searchParams.set(pn, value)
     } else {
       // 允许清空过滤时回到无过滤状态：移除该参数
-      u.searchParams.delete(this.paramNameValue || "q")
+      u.searchParams.delete(pn)
     }
 
     // 通过 turbo-frame 刷新右侧区域
