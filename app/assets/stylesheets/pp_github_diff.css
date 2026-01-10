@@ -55,19 +55,19 @@
 
 .pp-diff-table {
   width: 100%;
-  border-collapse: collapse; /* 关键：避免 border spacing 带来的“缝” */
-  table-layout: fixed;       /* 固定布局必须配合列宽，否则容易挤压 */
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .pp-diff-table td {
   padding: 0;
-  border: 0; /* 不要行级 border，避免“明显边框” */
+  border: 0;
   vertical-align: top;
 }
 
 /* ===== colgroup：固定两列行号宽度，防止重叠 ===== */
 .pp-diff-table col.pp-col-lineno {
-  width: 56px; /* 两列行号各自固定宽度 */
+  width: 56px;
 }
 
 .pp-diff-table col.pp-col-code {
@@ -76,25 +76,17 @@
 
 /* ===== gutter (line numbers) ===== */
 .pp-blob-num {
-  /* 固定宽度，避免 table-layout: fixed 下被压到一起导致重叠 */
   width: 56px;
   min-width: 56px;
   max-width: 56px;
   box-sizing: border-box;
-
   padding: 0 10px;
   text-align: right;
   user-select: none;
   color: #656d76;
   background: #ffffff;
-
-  /* GitHub 风格：淡竖线分隔 */
   border-right: 1px solid #d8dee4;
-
-  /* 行高一致：与 code-inner 同一行高 */
   line-height: 20px;
-
-  /* 行号不要换行/挤压 */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: clip;
@@ -109,16 +101,13 @@
 .pp-blob-code {
   width: auto;
   background: #ffffff;
-  overflow: hidden; /* 防止内容把表格撑出导致怪异布局 */
+  overflow: hidden;
 }
 
 .pp-blob-code-inner {
   display: block;
-
-  /* 行高一致的关键：所有类型行都用这套 */
   line-height: 20px;
   padding: 2px 12px;
-
   white-space: pre;
   overflow-x: auto;
 }
@@ -149,10 +138,6 @@
   background: #dafbe1;
 }
 
-/*
-  不要用 border-top/bottom，否则会出现“行高不一致”和“粗边框感”
-  用 very light inset shadow 模拟 GitHub 的轻微分隔感
-*/
 .pp-del .pp-blob-code,
 .pp-del .pp-blob-num,
 .pp-add .pp-blob-code,
@@ -162,9 +147,7 @@
     inset 0 -1px 0 rgba(27, 31, 36, 0.04);
 }
 
-/* ===== +/- sign via pseudo element =====
-   用伪元素固定宽度，不引入额外 inline 影响行高
-*/
+/* ===== +/- sign via pseudo element ===== */
 .pp-line-del::before,
 .pp-line-add::before {
   display: inline-block;
@@ -176,3 +159,27 @@
 
 .pp-line-del::before { content: "-"; }
 .pp-line-add::before { content: "+"; }
+
+/* ===== inline highlight for changed segment =====
+   仅高亮行内的“变化片段”，背景保持 GitHub diff 的行底色
+*/
+.highlighted_deletion,
+.highlighted_addition {
+  display: inline;
+  padding: 0 2px;
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* deletion: slightly darker red within deletion row */
+.highlighted_deletion {
+  background: rgba(207, 34, 46, 0.18);
+  color: inherit;
+}
+
+/* addition: slightly darker green within addition row */
+.highlighted_addition {
+  background: rgba(26, 127, 55, 0.18);
+  color: inherit;
+}

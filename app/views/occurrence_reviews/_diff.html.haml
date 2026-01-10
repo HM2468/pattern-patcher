@@ -14,8 +14,6 @@
       .pp-diff-header-right
         - if diff.additions.to_i.positive? || diff.deletions.to_i.positive?
           %span.pp-diff-stats
-            -# %span.pp-add= "+#{diff.additions}"
-            -# %span.pp-del= "-#{diff.deletions}"
             %span.pp-add
               = button_to approve_occurrence_review_path(review),
                 method: :post,
@@ -66,11 +64,11 @@
                 %td.pp-blob-num.pp-blob-num-del= row.old_lineno
                 %td.pp-blob-num.pp-blob-num-empty
                 %td.pp-blob-code.pp-blob-code-del
-                  %span.pp-blob-code-inner.pp-line-del= h(row.content)
+                  %span.pp-blob-code-inner.pp-line-del= sanitize(CGI.unescapeHTML(row.content.to_s), tags: %w[span], attributes: %w[class])
 
             - when :add
               %tr.pp-add
                 %td.pp-blob-num.pp-blob-num-empty
                 %td.pp-blob-num.pp-blob-num-add= row.new_lineno
                 %td.pp-blob-code.pp-blob-code-add
-                  %span.pp-blob-code-inner.pp-line-add= h(row.content)
+                  %span.pp-blob-code-inner.pp-line-add= sanitize(CGI.unescapeHTML(row.content.to_s), tags: %w[span], attributes: %w[class])
