@@ -49,11 +49,10 @@
               %div{ class: "text-sm text-gray-600" }
                 No lexemes found.
         - else
-          .rounded-2xl.bg-white.shadow-sm.overflow-hidden
-            %table{ class: "w-full table-fixed text-sm" }
-              %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-300" }
-                - @lexemes.each do |lexeme|
-                  = render "row", lexeme: lexeme
+          %table{ class: "w-full table-fixed text-sm" }
+            %tbody{ id: "lexemes_tbody", class: "divide-y divide-gray-200" }
+              - @lexemes.each do |lexeme|
+                = render "row", lexeme: lexeme
 
     -# ===== Fixed Footer Pagination =====
     %div{ class: "sticky bottom-0" }

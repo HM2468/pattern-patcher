@@ -6,12 +6,13 @@ class LexemesController < ApplicationController
 
   def index
     @status = params[:status].presence
-    base = Lexeme.order(created_at: :desc)
+    base = Lexeme
+      .includes(occurrences: :repository_file)
 
-    @pending_count = Lexeme.pending.count
+    @pending_count   = Lexeme.pending.count
     @processed_count = Lexeme.processed.count
-    @ignored_count = Lexeme.ignored.count
-    @failed_count = Lexeme.failed.count
+    @ignored_count   = Lexeme.ignored.count
+    @failed_count    = Lexeme.failed.count
 
     @lexemes =
       case @status
@@ -22,6 +23,14 @@ class LexemesController < ApplicationController
       else
         base
       end.page(params[:page]).per(15)
+
+    # For each lexeme: list [{ occurrence_id, repository_file_path }, ...]
+    @occurrence_links_by_lexeme_id =
+      @lexemes.each_with_object({}) do |lex, h|
+        h[lex.id] = lex.occurrences.map do |occ|
+          { occurrence_id: occ.id, repository_file_path: occ.repository_file&.path.to_s }
+        end
+      end
   end
 
   def toggle_ignore
