@@ -6,15 +6,13 @@ class LexemesController < ApplicationController
 
   def index
     @status = params[:status].presence
-    base = Lexeme
-      .includes(occurrences: :repository_file)
+    @text_filter = params[:text_filter].to_s.strip
+    @path_filter = params[:path_filter].to_s.strip
 
-    @pending_count   = Lexeme.pending.count
-    @processed_count = Lexeme.processed.count
-    @ignored_count   = Lexeme.ignored.count
-    @failed_count    = Lexeme.failed.count
+    base = Lexeme.all
 
-    @lexemes =
+    # ===== Status filter =====
+    base =
       case @status
       when "pending"   then base.pending
       when "processed" then base.processed
@@ -22,9 +20,27 @@ class LexemesController < ApplicationController
       when "failed"    then base.failed
       else
         base
-      end.page(params[:page]).per(15)
+      end
 
-    # For each lexeme: list [{ occurrence_id, repository_file_path }, ...]
+    # ===== Text filter (lexeme.source_text) =====
+    if @text_filter.present?
+      base = base.where("lexemes.source_text ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(@text_filter)}%")
+    end
+
+    # ===== Path filter (occurrence.repository_file.path) =====
+    if @path_filter.present?
+      escaped = ActiveRecord::Base.sanitize_sql_like(@path_filter)
+      base = base.joins(occurrences: :repository_file).where("repository_files.path ILIKE ?", "%#{escaped}%").distinct
+    end
+
+    # Counts (counts are for all statuses, not affected by search)
+    @pending_count   = Lexeme.pending.count
+    @processed_count = Lexeme.processed.count
+    @ignored_count   = Lexeme.ignored.count
+    @failed_count    = Lexeme.failed.count
+
+    @lexemes = base.includes(occurrences: :repository_file).order(source_text: :asc).page(params[:page]).per(15)
+
     @occurrence_links_by_lexeme_id =
       @lexemes.each_with_object({}) do |lex, h|
         h[lex.id] = lex.occurrences.map do |occ|

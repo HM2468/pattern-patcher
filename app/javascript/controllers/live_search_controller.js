@@ -1,3 +1,4 @@
+// app/javascript/controllers/live_search_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 // Usage:
