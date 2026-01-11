@@ -14,7 +14,7 @@
         = link_to lexical_patterns_path,
           class: "icon-button",
           data: tooltip_data(tip: "All patterns", turbo_frame: "repo_right") do
-          = svg_icon("ellipsis-horizontal", class_name: "w-6 h-6")
+          = svg_icon("ellipsis-horizontal-circle", class_name: "w-6 h-6")
 
     - if pattern.nil?
       %div{ class: "px-2 py-2 space-y-2" }
