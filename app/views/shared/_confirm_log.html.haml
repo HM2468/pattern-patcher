@@ -1,12 +1,10 @@
 -# app/views/shared/_confirm_log.html.haml
--# Reusable confirm modal (global).
--# Controlled by plain JS: show/hide + submit the original form on confirm.
--# Default labels are Cancel / Confirm and can be overridden via JS options.
 
 %div{
   id: "app_confirm_log",
   class: "fixed inset-0 z-50 hidden",
-  aria: { hidden: "true" }
+  aria: { hidden: "true" },
+  inert: true
 }
   -# Backdrop
   %div{
@@ -14,7 +12,6 @@
     onclick: "PopConfirmLog.cancel()"
   }
 
-  -# Modal container: centered both vertically and horizontally
   %div{ class: "absolute inset-0 flex items-center justify-center px-4" }
     %div{ class: "w-full max-w-md rounded-2xl bg-white p-0 shadow-xl" }
 
