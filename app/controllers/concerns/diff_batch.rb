@@ -3,7 +3,7 @@
 
 class DiffBatch
   # records: Array<OccurrenceReview> OR Array<Occurrence>
-  # 返回：{ id => GithubLikeDiff instance }
+  # returns: { record_id => GithubLikeDiff instance }
   def self.build(records, context_lines: 3)
     new(records, context_lines: context_lines).build
   end
@@ -18,10 +18,8 @@ class DiffBatch
     diffs = {}
     return diffs if @records.empty?
 
-    # 统一把 record 映射到 occurrence / repository_file
-    groups = @records.group_by { |rec| repository_file_for(rec) }
-
-    groups.each do |file, file_records|
+    # Group by repository_file so we only read each blob once
+    @records.group_by { |rec| repository_file_for(rec) }.each do |file, file_records|
       next if file.nil?
 
       repo = file.repository
@@ -39,7 +37,7 @@ class DiffBatch
           raw_lines: raw_lines,
           target_lineno: occ.line_at,
           old_line_override: old_line_highlighted,
-          new_line: new_line_highlighted,
+          new_line: new_line_highlighted, # nil when rec is an Occurrence
           context_lines: @context_lines
         )
       end
@@ -55,17 +53,12 @@ class DiffBatch
   def occurrence_for(rec)
     # OccurrenceReview -> occurrence
     # Occurrence       -> itself
-    if rec.respond_to?(:occurrence)
-      rec.occurrence
-    else
-      rec
-    end
+    rec.respond_to?(:occurrence) ? rec.occurrence : rec
   end
 
   def repository_file_for(rec)
     occ = occurrence_for(rec)
-    return nil if occ.nil?
-    occ.repository_file
+    occ&.repository_file
   end
 
   def occurrence_review_record?(rec)
@@ -84,34 +77,38 @@ class DiffBatch
 
   # -------- highlighting builders --------
   #
-  # 让 DiffBatch 生成的 old/new 行与 show 行为一致：
-  # - old_line_override / new_line 使用“带高亮的 HTML span”
-  # - char range 对齐 blob 原始行
-  # - 传 Occurrence 时：new_line = nil
+  # Ensures DiffBatch produces the same old/new line behavior as your show actions:
+  # - old_line_override / new_line contain HTML with <span class="..."> for inline highlight
+  # - char range is aligned to the blob's actual line text
+  # - when passing Occurrence: new_line is nil
+  #
+  # IMPORTANT:
+  # - line_char_end is treated as EXCLUSIVE (Ruby slice style: [s...e])
   #
   def compute_old_and_new_line_highlighted(raw_lines, occ, rec)
     old_line_from_blob = line_from_blob(raw_lines, occ.line_at)
 
-    # old: deletion highlight（基于 matched_text / range）
+    # old: deletion highlight (based on matched_text and [start, end) range)
     old_line_highlighted =
       if occ.line_char_start && occ.line_char_end
         s = occ.line_char_start.to_i
-        e = occ.line_char_end.to_i
-        highlight_range(old_line_from_blob, s, e, old_line_from_blob[s..e].to_s, "highlighted_deletion")
+        e = occ.line_char_end.to_i # EXCLUSIVE
+        inner = occ.matched_text.to_s.presence || old_line_from_blob[s...e].to_s
+        highlight_range_exclusive(old_line_from_blob, s, e, inner, "highlighted_deletion")
       else
         CGI.escapeHTML(old_line_from_blob.to_s)
       end
 
     # new:
-    # - OccurrenceReview：addition highlight（rendered_code）
-    # - Occurrence：new_line = nil
+    # - OccurrenceReview: addition highlight (rendered_code)
+    # - Occurrence: new_line = nil
     new_line_highlighted =
       if occurrence_review_record?(rec)
         rendered = rec.rendered_code.to_s
         if rendered.present? && occ.line_char_start && occ.line_char_end
           s = occ.line_char_start.to_i
-          e = occ.line_char_end.to_i
-          highlight_range(old_line_from_blob, s, e, rendered, "highlighted_addition")
+          e = occ.line_char_end.to_i # EXCLUSIVE
+          highlight_range_exclusive(old_line_from_blob, s, e, rendered, "highlighted_addition")
         else
           CGI.escapeHTML(old_line_from_blob.to_s)
         end
@@ -129,9 +126,10 @@ class DiffBatch
     raw_lines[idx].to_s
   end
 
-  # 将 raw_line 按 [s..e] 切片，高亮 inner_text（不一定等于 raw_line[s..e]）
-  # 并对三段分别 escape，保证 HTML 安全 + char range 不受 escape 影响
-  def highlight_range(raw_line, s, e, inner_text, klass)
+  # Highlight the segment defined by [s, e) (end is EXCLUSIVE).
+  # inner_text does not have to equal raw_line[s...e] (e.g. can come from matched_text/rendered_code).
+  # Escapes prefix/inner/suffix separately for HTML safety.
+  def highlight_range_exclusive(raw_line, s, e, inner_text, klass)
     line = raw_line.to_s
     return CGI.escapeHTML(line) if line.empty?
 
@@ -139,8 +137,11 @@ class DiffBatch
     e = s if e < s
     return CGI.escapeHTML(line) if s > line.length
 
+    # Clamp end (exclusive) into [s, line.length]
+    e = [e, line.length].min
+
     prefix = line[0...s].to_s
-    suffix = line[(e + 1)..].to_s
+    suffix = line[e..].to_s # because e is EXCLUSIVE
 
     "#{CGI.escapeHTML(prefix)}" \
       "<span class=\"#{klass}\">#{CGI.escapeHTML(inner_text.to_s)}</span>" \

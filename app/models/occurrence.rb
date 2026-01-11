@@ -37,7 +37,7 @@ class Occurrence < ApplicationRecord
     return raw if s.negative? || e < s || s > raw.length
 
     prefix = raw[0...s].to_s
-    suffix = raw[(e + 1)..].to_s
+    suffix = raw[e..].to_s
 
     safe_prefix = ERB::Util.html_escape(prefix)
     safe_suffix = ERB::Util.html_escape(suffix)
@@ -59,7 +59,7 @@ class Occurrence < ApplicationRecord
 
     prefix = raw[0...s].to_s
     mid = raw_matched.to_s.presence || raw[s..e].to_s
-    suffix = raw[(e + 1)..].to_s
+    suffix = raw[e..].to_s
 
     safe_prefix = ERB::Util.html_escape(prefix)
     safe_mid = ERB::Util.html_escape(mid)

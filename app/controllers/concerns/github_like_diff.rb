@@ -7,14 +7,15 @@ class GithubLikeDiff
 
   attr_reader :path, :additions, :deletions, :hunk_header, :rows
 
-  # raw_lines: 原文件按行 split 后数组（不带 \n）
+  # raw_lines: original file split into lines (each line WITHOUT "\n")
   # target_lineno: 1-based
-  # new_line: 替换后的整行文本（不带 \n）
+  # new_line: the full replacement line (WITHOUT "\n"); can be nil (meaning "no new line")
+  # old_line_override: if provided, used as the "old line" shown in the diff
   def initialize(path:, raw_lines:, target_lineno:, new_line:, context_lines: 3, old_line_override: nil)
     @path = path
     @raw_lines = raw_lines || []
     @target_lineno = target_lineno.to_i
-    @new_line = (new_line || "").to_s
+    @new_line = new_line # keep nil as nil (important for Occurrence-only diffs)
     @context_lines = context_lines.to_i
     @old_line_override = old_line_override
     build!
@@ -28,14 +29,16 @@ class GithubLikeDiff
     idx = @raw_lines.length - 1 if @raw_lines.any? && idx >= @raw_lines.length
 
     old_line = (@old_line_override || @raw_lines[idx]).to_s
+    old_line_norm = normalize(old_line)
 
-    start_idx = [idx - @context_lines, 0].max
-    end_idx   = [idx + @context_lines, @raw_lines.length - 1].min
-
-    changed = normalize(old_line) != normalize(@new_line)
+    new_line_norm = @new_line.nil? ? nil : normalize(@new_line)
+    changed = !new_line_norm.nil? && (old_line_norm != new_line_norm)
 
     @additions = changed ? 1 : 0
     @deletions = changed ? 1 : 0
+
+    start_idx = [idx - @context_lines, 0].max
+    end_idx   = [idx + @context_lines, @raw_lines.length - 1].min
 
     old_count = end_idx - start_idx + 1
     new_count = old_count
