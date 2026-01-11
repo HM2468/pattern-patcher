@@ -11,7 +11,7 @@ function initFlash() {
     if (el.dataset.flashInitialized === "1") return;
     el.dataset.flashInitialized = "1";
 
-    const timeout = Number(el.dataset.flashTimeout || "5000");
+    const timeout = Number(el.dataset.flashTimeout || "2000");
 
     const dismiss = () => {
       if (!el.isConnected) return;
