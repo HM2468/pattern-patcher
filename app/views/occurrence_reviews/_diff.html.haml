@@ -19,7 +19,7 @@
               = button_to approve_occurrence_review_path(review),
                 method: :post,
                 params: { page: params[:page], status: status },
-                form: { class: "inline-flex" },
+                form: { class: "inline-flex", data: { turbo: false } },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
                 data: tooltip_data(tip: "Approve") do
@@ -28,7 +28,7 @@
               = button_to reject_occurrence_review_path(review),
                 method: :post,
                 params: { page: params[:page], status: status  },
-                form: { class: "inline-flex" },
+                form: { class: "inline-flex", data: { turbo: false } },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
                 data: tooltip_data(tip: "Reject") do
