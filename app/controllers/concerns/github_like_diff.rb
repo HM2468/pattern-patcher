@@ -28,17 +28,29 @@ class GithubLikeDiff
     idx = 0 if idx.negative?
     idx = @raw_lines.length - 1 if @raw_lines.any? && idx >= @raw_lines.length
 
-    old_line = (@old_line_override || @raw_lines[idx]).to_s
-    old_line_norm = normalize(old_line)
-
-    new_line_norm = @new_line.nil? ? nil : normalize(@new_line)
-    changed = !new_line_norm.nil? && (old_line_norm != new_line_norm)
-
-    @additions = changed ? 1 : 0
-    @deletions = changed ? 1 : 0
+    raw_old_line = @raw_lines[idx].to_s
+    shown_old_line = (@old_line_override || raw_old_line).to_s
 
     start_idx = [idx - @context_lines, 0].max
     end_idx   = [idx + @context_lines, @raw_lines.length - 1].min
+
+    # Mode A: normal replacement diff (del + add)
+    new_line_norm = @new_line.nil? ? nil : normalize(@new_line.to_s)
+    raw_old_norm  = normalize(raw_old_line)
+
+    replacement_changed = !new_line_norm.nil? && (raw_old_norm != new_line_norm)
+
+    # Mode B: deletion-only diff (show :del but no :add)
+    # This is used by Occurrence#show where new_line is nil, but old_line_override contains highlighted HTML.
+    deletion_only_changed =
+      @new_line.nil? &&
+      @old_line_override.present? &&
+      normalize(shown_old_line) != normalize(raw_old_line)
+
+    changed = replacement_changed || deletion_only_changed
+
+    @additions = replacement_changed ? 1 : 0
+    @deletions = changed ? 1 : 0
 
     old_count = end_idx - start_idx + 1
     new_count = old_count
@@ -51,12 +63,18 @@ class GithubLikeDiff
     (start_idx..end_idx).each do |i|
       line = @raw_lines[i].to_s
 
-      if i == idx && changed
-        @rows << Row.new(type: :del, old_lineno: i + 1, new_lineno: nil, content: old_line)
-        @rows << Row.new(type: :add, old_lineno: nil, new_lineno: i + 1, content: @new_line)
-      else
-        @rows << Row.new(type: :context, old_lineno: i + 1, new_lineno: i + 1, content: line)
+      if i == idx && replacement_changed
+        @rows << Row.new(type: :del, old_lineno: i + 1, new_lineno: nil, content: shown_old_line)
+        @rows << Row.new(type: :add, old_lineno: nil, new_lineno: i + 1, content: @new_line.to_s)
+        next
       end
+
+      if i == idx && deletion_only_changed
+        @rows << Row.new(type: :del, old_lineno: i + 1, new_lineno: nil, content: shown_old_line)
+        next
+      end
+
+      @rows << Row.new(type: :context, old_lineno: i + 1, new_lineno: i + 1, content: line)
     end
   end
 
