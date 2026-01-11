@@ -17,7 +17,7 @@
             %span.pp-add
               = button_to approve_occurrence_review_path(review),
                 method: :post,
-                params: { id: review.id },
+                params: { page: params[:page] },
                 form: { class: "inline-flex" },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
@@ -26,7 +26,7 @@
             %span.pp-del
               = button_to reject_occurrence_review_path(review),
                 method: :post,
-                params: { id: review.id },
+                params: { page: params[:page] },
                 form: { class: "inline-flex" },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
