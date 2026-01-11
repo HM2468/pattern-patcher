@@ -22,10 +22,6 @@ class Occurrence < ApplicationRecord
     line_char_start..line_char_end
   end
 
-  def highlighted_origin_context
-    highlight_in_context(context.to_s, matched_text.to_s, css_class: "ppmatchhi")
-  end
-
   def highlighted_deletion
     highlight_in_context(context.to_s, matched_text.to_s, css_class: "highlighted_deletion")
   end
