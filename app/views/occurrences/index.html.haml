@@ -1,12 +1,10 @@
 -# frozen_string_literal: true
 -# app/views/occurrences/index.html.haml
 
-- current_status = (@status.presence || "unprocessed").to_s
-- status_options = [["Unprocessed (#{@unprocessed_count})", "unprocessed"], ["Processed (#{@processed_count})", "processed"], ["Ignored (#{@ignored_count})", "ignored"]]
 - filter_type = (params[:filter_type].presence || (params[:path_filter].present? ? "file_path" : "lexeme_text")).to_s
 - input_value = (filter_type == "file_path" ? params[:path_filter].to_s : params[:text_filter].to_s)
 - scan_run_id = params[:scan_run_id].presence
-- pagination_options = { status: params[:status], text_filter: params[:text_filter], path_filter: params[:path_filter], filter_type: params[:filter_type], scan_run_id: scan_run_id }.compact
+- pagination_options = { text_filter: params[:text_filter], path_filter: params[:path_filter], filter_type: params[:filter_type], scan_run_id: scan_run_id }.compact
 - search_param_name = (filter_type == "file_path" ? "path_filter" : "text_filter")
 
 %div{ class: "h-full overflow-hidden" }
@@ -16,27 +14,19 @@
     %div{ class: "bg-indigo-100 text-gray-600 border-b border-gray-100 mx-5 rounded-2xl" }
       %div{ class: "px-6 py-3 flex items-center justify-left gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
-          %div{ class: "text-lg font-semibold text-gray-900" } Occurrences
+          %div{ class: "text-lg font-semibold text-gray-900" }= "##{scan_run_id} matches"
 
-        -# ===== Status dropdown =====
         = form_with url: occurrences_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
           = hidden_field_tag :page, nil
           = hidden_field_tag :text_filter, params[:text_filter]
           = hidden_field_tag :path_filter, params[:path_filter]
           = hidden_field_tag :filter_type, params[:filter_type]
           = hidden_field_tag :scan_run_id, scan_run_id if scan_run_id.present?
-          %div{ class: "inline-flex items-center gap-2 rounded-md bg-white px-2.5 py-1 shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500" }
-            %span{ class: "font-mono text-xs text-gray-600" }
-            = select_tag :status,
-              options_for_select(status_options, current_status),
-              class: "font-mono text-xs text-gray-900 bg-transparent border-0 p-0 pr-6 focus:ring-0 focus:outline-none cursor-pointer",
-              onchange: "this.form.submit()"
 
         -# ===== Combined filter dropdown + input (single control) =====
         %div{ class: "inline-flex items-center" }
           %div{ class: "inline-flex items-center rounded-md bg-white shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500 overflow-hidden" }
             = form_with url: occurrences_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
-              = hidden_field_tag :status, params[:status]
               = hidden_field_tag :page, nil
               = hidden_field_tag :scan_run_id, scan_run_id if scan_run_id.present?
               = hidden_field_tag :text_filter, (filter_type == "lexeme_text" ? input_value : "")
