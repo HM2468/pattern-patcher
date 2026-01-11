@@ -129,12 +129,12 @@ class OccurrenceReviewsController < ApplicationController
   end
 
   def approve
-    flash[:success] = "Occurrence review was successfully approved."
+    flash[:success] = "Code change was successfully applied."
     redirect_to occurrence_reviews_path(page: params[:page]), status: :see_other
   end
 
   def reject
-    flash[:success] = "Occurrence review was successfully rejected."
+    flash[:alert] = "Code change was rejected."
     redirect_to occurrence_reviews_path(page: params[:page]), status: :see_other
   end
 

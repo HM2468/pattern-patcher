@@ -76,6 +76,29 @@ module ApplicationHelper
     }
   end
 
+  # {
+  #   controller: "tooltip",
+  #   tooltip_text_value: "Repository Scan",
+  #   tooltip_placement_value: "bottom",
+  #   confirm_title: "Scan Repository",
+  #   confirm_message_html: scan_hint,
+  #   confirm_confirm_label: "Scan",
+  #   confirm_cancel_label: "Cancel"
+  # }
+  def confirm_action_tip(tip: '', action: '', title: '', msg: '')
+    {
+      controller: "tooltip",
+      tooltip_text_value: tip,
+      tooltip_placement_value: "bottom",
+      confirm_title: title,
+      confirm_message: msg,
+      confirm_confirm_label: action,
+      confirm_cancel_label: "Cancel"
+    }
+  end
+
+
+
   def svg_icon(name, class_name: "")
     path = Rails.root.join("app/assets/images/icons/#{name}.svg")
     return "" unless File.exist?(path)

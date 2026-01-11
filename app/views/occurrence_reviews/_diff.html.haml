@@ -22,7 +22,7 @@
                 form: { class: "inline-flex", data: { turbo: false } },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
-                data: tooltip_data(tip: "Approve") do
+                data: confirm_action_tip(tip: 'Approve', action: 'Confirm', title: 'Apply this change', msg: 'Are you sure you want to apply this change?') do
                 = svg_icon("hand-thumb-up", class_name: "w-5 h-5")
             %span.pp-del
               = button_to reject_occurrence_review_path(review),
@@ -31,7 +31,7 @@
                 form: { class: "inline-flex", data: { turbo: false } },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
-                data: tooltip_data(tip: "Reject") do
+                data: confirm_action_tip(tip: 'Reject', action: 'Confirm', title: 'Reject this change', msg: 'Are you sure you want to reject this change?') do
                 = svg_icon("hand-thumb-down", class_name: "w-5 h-5")
         - else
           %span.pp-diff-stats
