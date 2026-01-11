@@ -72,7 +72,7 @@
           - @occurrence_reviews.each do |occ_rev|
             - diff = @diffs_by_review_id[occ_rev.id]
             - next if diff.nil?
-            = render "diff", occ_rev: occ_rev, occ_rev_diff: diff
+            = render "diff", occ_rev: occ_rev, occ_rev_diff: diff, status: current_status
 
     -# ===== Fixed Footer Pagination =====
     %div{ class: "sticky bottom-0" }

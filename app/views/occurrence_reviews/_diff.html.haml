@@ -3,6 +3,7 @@
 
 - diff = occ_rev_diff
 - review = occ_rev
+- status = status
 .pp-diff
   .pp-diff-file
     .pp-diff-header
@@ -17,7 +18,7 @@
             %span.pp-add
               = button_to approve_occurrence_review_path(review),
                 method: :post,
-                params: { page: params[:page] },
+                params: { page: params[:page], status: status },
                 form: { class: "inline-flex" },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
@@ -26,7 +27,7 @@
             %span.pp-del
               = button_to reject_occurrence_review_path(review),
                 method: :post,
-                params: { page: params[:page] },
+                params: { page: params[:page], status: status  },
                 form: { class: "inline-flex" },
                 class: "icon-button",
                 onclick: "return window.PopConfirmLog.open(event, this)",
