@@ -129,13 +129,15 @@ class OccurrenceReviewsController < ApplicationController
   end
 
   def approve
+    @occurrence_review.update!(status: "approved")
     flash[:success] = "Code change was successfully applied."
-    redirect_to occurrence_reviews_path(page: params[:page]), status: :see_other
+    redirect_to occurrence_reviews_path(forwarded_params)
   end
 
   def reject
+    @occurrence_review.update!(status: "rejected")
     flash[:alert] = "Code change was rejected."
-    redirect_to occurrence_reviews_path(page: params[:page]), status: :see_other
+    redirect_to occurrence_reviews_path(forwarded_params)
   end
 
   private
@@ -149,6 +151,16 @@ class OccurrenceReviewsController < ApplicationController
         OccurrenceReview
           .includes(occurrence: { repository_file: :repository })
           .find(params[:id])
+    end
+
+    def forwarded_params
+      {
+        page: params[:page].presence,
+        status: params[:status].presence,
+        filter_type: params[:filter_type].presence,
+        text_filter: params[:text_filter].presence,
+        path_filter: params[:path_filter].presence,
+      }.compact
     end
 
     # Only allow a list of trusted parameters through.
