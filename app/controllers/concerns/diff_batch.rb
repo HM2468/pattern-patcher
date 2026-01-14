@@ -12,22 +12,30 @@ class DiffBatch
     @records = Array(records).compact
     @context_lines = context_lines.to_i
     @raw_lines_cache = {} # key: [repo_id, blob_sha] => Array<String>
+    @worktree_lines_cache = {} # key: [repository_file_id, mtime_i] => Array<String>
   end
 
   def build
     diffs = {}
     return diffs if @records.empty?
 
-    # Group by repository_file so we only read each blob once
+    # Group by repository_file so we only read each "source" once
     @records.group_by { |rec| repository_file_for(rec) }.each do |file, file_records|
       next if file.nil?
-
-      repo = file.repository
-      raw_lines = raw_lines_for(repo, file.blob_sha)
 
       file_records.each do |rec|
         occ = occurrence_for(rec)
         next if occ.nil?
+
+        raw_lines =
+          if occurrence_review_record?(rec)
+            # OccurrenceReview: preview should reflect working tree latest content
+            raw_lines_from_worktree(file)
+          else
+            # Occurrence: keep existing behavior (read from git blob)
+            repo = file.repository
+            raw_lines_for(repo, file.blob_sha)
+          end
 
         old_line_highlighted, new_line_highlighted =
           compute_old_and_new_line_highlighted(raw_lines, occ, rec)
@@ -48,8 +56,7 @@ class DiffBatch
 
   private
 
-  # -------- type helpers --------
-
+  #  type helpers
   def occurrence_for(rec)
     # OccurrenceReview -> occurrence
     # Occurrence       -> itself
@@ -65,8 +72,7 @@ class DiffBatch
     rec.respond_to?(:occurrence) && rec.respond_to?(:rendered_code)
   end
 
-  # -------- git blob cache --------
-
+  #  git blob cache (for Occurrence)
   def raw_lines_for(repo, blob_sha)
     key = [repo.id, blob_sha]
     return @raw_lines_cache[key] if @raw_lines_cache.key?(key)
@@ -75,7 +81,29 @@ class DiffBatch
     @raw_lines_cache[key] = content.lines.map { |l| l.chomp("\n").chomp("\r") }
   end
 
-  # -------- highlighting builders --------
+  #  working tree cache (for OccurrenceReview)
+  #
+  # OccurrenceReview should read current working tree content via RepositoryFile#raw_content.
+  # Cache is keyed by [repository_file_id, mtime_i] so it auto-busts when file changes.
+  #
+  def raw_lines_from_worktree(repository_file)
+    abs = repository_file.absolute_path.to_s
+
+    mtime_i =
+      begin
+        File.mtime(abs).to_i
+      rescue StandardError
+        nil
+      end
+
+    key = [repository_file.id, mtime_i]
+    return @worktree_lines_cache[key] if @worktree_lines_cache.key?(key)
+
+    content = repository_file.raw_content.to_s
+    @worktree_lines_cache[key] = content.lines.map { |l| l.chomp("\n").chomp("\r") }
+  end
+
+  #  highlighting builders
   #
   # Ensures DiffBatch produces the same old/new line behavior as your show actions:
   # - old_line_override / new_line contain HTML with <span class="..."> for inline highlight
