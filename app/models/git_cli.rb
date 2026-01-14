@@ -79,7 +79,7 @@ class GitCli
   # @param file_path [String]
   # @return [true]
   # --------------------------------------------------
-  def commit_file(message, file_path)
+  def commit_file(message, file_path, no_verify: false)
     ensure_ready!
 
     msg = message.to_s.strip
@@ -88,7 +88,8 @@ class GitCli
     path = file_path.to_s.strip
     raise ArgumentError, "file_path cannot be blank" if path.empty?
 
-    shell!("git commit -m #{shell_escape_double_quoted(msg)} -- #{shell_escape(path)}")
+    nv = no_verify ? " --no-verify" : ""
+    shell!("git commit#{nv} -m #{shell_escape_double_quoted(msg)} -- #{shell_escape(path)}")
     true
   end
 

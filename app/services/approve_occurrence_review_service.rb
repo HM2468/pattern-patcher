@@ -38,11 +38,22 @@ class ApproveOccurrenceReviewService
       begin
         if @git_cli.has_changes_for_path?(@file.path)
           msg = build_commit_message
-          @git_cli.commit_file(msg, @file.path)
+          @git_cli.commit_file(msg, @file.path, no_verify: true)
           @committed = true
         end
       rescue StandardError => e
-        @errors << "git commit (file-only) failed: #{e.message}"
+        Rails.logger.error(
+          "[ApproveOccurrenceReviewService] git commit (file-only) failed",
+          occurrence_review_id: @review.id,
+          file: @file.path,
+          error: e.class.name,
+          message: e.message,
+          backtrace: e.backtrace&.first(10)
+        )
+
+        # 给前端：短消息
+        @errors << "git commit failed (details logged)."
+        @errors << e.message.to_s.byteslice(0, 300) # 再给一点点上下文
         return fail_result
       end
     end
