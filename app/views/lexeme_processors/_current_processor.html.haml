@@ -34,7 +34,7 @@
           = link_to lexeme_processors_path,
             class: "icon-button",
             data: tooltip_data(tip: "All processors", turbo_frame: "processor_right") do
-            = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
+            = svg_icon("chevron-right", class_name: "w-6 h-6")
     - else
       %div{ class: "px-2 py-2 space-y-2" }
         - name_text = processor&.name.presence || "—"

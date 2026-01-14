@@ -24,7 +24,7 @@
           = link_to lexical_patterns_path,
             class: "icon-button",
             data: tooltip_data(tip: "All patterns", turbo_frame: "repo_right") do
-            = svg_icon("arrow-uturn-right", class_name: "w-6 h-6")
+            = svg_icon("chevron-right", class_name: "w-6 h-6")
     - else
       %div{ class: "px-2 py-2 space-y-2" }
         - name_text = pattern&.name.presence || "—"
