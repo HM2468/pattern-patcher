@@ -1,4 +1,4 @@
-# app/services/occurrence_review_diff_batch.rb
+# app/controllers/concerns/batch_diff.rb
 # frozen_string_literal: true
 
 class DiffBatch

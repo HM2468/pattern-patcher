@@ -43,9 +43,7 @@ class OccurrenceReviewsController < ApplicationController
   def show
     @occurrence = @occurrence_review.occurrence
     @file = @occurrence.repository_file
-    @repo = @file.repository
-
-    raw_content = @repo.git_cli.read_file(@file.blob_sha).to_s
+    raw_content = @file.raw_content
     raw_lines = raw_content.lines.map { |l| l.chomp("\n").chomp("\r") }
 
     idx = [@occurrence.line_at.to_i - 1, 0].max
