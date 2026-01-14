@@ -127,8 +127,14 @@ class OccurrenceReviewsController < ApplicationController
   end
 
   def approve
-    @occurrence_review.update!(status: "approved")
-    flash[:success] = "Code change was successfully applied."
+    result = ApproveOccurrenceReviewService.new(occ_rev: @occurrence_review).execute
+
+    if result.ok?
+      flash[:success] = result.message.presence || "Code change was successfully applied."
+    else
+      flash[:error] = result.errors.join(" | ").presence || "Approve failed."
+    end
+
     redirect_to occurrence_reviews_path(forwarded_params)
   end
 
