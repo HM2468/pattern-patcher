@@ -93,17 +93,17 @@ RepositoryFile
 Each Occurrence generates an OccurrenceReview, representing one potential code change.
 
 An OccurrenceReview contains:
-	•	Original context
-	•	Rendered new code (rendered_code)
-	•	Review status:
-	•	pending
-	•	approved
-	•	rejected
-	•	Apply status:
-	•	not_applied
-	•	applied
-	•	conflict
-	•	failed
+- Original context
+- Rendered new code (rendered_code)
+- Review status:
+- pending
+- approved
+- rejected
+- Apply status:
+- not_applied
+- applied
+- conflict
+- failed
 
 One OccurrenceReview = one minimal modification unit that can be approved or rejected independently.
 
@@ -114,13 +114,13 @@ Instead, it validates changes using the exact coordinates recorded during scanni
 
 lines[line_at - 1][start...end] == matched_text
 
-	•	Exact match → allowed to apply
-	•	Mismatch → detected as a conflict
+- Exact match → allowed to apply
+- Mismatch → detected as a conflict
 
 This guarantees:
-	•	Manual or external edits are automatically detected
-	•	No silent overwrites
-	•	Deterministic application results
+- Manual or external edits are automatically detected
+- No silent overwrites
+- Deterministic application results
 
 4. Working Tree Writes + Git Index Control
 
@@ -163,13 +163,13 @@ Repository
 ```
 
 Key service object:
-	•	ApproveOccurrenceReviewService
-	•	Resource validation
-	•	Patch application
-	•	Conflict detection
-	•	git add
-	•	File-scoped commit
-	•	Fully recoverable error handling
+- ApproveOccurrenceReviewService
+- Resource validation
+- Patch application
+- Conflict detection
+- git add
+- File-scoped commit
+- Fully recoverable error handling
 
 ## Core Workflow
 
@@ -186,9 +186,9 @@ ApproveOccurrenceReviewService
         → git commit -- <file>
 
 Every step:
-	•	Explicitly returns success or failure
-	•	Preserves full error context
-	•	Never swallows errors or skips implicitly
+- Explicitly returns success or failure
+- Preserves full error context
+- Never swallows errors or skips implicitly
 
 ## Git Integration Strategy
 
@@ -201,15 +201,15 @@ git commit -m "message" -- <file_path>
 ```
 
 This guarantees:
-	•	Even if other files are staged
-	•	The commit includes only the specified file
+- Even if other files are staged
+- The commit includes only the specified file
 
 Disabling Git Hooks for Automation
 
 In real-world projects, repositories often include:
-	•	husky / pre-commit hooks
-	•	eslint / rubocop / stylelint
-	•	environment-dependent checks
+- husky / pre-commit hooks
+- eslint / rubocop / stylelint
+- environment-dependent checks
 
 Automated commits use:
 
@@ -218,34 +218,34 @@ git commit --no-verify -- <file>
 ```
 
 The goal is not to bypass standards, but to:
-	•	Prevent automation from being blocked by local environments
-	•	Preserve developers’ normal commit workflows
+- Prevent automation from being blocked by local environments
+- Preserve developers’ normal commit workflows
 
 ## Failure and Conflict Handling
 
 Conflict Detection
 
 When file content differs from the scanned record:
-	•	The file is not written
-	•	apply_status is set to conflict
-	•	A clear error message is returned
+- The file is not written
+- apply_status is set to conflict
+- A clear error message is returned
 
 Write Failure
-	•	File permission or I/O errors
-	•	Temporary changes are rolled back
-	•	apply_status is set to failed
+- File permission or I/O errors
+- Temporary changes are rolled back
+- apply_status is set to failed
 
 Git Operation Failure
-	•	Errors from git add or git commit
-	•	Full error output is preserved
-	•	Already-applied files remain unaffected
+- Errors from git add or git commit
+- Full error output is preserved
+- Already-applied files remain unaffected
 
 ## Key Design Decisions
 
 Why not use git diff / patch directly?
-	•	Diff describes results, not intent
-	•	Diff can be misapplied when files change concurrently
-	•	Diff cannot reliably express which semantic fragment should be replaced
+- Diff describes results, not intent
+- Diff can be misapplied when files change concurrently
+- Diff cannot reliably express which semantic fragment should be replaced
 
 PatternPatcher instead chooses:
 
@@ -253,36 +253,36 @@ Exact coordinates + original text
 as the only trusted source for applying changes.
 
 Why separate Review and Apply?
-	•	Auto-generation ≠ production-ready
-	•	Humans must see:
-	•	Context
-	•	Old vs new code
-	•	Semantic correctness
-	•	Review is a product feature, not an implementation detail
+- Auto-generation ≠ production-ready
+- Humans must see:
+- Context
+- Old vs new code
+- Semantic correctness
+- Review is a product feature, not an implementation detail
 
 ## Use Cases
-	•	Large-scale i18n or copy migrations
-	•	Semi-automated API / SDK upgrades
-	•	Legacy code style → new standards
-	•	AI-generated code that requires human confirmation
-	•	Safe batch modifications in collaborative teams
+- Large-scale i18n or copy migrations
+- Semi-automated API / SDK upgrades
+- Legacy code style → new standards
+- AI-generated code that requires human confirmation
+- Safe batch modifications in collaborative teams
 
 ## Non-Goals
 
 PatternPatcher intentionally does not aim to:
-	•	❌ Automatically fix all code issues
-	•	❌ Perform unreviewed one-click rewrites
-	•	❌ Replace CI, linting, or code review processes
+- ❌ Automatically fix all code issues
+- ❌ Perform unreviewed one-click rewrites
+- ❌ Replace CI, linting, or code review processes
 
 ## Current Status
-	•	✅ Core workflow fully implemented
-	•	✅ Validated in real large-scale repositories
-	•	✅ Supports conflict detection, rollback, and file-scoped commits
-	•	🚧 Potential future extensions:
-	•	Dry-run mode
-	•	Batch approval
-	•	Enhanced review UI
-	•	Pluggable AI patch generators
+- ✅ Core workflow fully implemented
+- ✅ Validated in real large-scale repositories
+- ✅ Supports conflict detection, rollback, and file-scoped commits
+- 🚧 Potential future extensions:
+- Dry-run mode
+- Batch approval
+- Enhanced review UI
+- Pluggable AI patch generators
 
 ## Summary
 
