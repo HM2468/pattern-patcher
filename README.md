@@ -86,6 +86,7 @@ RepositoryFile
         - line_char_start
         - line_char_end
         - matched_text
+```
 
 2. OccurrenceReview: the Smallest Reviewable Patch Unit
 
@@ -127,22 +128,26 @@ The apply process is strictly layered:
 	1.	Modify only the working tree file
 	2.	Run:
 
+```bash
 git add -- <file>
+```
 
 
 	3.	Only if all OccurrenceReviews for that file are approved
 	4.	Run:
 
+```bash
 git commit -m "..." -- <file>
-
+```
 
 
 ✔ Each file is committed exactly once
 ✔ Approval order does not matter
 ✔ Other staged files are never accidentally committed
 
-Overall Architecture
+## Overall Architecture
 
+```text
 Repository
   ├── RepositoryFile
   │     └── Occurrence (scan result)
@@ -155,6 +160,7 @@ Repository
          ├── git commit -- <file>
          ├── git diff --cached
          └── git cat-file / ls-tree
+```
 
 Key service object:
 	•	ApproveOccurrenceReviewService
@@ -165,7 +171,7 @@ Key service object:
 	•	File-scoped commit
 	•	Fully recoverable error handling
 
-Core Workflow
+## Core Workflow
 
 Full Flow of a Single Approval
 
@@ -184,13 +190,15 @@ Every step:
 	•	Preserves full error context
 	•	Never swallows errors or skips implicitly
 
-Git Integration Strategy
+## Git Integration Strategy
 
 File-Scoped Commits
 
 Using native Git capabilities:
 
+```bash
 git commit -m "message" -- <file_path>
+```
 
 This guarantees:
 	•	Even if other files are staged
@@ -205,13 +213,15 @@ In real-world projects, repositories often include:
 
 Automated commits use:
 
+```bash
 git commit --no-verify -- <file>
+```
 
 The goal is not to bypass standards, but to:
 	•	Prevent automation from being blocked by local environments
 	•	Preserve developers’ normal commit workflows
 
-Failure and Conflict Handling
+## Failure and Conflict Handling
 
 Conflict Detection
 
@@ -230,7 +240,7 @@ Git Operation Failure
 	•	Full error output is preserved
 	•	Already-applied files remain unaffected
 
-Key Design Decisions
+## Key Design Decisions
 
 Why not use git diff / patch directly?
 	•	Diff describes results, not intent
@@ -250,21 +260,21 @@ Why separate Review and Apply?
 	•	Semantic correctness
 	•	Review is a product feature, not an implementation detail
 
-Use Cases
+## Use Cases
 	•	Large-scale i18n or copy migrations
 	•	Semi-automated API / SDK upgrades
 	•	Legacy code style → new standards
 	•	AI-generated code that requires human confirmation
 	•	Safe batch modifications in collaborative teams
 
-Non-Goals
+## Non-Goals
 
 PatternPatcher intentionally does not aim to:
 	•	❌ Automatically fix all code issues
 	•	❌ Perform unreviewed one-click rewrites
 	•	❌ Replace CI, linting, or code review processes
 
-Current Status
+## Current Status
 	•	✅ Core workflow fully implemented
 	•	✅ Validated in real large-scale repositories
 	•	✅ Supports conflict detection, rollback, and file-scoped commits
@@ -274,7 +284,7 @@ Current Status
 	•	Enhanced review UI
 	•	Pluggable AI patch generators
 
-Summary
+## Summary
 
 The value of PatternPatcher is not speed, but trust:
 
