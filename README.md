@@ -292,3 +292,12 @@ It makes large-scale code changes reliable, controllable, and traceable.
 
 It focuses not on technical showmanship, but on
 the real complexity and risk management required in production engineering.
+
+## Commercial Use
+
+PatternPatcher is licensed under AGPL-3.0.
+
+Commercial use (including internal enterprise use or SaaS)
+requires either full source code disclosure under AGPL or a separate commercial license.
+
+Contact: huangmiao2468@gmail.com
