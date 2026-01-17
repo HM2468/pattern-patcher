@@ -1,4 +1,9 @@
+/* ------------------------------------------------------------
+ * Application-wide TailwindCSS Config
+ * ------------------------------------------------------------ */
+
 @import "tailwindcss";
+@import "github-markdown-css/github-markdown.css";
 
 /* ------------------------------------------------------------
  * Bottom Pagination Module

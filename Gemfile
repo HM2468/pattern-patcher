@@ -17,6 +17,7 @@ gem "redis", ">= 4.0"
 gem "solid_cache"
 gem "solid_queue"
 gem "solid_cable"
+gem "commonmarker"
 
 # HTTP client (often used with OpenAI)
 gem "faraday"
