@@ -2,7 +2,9 @@
 
 This document describes the database schema of Pattern-Patcher based on the provided schema.rb. It explains what each table does, how tables relate to each other, and why key indexes/constraints exist.
 
+## 1. ERD
 
+![ERD Diagram](wiki/erd.svg)
 
 ## 1. High-level Data Flow
 
