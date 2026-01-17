@@ -17,10 +17,10 @@
       - workspace_controllers = %w[repositories repository_files scan_runs occurrences]
       - repo_active = workspace_controllers.include?(controller_name)
       - proc_active = controller_name == "lexeme_processors"
-      - manual_active = controller_name == "wiki"
+      - wiki_active = controller_name == "wiki"
 
-      = link_to "Manual", root_path,
-        class: "px-3 py-2 rounded-xl #{manual_active ? 'bg-indigo-300 shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
+      = link_to "Wiki", root_path,
+        class: "px-3 py-2 rounded-xl #{wiki_active ? 'bg-indigo-300 shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"
 
       = link_to "Repositories", repositories_path,
         class: "px-3 py-2 rounded-xl #{repo_active ? 'bg-indigo-300 shadow-sm text-gray-900' : 'text-gray-700 hover:bg-white/70'}"

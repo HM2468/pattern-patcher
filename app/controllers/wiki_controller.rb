@@ -1,5 +1,5 @@
 class WikiController < ApplicationController
-  layout "manual_workspace", only: %i[show]
+  layout "wiki_workspace", only: %i[show]
 
   WIKI_ROOT = Rails.root.join("docs").freeze
 

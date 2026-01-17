@@ -1,4 +1,4 @@
--# app/views/layouts/manual_workspace.html.haml
+-# app/views/layouts/wiki_workspace.html.haml
 
 - content_for :layout_main do
   %div{ class: "flex h-screen", data: { controller: "sidebar" } }
@@ -10,7 +10,7 @@
     }
       %div{ class: "flex-1 min-h-0 flex flex-col space-y-3" }
         = render "shared/header"
-        = render "shared/manual_nav"
+        = render "shared/wiki_nav"
 
     -# Divider/Handle (ALWAYS visible)
     %div{
@@ -43,7 +43,7 @@
 
     -# Right: fill remaining width
     %div{ class: "flex-1 min-w-0 rounded-lg bg-white overflow-hidden flex flex-col" }
-      = turbo_frame_tag "manual_right", class: "flex-1 overflow-y-auto" do
+      = turbo_frame_tag "wiki_right", class: "flex-1 overflow-y-auto" do
         = yield
 
 = render template: "layouts/application"
