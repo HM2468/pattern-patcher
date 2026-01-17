@@ -1,4 +1,4 @@
-class DashboardController < ApplicationController
+class WikiController < ApplicationController
   layout "manual_workspace", only: %i[show]
 
   WIKI_ROOT = Rails.root.join("docs").freeze
@@ -31,7 +31,4 @@ class DashboardController < ApplicationController
       }
     )
   end
-
-
-
 end

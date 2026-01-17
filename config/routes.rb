@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
-  root "dashboard#show"
-  get "/wiki(/*path)", to: "dashboard#show", as: :wiki
+  root "wiki#show"
+  get "/wiki(/*path)", to: "wiki#show", as: :wiki
 
   # Health check endpoint
   get "up" => "rails/health#show", :as => :rails_health_check
