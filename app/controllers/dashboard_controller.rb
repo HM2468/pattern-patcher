@@ -1,12 +1,10 @@
 class DashboardController < ApplicationController
-  # layout "manual_workspace", only: %i[index]
+  layout "manual_workspace", only: %i[show]
 
   WIKI_ROOT = Rails.root.join("docs").freeze
 
-  def index; end
-
   def show
-    rel  = (params[:path].presence || "Home").to_s
+    rel  = (params[:path].presence || "overview").to_s
     file = WIKI_ROOT.join("#{rel}.md")
     raise ActiveRecord::RecordNotFound unless file.exist?
 
