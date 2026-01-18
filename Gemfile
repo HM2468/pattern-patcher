@@ -25,7 +25,7 @@ gem "faraday-retry"
 gem "openai"
 
 # Required in config/boot.rb
-gem "bootsnap", require: false
+gem "bootsnap", "~> 1.21.0", require: false
 gem "kamal", require: false
 gem "thruster", require: false
 
@@ -42,7 +42,7 @@ group :development do
   gem "faker"
   gem "web-console"
   gem "rubocop", require: false
-  gem "rubocop-rails", require: false
+  gem "rubocop-rails", "~> 2.34.2", require: false
   gem "rubocop-rspec", require: false
   gem "dotenv-rails"
   gem "rails-erd", "~> 1.7"
