@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateRepositoryFiles < ActiveRecord::Migration[8.0]
   def change
     create_table :repository_files do |t|

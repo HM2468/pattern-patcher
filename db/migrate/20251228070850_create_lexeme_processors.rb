@@ -1,4 +1,5 @@
-# db/migrate/XXXXXXXXXXXXXX_create_lexeme_processors.rb
+# frozen_string_literal: true
+
 class CreateLexemeProcessors < ActiveRecord::Migration[8.0]
   def change
     create_table :lexeme_processors do |t|

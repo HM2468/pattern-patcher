@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateLexemeProcessJobs < ActiveRecord::Migration[8.0]
   def change
     create_table :lexeme_process_jobs do |t|
@@ -14,7 +16,7 @@ class CreateLexemeProcessJobs < ActiveRecord::Migration[8.0]
 
     add_index :lexeme_process_jobs, :status
     add_index :lexeme_process_jobs,
-              [:lexeme_processor_id, :created_at],
-              name: "index_lexeme_process_jobs_on_processor_id_and_created_at"
+      %i[lexeme_processor_id created_at],
+      name: "index_lexeme_process_jobs_on_processor_id_and_created_at"
   end
 end

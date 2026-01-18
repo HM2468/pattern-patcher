@@ -19,13 +19,13 @@ LexemeProcessor.create!(
   default_config: {
     use_llm: true,
     llm_provider: "openai",
-    llm_model:  "gpt-4o",
+    llm_model: "gpt-4o",
     batch_token_limit: 1500,
     key_prefix: "gpt_trans",
   },
   output_schema: {
     processed_text: "string",
     i18n_key: "string",
-    locale: "string"
+    locale: "string",
   },
 )

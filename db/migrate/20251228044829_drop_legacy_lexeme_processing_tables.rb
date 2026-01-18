@@ -2,16 +2,12 @@
 
 class DropLegacyLexemeProcessingTables < ActiveRecord::Migration[8.0]
   def up
-    if table_exists?(:replacement_actions)
-      drop_table :replacement_actions
-    end
+    drop_table :replacement_actions if table_exists?(:replacement_actions)
 
-    if table_exists?(:replacement_targets)
-      drop_table :replacement_targets
-    end
+    drop_table :replacement_targets if table_exists?(:replacement_targets)
 
-    if table_exists?(:lexeme_processings)
-      drop_table :lexeme_processings
-    end
+    return unless table_exists?(:lexeme_processings)
+
+    drop_table :lexeme_processings
   end
 end

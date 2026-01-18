@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateRepositorySnapshots < ActiveRecord::Migration[8.0]
   def change
     create_table :repository_snapshots do |t|
@@ -9,6 +11,6 @@ class CreateRepositorySnapshots < ActiveRecord::Migration[8.0]
     end
 
     add_index :repository_snapshots, :commit_sha
-    add_index :repository_snapshots, [:repository_id, :commit_sha], unique: true
+    add_index :repository_snapshots, %i[repository_id commit_sha], unique: true
   end
 end

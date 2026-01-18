@@ -13,12 +13,12 @@ class CreateScanRunFiles < ActiveRecord::Migration[8.0]
     end
 
     add_index :scan_run_files,
-              [:scan_run_id, :repository_file_id],
-              unique: true,
-              name: "index_scan_run_files_on_scan_run_and_repo_file_unique"
+      %i[scan_run_id repository_file_id],
+      unique: true,
+      name: "index_scan_run_files_on_scan_run_and_repo_file_unique"
 
     add_index :scan_run_files,
-              [:scan_run_id, :status],
-              name: "index_scan_run_files_on_scan_run_id_and_status"
+      %i[scan_run_id status],
+      name: "index_scan_run_files_on_scan_run_id_and_status"
   end
 end

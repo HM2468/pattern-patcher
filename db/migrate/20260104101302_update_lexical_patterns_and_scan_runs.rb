@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateLexicalPatternsAndScanRuns < ActiveRecord::Migration[8.0]
   def change
     remove_column :lexical_patterns, :pattern_type, :string

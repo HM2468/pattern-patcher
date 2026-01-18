@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateReplacementTargets < ActiveRecord::Migration[8.0]
   def change
     create_table :replacement_targets do |t|

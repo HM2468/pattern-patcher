@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateLexemeProcessings < ActiveRecord::Migration[8.0]
   def change
     create_table :lexeme_processings do |t|

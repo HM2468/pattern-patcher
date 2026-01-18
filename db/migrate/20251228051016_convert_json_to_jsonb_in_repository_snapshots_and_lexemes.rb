@@ -4,27 +4,27 @@ class ConvertJsonToJsonbInRepositorySnapshotsAndLexemes < ActiveRecord::Migratio
   def up
     # repository_snapshots.metadata
     change_column :repository_snapshots,
-                  :metadata,
-                  :jsonb,
-                  using: "metadata::jsonb"
+      :metadata,
+      :jsonb,
+      using: "metadata::jsonb"
 
     # lexemes.metadata
     change_column :lexemes,
-                  :metadata,
-                  :jsonb,
-                  using: "metadata::jsonb"
+      :metadata,
+      :jsonb,
+      using: "metadata::jsonb"
   end
 
   def down
     # 回滚：jsonb -> json
     change_column :repository_snapshots,
-                  :metadata,
-                  :json,
-                  using: "metadata::json"
+      :metadata,
+      :json,
+      using: "metadata::json"
 
     change_column :lexemes,
-                  :metadata,
-                  :json,
-                  using: "metadata::json"
+      :metadata,
+      :json,
+      using: "metadata::json"
   end
 end
