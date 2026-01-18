@@ -31,9 +31,10 @@ gem "thruster", require: false
 
 gem "connection_pool", "< 3.0"
 gem "kaminari", "~> 1.2.1"
+
+
 group :development, :test do
-  gem "debug", platforms: %i[mri windows], require: "debug/prelude"
-  gem "brakeman", require: false
+  gem "brakeman", "~> 7.1.2", require: false
   gem "rubocop-rails-omakase", require: false
 end
 
