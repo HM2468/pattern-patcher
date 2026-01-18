@@ -29,55 +29,31 @@ class GitCli
   end
 
   # --------------------------------------------------
-  # add_file(path)
-  #
-  # shell:
-  #   git add -- <path>
-  #
-  # @param path [String]
-  # @return [true]
+  # git add -- <path>
   # --------------------------------------------------
   def add_file(path)
     ensure_ready!
-
     path = path.to_s.strip
     raise ArgumentError, "path cannot be blank" if path.empty?
 
-    shell!("git add -- #{shell_escape(path)}")
+    run_git!("add", "--", path)
     true
   end
 
   # --------------------------------------------------
-  # commit(message)
-  #
-  # shell:
-  #   git commit -m "<message>"
-  #
-  # @param message [String]
-  # @return [true]
+  # git commit -m "<message>"
   # --------------------------------------------------
   def commit(message)
     ensure_ready!
-
     msg = message.to_s.strip
     raise ArgumentError, "commit message cannot be blank" if msg.empty?
 
-    shell!("git commit -m #{shell_escape_double_quoted(msg)}")
+    run_git!("commit", "-m", msg)
     true
   end
 
   # --------------------------------------------------
-  # commit_file(message, file_path)
-  #
-  # shell:
-  #   git commit -m "<message>" -- <file_path>
-  #
-  # Commits ONLY the staged changes of the given file_path.
-  # Other staged files remain staged for later commits.
-  #
-  # @param message [String]
-  # @param file_path [String]
-  # @return [true]
+  # git commit -m "<message>" [--no-verify] -- <file_path>
   # --------------------------------------------------
   def commit_file(message, file_path, no_verify: false)
     ensure_ready!
@@ -88,18 +64,15 @@ class GitCli
     path = file_path.to_s.strip
     raise ArgumentError, "file_path cannot be blank" if path.empty?
 
-    nv = no_verify ? " --no-verify" : ""
-    shell!("git commit#{nv} -m #{shell_escape_double_quoted(msg)} -- #{shell_escape(path)}")
+    argv = ["commit"]
+    argv << "--no-verify" if no_verify
+    argv += ["-m", msg, "--", path]
+    run_git!(*argv)
     true
   end
 
   # --------------------------------------------------
-  # has_changes?
-  #
-  # shell:
-  #   git diff --cached --quiet
-  #
-  # @return [Boolean] true if index has staged changes
+  # git diff --cached --quiet
   # --------------------------------------------------
   def has_changes?
     ensure_ready!
@@ -107,16 +80,11 @@ class GitCli
   end
 
   # --------------------------------------------------
-  # has_changes_for_path?(file_path)
-  #
-  # shell:
-  #   git diff --cached --quiet -- <file_path>
+  # git diff --cached --quiet -- <file_path>
   #
   # exit status:
   #   0 => no diff for this path
   #   1 => has diff for this path
-  #
-  # @return [Boolean]
   # --------------------------------------------------
   def has_changes_for_path?(file_path)
     ensure_ready!
@@ -124,27 +92,19 @@ class GitCli
     path = file_path.to_s.strip
     raise ArgumentError, "file_path cannot be blank" if path.empty?
 
-    command = "git diff --cached --quiet -- #{shell_escape(path)}"
-    logger&.debug { "[GitCli] #{root_path}$ #{command}" }
+    ok = run_git_quiet?("diff", "--cached", "--quiet", "--", path)
+    return false if ok # 0 => no diff
 
-    Timeout.timeout(timeout_seconds) do
-      _stdout, stderr, status = Open3.capture3(command, chdir: root_path)
-
-      return true if status.exitstatus == 1
-      return false if status.exitstatus == 0
-
-      raise RuntimeError, <<~MSG
-        command failed (exit=#{status.exitstatus})
-        cwd: #{root_path}
-        cmd: #{command}
-        stderr: #{stderr.strip}
-      MSG
-    end
-  rescue Timeout::Error
-    raise Timeout::Error, "command timeout after #{timeout_seconds}s: #{command}"
+    # run_git_quiet? returns false when exitstatus==1 (diff exists)
+    return true
   end
 
-  # === awk semantic clone ===
+  # --------------------------------------------------
+  # list_blob_paths(ref:, exts:)
+  #
+  # Instead of `git ls-tree ... | awk ...`, parse in Ruby (no shell).
+  # Returns: [[sha, path], ...]
+  # --------------------------------------------------
   def list_blob_paths(ref: "HEAD", exts: nil)
     ensure_ready!
 
@@ -153,32 +113,47 @@ class GitCli
 
     exts = normalize_exts(exts)
 
-    awk_script =
-      if exts.empty?
-        "{print $3, $4}"
-      else
-        pattern = exts.join("|")
-        %Q{$4 ~ /\\.(#{pattern})$/ {print $3, $4}}
+    out = run_git!("ls-tree", "-r", ref)
+
+    out
+      .to_s
+      .lines
+      .map(&:strip)
+      .reject(&:empty?)
+      .map do |line|
+        # format: <mode> <type> <sha>\t<path>
+        # e.g.:   100644 blob a1b2c3...\tapp/models/foo.rb
+        left, path = line.split("\t", 2)
+        next if path.nil?
+
+        sha = left.split(/\s+/)[2]
+        next if sha.nil?
+
+        if exts.empty?
+          [sha, path]
+        else
+          next unless exts.any? { |e| path.downcase.end_with?(".#{e}") }
+          [sha, path]
+        end
       end
-
-    command = <<~SH.strip
-      git ls-tree -r #{shell_escape(ref)} | awk '#{awk_script}'
-    SH
-
-    output = shell!(command)
-    parse_awk_output(output)
+      .compact
   end
 
+  # --------------------------------------------------
+  # git rev-parse <ref>
+  # --------------------------------------------------
   def current_snapshot(ref: "HEAD")
     ensure_ready!
-
     ref = ref.to_s.strip
     raise ArgumentError, "ref cannot be blank" if ref.empty?
 
-    output = shell!("git rev-parse #{shell_escape(ref)}")
-    output.to_s.strip
+    run_git!("rev-parse", ref).to_s.strip
   end
 
+  # --------------------------------------------------
+  # git ls-tree <ref> -- <file_path>
+  # -> returns blob sha or nil
+  # --------------------------------------------------
   def current_file_blob(ref: "HEAD", file_path:)
     ensure_ready!
 
@@ -188,25 +163,27 @@ class GitCli
     file_path = file_path.to_s.strip
     raise ArgumentError, "file_path cannot be blank" if file_path.empty?
 
-    command = <<~SH.strip
-      git ls-tree #{shell_escape(ref)} #{shell_escape(file_path)} | awk '{print $3}'
-    SH
+    out = run_git!("ls-tree", ref, "--", file_path).to_s.strip
+    return nil if out.empty?
 
-    output = shell!(command).to_s.strip
-    output.empty? ? nil : output
+    # same format: <mode> <type> <sha>\t<path>
+    sha = out.split(/\s+/)[2]
+    sha&.strip
   end
 
+  # --------------------------------------------------
+  # git cat-file -p <blob>
+  # --------------------------------------------------
   def read_file(blob)
     ensure_ready!
 
     blob = blob.to_s.strip
     raise ArgumentError, "blob cannot be blank" if blob.empty?
-
     unless blob.match?(/\A[0-9a-f]{7,64}\z/i)
       raise ArgumentError, "invalid blob sha format: #{blob.inspect}"
     end
 
-    shell!("git cat-file -p #{shell_escape(blob)}")
+    run_git!("cat-file", "-p", blob)
   end
 
   def ready?
@@ -214,11 +191,6 @@ class GitCli
   end
 
   private
-
-  # escape for double-quoted shell string: " ... "
-  def shell_escape_double_quoted(str)
-    %("#{str.to_s.gsub("\\", "\\\\").gsub('"', '\"')}")
-  end
 
   def ensure_ready!
     raise RuntimeError, "Invalid GitCli: #{errors.full_messages.join(', ')}" unless valid?
@@ -241,63 +213,49 @@ class GitCli
       .uniq
   end
 
-  def shell!(command)
-    logger&.debug { "[GitCli] #{root_path}$ #{command}" }
-
-    stdout = +""
-    stderr = +""
+  # --- Safe runner: NEVER pass a single string to Open3 ---
+  def run_git!(*args)
+    argv = ["git", *args.map(&:to_s)]
+    logger&.debug { "[GitCli] #{root_path}$ #{argv.inspect}" }
 
     Timeout.timeout(timeout_seconds) do
-      stdout, stderr, status = Open3.capture3(command, chdir: root_path)
+      stdout, stderr, status = Open3.capture3(*argv, chdir: root_path)
+      return stdout if status.success?
 
-      unless status.success?
-        raise RuntimeError, <<~MSG
-          command failed (exit=#{status.exitstatus})
-          cwd: #{root_path}
-          cmd: #{command}
-          stderr: #{stderr.strip}
-        MSG
-      end
+      raise RuntimeError, <<~MSG
+        command failed (exit=#{status.exitstatus})
+        cwd: #{root_path}
+        argv: #{argv.inspect}
+        stderr: #{stderr.to_s.strip}
+      MSG
     end
-
-    stdout
   rescue Timeout::Error
-    raise Timeout::Error, "command timeout after #{timeout_seconds}s: #{command}"
+    raise Timeout::Error, "command timeout after #{timeout_seconds}s: git #{args.join(' ')}"
   end
 
-  def diff_cached_quiet?
-    command = "git diff --cached --quiet"
-    logger&.debug { "[GitCli] #{root_path}$ #{command}" }
+  # For commands where exitstatus 0/1 is meaningful (like `git diff --quiet`)
+  def run_git_quiet?(*args)
+    argv = ["git", *args.map(&:to_s)]
+    logger&.debug { "[GitCli] #{root_path}$ #{argv.inspect}" }
 
     Timeout.timeout(timeout_seconds) do
-      _stdout, stderr, status = Open3.capture3(command, chdir: root_path)
+      _stdout, stderr, status = Open3.capture3(*argv, chdir: root_path)
+
       return true if status.exitstatus == 0
       return false if status.exitstatus == 1
 
       raise RuntimeError, <<~MSG
         command failed (exit=#{status.exitstatus})
         cwd: #{root_path}
-        cmd: #{command}
-        stderr: #{stderr.strip}
+        argv: #{argv.inspect}
+        stderr: #{stderr.to_s.strip}
       MSG
     end
   rescue Timeout::Error
-    raise Timeout::Error, "command timeout after #{timeout_seconds}s: #{command}"
+    raise Timeout::Error, "command timeout after #{timeout_seconds}s: git #{args.join(' ')}"
   end
 
-  def parse_awk_output(output)
-    output
-      .to_s
-      .lines
-      .map(&:strip)
-      .reject(&:empty?)
-      .map do |line|
-        sha, path = line.split(/\s+/, 2)
-        [sha, path]
-      end
-  end
-
-  def shell_escape(str)
-    str.gsub("'", %q('\''))
+  def diff_cached_quiet?
+    run_git_quiet?("diff", "--cached", "--quiet")
   end
 end
