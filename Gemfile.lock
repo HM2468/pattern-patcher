@@ -138,7 +138,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
-    haml (7.1.0)
+    haml (7.2.0)
       temple (>= 0.8.2)
       thor
       tilt
@@ -419,7 +419,7 @@ GEM
     thruster (0.1.17-arm64-darwin)
     thruster (0.1.17-x86_64-darwin)
     thruster (0.1.17-x86_64-linux)
-    tilt (2.6.1)
+    tilt (2.7.0)
     timeout (0.6.0)
     tsort (0.2.0)
     turbo-rails (2.0.20)
@@ -549,7 +549,7 @@ CHECKSUMS
   faraday-retry (2.3.2) sha256=2402d2029032ebd238a2046221e67f6ef0da78c5a8ce8cd4f8b9c62e4d6451d1
   fugit (1.12.1) sha256=5898f478ede9b415f0804e42b8f3fd53f814bd85eebffceebdbc34e1107aaf68
   globalid (1.3.0) sha256=05c639ad6eb4594522a0b07983022f04aa7254626ab69445a0e493aa3786ff11
-  haml (7.1.0) sha256=aed691bddcaaf4855398b3e4dd39d8590600b0f0151f4def1c2aa83bfd444248
+  haml (7.2.0) sha256=87fd2b71f7feab1724337b090a7d767f5ab2d42f08c974f3ead673f18cfcd55a
   haml-rails (3.0.0) sha256=091fe496a85ca521d9cac87fb50f1ecf77a57974a99aa7e267130add81a5585f
   i18n (1.14.8) sha256=285778639134865c5e0f6269e0b818256017e8cde89993fdfcbfb64d088824a5
   importmap-rails (2.2.2) sha256=729f5b1092f832780829ade1d0b46c7e53d91c556f06da7254da2977e93fe614
@@ -660,7 +660,7 @@ CHECKSUMS
   thruster (0.1.17-arm64-darwin) sha256=75da66fc4a0f012f9a317f6362f786a3fa953879a3fa6bed8deeaebf1c1d66ec
   thruster (0.1.17-x86_64-darwin) sha256=b49e4c52563d1476d3aa1e12f7f57febb4510ac163f6abeac7c7c0de8a54437f
   thruster (0.1.17-x86_64-linux) sha256=77b8f335075bd4ece7631dc84a19a710a1e6e7102cbce147b165b45851bdfcd3
-  tilt (2.6.1) sha256=35a99bba2adf7c1e362f5b48f9b581cce4edfba98117e34696dde6d308d84770
+  tilt (2.7.0) sha256=0d5b9ba69f6a36490c64b0eee9f6e9aad517e20dcc848800a06eb116f08c6ab3
   timeout (0.6.0) sha256=6d722ad619f96ee383a0c557ec6eb8c4ecb08af3af62098a0be5057bf00de1af
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo-rails (2.0.20) sha256=cbcbb4dd3ce59f6471c9f911b1655b2c721998cc8303959d982da347f374ea95
