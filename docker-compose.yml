@@ -1,0 +1,83 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: patternpatcher-postgres
+    environment:
+      POSTGRES_DB: patternpatcher_production
+      POSTGRES_USER: patternpatcher
+      POSTGRES_PASSWORD: patternpatcher_password
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U patternpatcher -d patternpatcher_production"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7
+    container_name: patternpatcher-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "PING"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: patternpatcher:latest
+    container_name: patternpatcher-web
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: "1"
+
+      # ---- DB ----
+      DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
+
+      # ---- Redis / Sidekiq ----
+      REDIS_URL: redis://redis:6379/0
+
+      # ---- Secrets ----
+      # Provide one of these approaches:
+      # 1) set RAILS_MASTER_KEY for credentials
+      # 2) OR set SECRET_KEY_BASE directly
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+
+    ports:
+      - "3000:3000"
+    # If you need persistent Rails storage (ActiveStorage local):
+    volumes:
+      - rails_storage:/rails/storage
+
+  sidekiq:
+    image: patternpatcher:latest
+    container_name: patternpatcher-sidekiq
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: "1"
+      DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
+      REDIS_URL: redis://redis:6379/0
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+
+volumes:
+  pg_data:
+  redis_data:
+  rails_storage:
