@@ -3,7 +3,7 @@
 
 = turbo_frame_tag "current_processor" do
   - processor = @current_processor
-  - run_count = processor&.process_runs&.count || 0
+  - process_count = processor&.process_runs&.count || 0
 
   %div{ class: "rounded-2xl border border-indigo-200 overflow-hidden" }
     %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
@@ -50,10 +50,10 @@
 
         %div.repo-meta-block
           %div.repo-meta-label Process Runs
-          %div.repo-meta-value{ title: run_count }
+          %div.repo-meta-value{ title: process_count }
             = link_to process_runs_path(processor_id: processor&.id),
               data: { turbo_frame: "processor_right" },
               class: "repo-stat-card" do
               %div.repo-stat-value
-                %span{ id: dom_id(processor, :run_count) }
-                  = run_count
+                %span{ id: dom_id(processor, :process_count) }
+                  = process_count
