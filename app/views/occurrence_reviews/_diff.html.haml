@@ -22,6 +22,11 @@
       .pp-diff-header-left
         %span.pp-file-icon= "##{review.id}"
         %span.pp-file-path= diff.path
+        %span.pp-file-path
+          = button_tag type: "button",
+            class: "icon-button",
+            data: copy_tip(text: diff.path) do
+            = svg_icon("document-duplicate", class_name: "w-5 h-5")
 
       .pp-diff-header-right
         - if diff.additions.to_i.positive? || diff.deletions.to_i.positive?

@@ -43,6 +43,23 @@ module ApplicationHelper
     data
   end
 
+  # For diff path copy button
+  # Usage:
+  #   data: copy_tip(text: copy_text)
+  def copy_tip(text:, reset_after: 1200)
+    tooltip_data(
+      tip: "copy",
+      placement: "bottom",
+      controller: "clipboard",
+      action: "click->clipboard#copy",
+      clipboard_text_value: text.to_s,
+      clipboard_default_tip_value: "copy",
+      clipboard_copied_tip_value: "copied",
+      clipboard_reset_after_value: reset_after.to_i
+    )
+  end
+
+
   # {
   #   controller: "tooltip",
   #   tooltip_text_value: "Delete",
