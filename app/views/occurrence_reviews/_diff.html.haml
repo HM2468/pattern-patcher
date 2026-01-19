@@ -31,14 +31,16 @@
                 method: :post,
                 params: { page: params[:page], status: status, filter_type: filter_type, text_filter: text_filter_param, path_filter: path_filter_param },
                 form: { class: "inline-flex", data: { turbo: false } },
-                class: "icon-button" do
+                class: "icon-button",
+                data: tooltip_data(tip: "Approve") do
                 = svg_icon("hand-thumb-up", class_name: "w-5 h-5")
             %span.pp-del
               = button_to reject_occurrence_review_path(review),
                 method: :post,
                 params: { page: params[:page], status: status, filter_type: filter_type, text_filter: text_filter_param, path_filter: path_filter_param },
                 form: { class: "inline-flex", data: { turbo: false } },
-                class: "icon-button" do
+                class: "icon-button",
+                data: tooltip_data(tip: "Reject") do
                 = svg_icon("hand-thumb-down", class_name: "w-5 h-5")
         - else
           %span.pp-diff-stats
