@@ -4,6 +4,7 @@
 = turbo_frame_tag "current_processor" do
   - processor = @current_processor
   - process_count = processor&.process_runs&.count || 0
+  - confirm_html = "Start process all <strong>pending</strong> lexemes now."
 
   %div{ class: "rounded-2xl border border-indigo-200 overflow-hidden" }
     %div{ class: "bg-indigo-100 px-4 py-3 flex items-start justify-between gap-3" }
@@ -23,7 +24,7 @@
             form: { class: "inline-flex" },
             class: "icon-button",
             onclick: "return window.PopConfirmLog.open(event, this)",
-            data: tooltip_data(tip: "Start process now") do
+            data: start_action_tip(tip: 'Star processing now', title: 'Process lexemes', msg_html: confirm_html) do
             = svg_icon("play", class_name: "w-6 h-6")
 
     - if processor.nil?

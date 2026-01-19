@@ -61,17 +61,17 @@ module ApplicationHelper
   #   tooltip_placement_value: "bottom",
   #   confirm_title: "Scan Repository",
   #   confirm_message_html: scan_hint,
-  #   confirm_confirm_label: "Scan",
+  #   confirm_confirm_label: "Start",
   #   confirm_cancel_label: "Cancel"
   # }
-  def confirm_scan_tip(tip: '', title: '', msg_html: '')
+  def start_action_tip(tip: '', title: '', msg_html: '')
     {
       controller: "tooltip",
       tooltip_text_value: tip,
       tooltip_placement_value: "bottom",
       confirm_title: title,
       confirm_message_html: msg_html,
-      confirm_confirm_label: "Scan",
+      confirm_confirm_label: "Start",
       confirm_cancel_label: "Cancel"
     }
   end
