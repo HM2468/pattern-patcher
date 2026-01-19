@@ -24,8 +24,8 @@ Instead, it is an **engineering-grade solution that respects Git workflows and h
 
 ## Demo
 
-### review section
-<img src="docs/review.gif" width="900" />
+### run process
+<img src="docs/run_process.gif" width="900" />
 
 ## Background
 
