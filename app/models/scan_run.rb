@@ -9,13 +9,6 @@ class ScanRun < ApplicationRecord
 
   PHASES     = %w[Preparing Scanning].freeze
   CACHE_TTL = 1.hour
-  PROGRESS_COLOR = {
-    "pending" => "bg-indigo-500",
-    "running" => "bg-emerald-500",
-    "finished" => "bg-emerald-500",
-    "failed" => "bg-red-500",
-    "finished_with_errors" => "bg-red-500"
-  }
 
   validates :status, presence: true
   scope :latest,   -> { order(created_at: :desc) }

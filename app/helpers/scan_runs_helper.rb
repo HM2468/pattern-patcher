@@ -17,7 +17,6 @@ module ScanRunsHelper
       repo_name: scan_run.repository_name,
       sha_short: scan_run.commit_sha.to_s[0, sha_length],
       occ_count: result['occ_count'],
-      bar_class: ScanRun::PROGRESS_COLOR[status],
       pattern_name: pattern['name'],
       scan_mode: pattern['scan_mode'],
       regexp: pattern['regexp'],

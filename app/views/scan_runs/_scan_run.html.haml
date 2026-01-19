@@ -65,7 +65,7 @@
       %span{ class: "text-gray-400" } →
 
   %div{ class: "w-full h-3 rounded-full bg-gray-200 overflow-hidden" }
-    %div{ class: "h-3 #{d[:bar_class]}", style: "width: #{p[:pct]}%", data: { scan_runs_target: "bar" } }
+    %div{ class: "h-3 bg-indigo-500", style: "width: #{p[:pct]}%", data: { scan_runs_target: "bar" } }
 
   - if p[:err_msg].present?
     %div{ class: "text-sm text-red-700", data: { scan_runs_target: "error" } }= p[:err_msg]
