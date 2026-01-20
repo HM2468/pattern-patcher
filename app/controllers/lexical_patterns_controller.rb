@@ -29,7 +29,7 @@ class LexicalPatternsController < ApplicationController
   end
 
   def destroy
-    @lexical_pattern.destroy!
+    @lexical_pattern.update!(deleted_at: Time.current)
 
     redirect_to lexical_patterns_path(page: params[:page])
   end

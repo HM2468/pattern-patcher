@@ -11,6 +11,7 @@ class LexicalPattern < ApplicationRecord
   validates :scan_mode, presence: true
   validate :pattern_must_be_valid_regex
 
+  default_scope { where(deleted_at: nil) }
   scope :enabled_true, -> { where(enabled: true) }
 
   enum :scan_mode, {

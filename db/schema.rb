@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_20_015749) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_20_025502) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,12 +54,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_015749) do
 
   create_table "lexical_patterns", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.datetime "deleted_at"
     t.boolean "enabled"
     t.string "language"
     t.string "name"
     t.text "pattern"
     t.string "scan_mode", default: "line_mode", null: false
     t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_lexical_patterns_on_deleted_at"
     t.index ["enabled"], name: "index_lexical_patterns_on_enabled"
     t.index ["scan_mode"], name: "index_lexical_patterns_on_scan_mode"
   end
