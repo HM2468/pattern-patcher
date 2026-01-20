@@ -4,8 +4,8 @@
 class ScanRun < ApplicationRecord
   belongs_to :lexical_pattern
   belongs_to :repository_snapshot
-  has_many :occurrences, dependent: :delete_all
-  has_many :scan_run_files, dependent: :delete_all
+  has_many :occurrences
+  has_many :scan_run_files
 
   PHASES     = %w[Preparing Scanning].freeze
   CACHE_TTL = 1.hour

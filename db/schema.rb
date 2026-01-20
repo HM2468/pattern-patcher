@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_20_025502) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_20_030743) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -193,18 +193,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_20_025502) do
     t.index ["key"], name: "index_settings_on_key", unique: true
   end
 
-  add_foreign_key "lexeme_process_results", "lexemes"
+  add_foreign_key "lexeme_process_results", "lexemes", on_delete: :cascade
   add_foreign_key "lexeme_process_results", "process_runs"
-  add_foreign_key "occurrence_reviews", "occurrences"
-  add_foreign_key "occurrences", "lexemes"
+  add_foreign_key "occurrence_reviews", "occurrences", on_delete: :cascade
+  add_foreign_key "occurrences", "lexemes", on_delete: :cascade
   add_foreign_key "occurrences", "lexical_patterns"
-  add_foreign_key "occurrences", "repository_files"
+  add_foreign_key "occurrences", "repository_files", on_delete: :cascade
   add_foreign_key "occurrences", "scan_runs"
   add_foreign_key "process_runs", "lexeme_processors"
-  add_foreign_key "repository_files", "repositories"
-  add_foreign_key "repository_snapshots", "repositories"
-  add_foreign_key "scan_run_files", "repository_files"
-  add_foreign_key "scan_run_files", "scan_runs"
+  add_foreign_key "repository_files", "repositories", on_delete: :cascade
+  add_foreign_key "repository_snapshots", "repositories", on_delete: :cascade
+  add_foreign_key "scan_run_files", "repository_files", on_delete: :cascade
+  add_foreign_key "scan_run_files", "scan_runs", on_delete: :cascade
   add_foreign_key "scan_runs", "lexical_patterns"
   add_foreign_key "scan_runs", "repository_snapshots"
 end

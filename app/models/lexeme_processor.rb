@@ -2,7 +2,7 @@
 
 # app/models/lexeme_processor.rb
 class LexemeProcessor < ApplicationRecord
-  has_many :process_runs, dependent: :delete_all
+  has_many :process_runs
 
   validates :name, :key, :entrypoint, presence: true
   validates :name, length: { maximum: 200 }

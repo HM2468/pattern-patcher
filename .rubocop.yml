@@ -203,7 +203,7 @@ Rails/FindById:
   Enabled: true
 
 Rails/HasManyOrHasOneDependent:
-  Enabled: false # 你项目里大量 delete_all + DB cascade 讨论过，先不强制；需要再开
+  Enabled: false
 
 Rails/InverseOf:
   Enabled: true

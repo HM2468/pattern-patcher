@@ -2,8 +2,8 @@
 
 # app/models/repository.rb
 class Repository < ApplicationRecord
-  has_many :repository_files, dependent: :delete_all
-  has_many :repository_snapshots, dependent: :delete_all
+  has_many :repository_files
+  has_many :repository_snapshots
 
   validates :name, presence: true
   validates :root_path, presence: true, uniqueness: true

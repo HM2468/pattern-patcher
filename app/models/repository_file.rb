@@ -2,8 +2,8 @@
 class RepositoryFile < ApplicationRecord
   belongs_to :repository
 
-  has_many :occurrences, dependent: :delete_all
-  has_many :scan_run_files, dependent: :delete_all
+  has_many :occurrences
+  has_many :scan_run_files
 
   validates :path, presence: true
   validates :path, uniqueness: { scope: :repository_id }

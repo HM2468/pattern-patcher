@@ -5,7 +5,7 @@ class ProcessRun < ApplicationRecord
   include ProcessRunBroadcastor
 
   belongs_to :lexeme_processor
-  has_many :lexeme_process_results, dependent: :delete_all
+  has_many :lexeme_process_results
 
   default_scope { where(deleted_at: nil) }
 

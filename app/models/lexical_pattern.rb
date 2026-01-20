@@ -1,7 +1,7 @@
 # app/models/lexical_pattern.rb
 class LexicalPattern < ApplicationRecord
-  has_many :scan_runs, dependent: :restrict_with_error
-  has_many :occurrences, dependent: :restrict_with_error
+  has_many :scan_runs
+  has_many :occurrences
 
   ALLOWED_FLAGS  = %w[i m x].freeze
 
