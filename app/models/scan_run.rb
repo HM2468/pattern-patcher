@@ -11,6 +11,8 @@ class ScanRun < ApplicationRecord
   CACHE_TTL = 1.hour
 
   validates :status, presence: true
+
+  default_scope { where(deleted_at: nil) }
   scope :latest,   -> { order(created_at: :desc) }
   scope :finished, -> { where(status: "finished") }
   before_validation :default_status, on: :create

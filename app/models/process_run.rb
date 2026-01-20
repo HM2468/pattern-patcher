@@ -7,6 +7,8 @@ class ProcessRun < ApplicationRecord
   belongs_to :lexeme_processor
   has_many :lexeme_process_results, dependent: :delete_all
 
+  default_scope { where(deleted_at: nil) }
+
   DEFAULT_MAX_TOKENS_PER_BATCH = 150
   CACHE_TTL = 1.day
 

@@ -91,7 +91,7 @@ class ScanRunsController < ApplicationController
       @scan_run.repository_snapshot&.repository_id
 
     repository = Repository.find(repo_id)
-    @scan_run.destroy!
+    @scan_run.update!(deleted_at: Time.current)
     scan_count = scan_count_for(repo_id)
 
     respond_to do |format|

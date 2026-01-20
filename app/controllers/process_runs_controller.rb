@@ -80,7 +80,7 @@ class ProcessRunsController < ApplicationController
     run_id = @process_run.id
     processor = @process_run.lexeme_processor
 
-    @process_run.destroy!
+    @process_run.update!(deleted_at: Time.current)
     ProcessRunRollbackJob.perform_later(process_run_id: run_id)
 
     process_count = processor.process_runs.count
