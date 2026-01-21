@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:14
+    image: postgres:14.20
     container_name: patternpatcher-postgres
     environment:
       POSTGRES_DB: patternpatcher_production
@@ -15,7 +15,7 @@ services:
       retries: 20
 
   redis:
-    image: redis:7
+    image: redis:alpine
     container_name: patternpatcher-redis
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
@@ -30,7 +30,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: patternpatcher:latest
+    image: pattern-patcher:base
     container_name: patternpatcher-web
     depends_on:
       postgres:
@@ -40,28 +40,19 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
-
       DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
-      REDIS_URL: redis://redis:6379/0
-
+      REDIS_URL: redis://redis:6379
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
-
-      # 👇 统一告诉 Rails：Git 仓库根目录在哪里
       GIT_WORKSPACE_ROOT: /work/repos
-
     ports:
       - "3000:3000"
-
     volumes:
-      # Rails 自己的 runtime storage（可选）
       - rails_storage:/rails/storage
-
-      # 🔥 核心：挂载宿主机 git 仓库目录
       - /Users/miaohuang/work/repos:/work/repos
 
   sidekiq:
-    image: patternpatcher:latest
+    image: pattern-patcher:base
     container_name: patternpatcher-sidekiq
     depends_on:
       postgres:
@@ -71,21 +62,14 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
-
       DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
-      REDIS_URL: redis://redis:6379/0
-
+      REDIS_URL: redis://redis:6379
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
-
       GIT_WORKSPACE_ROOT: /work/repos
-
     command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
-
     volumes:
-      # 必须和 web 挂载同一份 git workspace
       - /Users/miaohuang/work/repos:/work/repos
-
 volumes:
   pg_data:
   redis_data:
