@@ -1,0 +1,34 @@
+# syntax=docker/dockerfile:1
+# check=error=true
+
+FROM pattern-patcher:base AS app
+
+WORKDIR /rails
+
+# Development env (local tool)
+ENV RAILS_ENV="development" \
+    NODE_ENV="development" \
+    RAILS_LOG_TO_STDOUT="1" \
+    BUNDLE_WITHOUT="" \
+    BUNDLE_PATH="/usr/local/bundle"
+
+# ---- Ruby gems first (better layer cache) ----
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# ---- JS deps (optional) ----
+# 如果你 repo 里确实有 package.json/yarn.lock，这一步会安装前端依赖（比如 github-markdown-css）
+# 若没有这些文件，你可以删掉这两行 COPY + RUN，或保持现在这样但确保文件存在
+COPY package.json yarn.lock ./
+RUN yarnpkg install --frozen-lockfile
+
+# ---- App code ----
+COPY . .
+
+# ---- Dev convenience ----
+# 如果你使用 tailwindcss-rails 的 watcher / bin/dev，建议暴露这个端口即可
+EXPOSE 3000
+
+# 默认启动 rails server（development）
+# 如果你更想用 bin/dev（同时跑 rails + tailwind watcher），把 CMD 改成 ["bin/dev"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
