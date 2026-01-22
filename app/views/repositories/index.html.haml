@@ -1,6 +1,8 @@
 -# app/views/repositories/index.html.haml
-%div{ class: "py-5 text-m text-gray-600 flex items-center justify-center" }
-  No repository found yet, please create one first.
+%div{ class: "repo-files-panel max-w-4xl mx-auto flex flex-col h-full py-4 overflow-hidden"}
+  %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" }
+    No repository found yet, please create one first.
+
   - if @selected_id.present?
     = link_to "Files",
       repository_files_path(repository_id: @selected_id, path_filter: @path_filter),

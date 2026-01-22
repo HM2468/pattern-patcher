@@ -2,7 +2,7 @@
 class RepositoriesController < ApplicationController
   include RepositoryWorkspaceContext
   before_action :set_repository, only: %i[show edit update destroy import]
-  layout "repository_workspace", only: %i[index new edit update]
+  layout "repository_workspace"
 
   def index
     if @selected_id.present?
@@ -23,6 +23,7 @@ class RepositoriesController < ApplicationController
     @repository = Repository.new(repository_params)
 
     if @repository.save
+      RepositoryImportJob.perform_later(@repository.id)
       flash[:success] = "Repository created successfully. File importing job enqueued."
       redirect_to repositories_path(repository_id: @repository.id)
     else

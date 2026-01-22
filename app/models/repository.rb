@@ -10,11 +10,9 @@ class Repository < ApplicationRecord
   validates :permitted_ext, presence: true
 
   validate :validate_root_path_for_env
-
   before_validation :normalize_inputs
 
   after_commit :create_snapshot, on: :create
-  after_commit :enqueue_import_job, on: :create
 
   def git_cli
     @git_cli ||= GitCli.new(self)
@@ -127,10 +125,6 @@ class Repository < ApplicationRecord
       errors.add(:root_path, "is not a git repository under workspace: #{full} (missing .git/)")
       return
     end
-  end
-
-  def enqueue_import_job
-    RepositoryImportJob.perform_later(id)
   end
 
   def create_snapshot

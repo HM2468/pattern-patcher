@@ -12,8 +12,9 @@
   %div{ class: "p-6 text-gray-700" }
     Please select a repository.
 - elsif no_files
-  %div{ class: "p-6 text-gray-700" }
-    Please import files or check whether the repository is empty.
+  %div{ class: "repo-files-panel max-w-4xl mx-auto flex flex-col h-full py-4 overflow-hidden"}
+    %div{ class: "rounded-xl bg-gray-50 p-6 text-gray-600" }
+      Please import files or check whether the repository is empty.
 - else
   %div#repo_files_panel{
     class: "repo-files-panel max-w-4xl mx-auto flex flex-col h-full py-4 overflow-hidden",

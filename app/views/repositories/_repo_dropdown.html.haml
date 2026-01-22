@@ -22,7 +22,7 @@
           = link_to new_repository_path,
             class: "icon-button",
             data: tooltip_data(tip: "New Repository") do
-            = svg_icon("chevron-right", class_name: "w-6 h-6")
+            = svg_icon("plus", class_name: "w-6 h-6")
     - else
       %div{ class: "space-y-2" }
         - selected_id = @selected_id || @repositories.first.id
