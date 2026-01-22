@@ -5,13 +5,13 @@ if LexicalPattern.count.zero?
     name: "Chinese inside single quotes",
     language: "ruby",
     enabled: true,
-    pattern: "/'[^']*[\u4e00-\u9fff]+[^']*'/",
+    pattern: %q{/'[^']*[\u4e00-\u9fff]+[^']*'/},
   )
   LexicalPattern.create!(
     name: "Chinese inside double quotes",
     language: "ruby",
     enabled: false,
-    pattern: '/"[^"]*[\u4e00-\u9fff]+[^"]*"/',
+    pattern: %q{/"[^"]*[\u4e00-\u9fff]+[^"]*"/},
   )
 end
 
