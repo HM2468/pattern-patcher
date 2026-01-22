@@ -29,6 +29,11 @@ PatternPatcher is built on a modern, production-ready Ruby ecosystem:
 | **Redis** | ≥ 8.4.0 |
 | **Sidekiq** | Latest stable |
 
+## Documentation
+
+- 📘 **[Overview](https://github.com/HM2468/pattern-patcher/wiki/Overview)**
+- 🗄️ **[Database Design](https://github.com/HM2468/pattern-patcher/wiki/Database-design)**
+
 
 ## How to run
 
@@ -42,7 +47,7 @@ cd pattern-patcher
 
 #### local run
 ```bash
-# start redis and postgres started first
+# get redis and postgres started
 # get ruby 3.4.1 installed
 # then
 bundle install
