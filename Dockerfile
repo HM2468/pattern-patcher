@@ -20,6 +20,8 @@ RUN apt-get update -qq && \
       pkg-config \
       nodejs \
       yarnpkg \
+      postgresql-client \
+      redis-tools \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Bundler defaults (dev-friendly)

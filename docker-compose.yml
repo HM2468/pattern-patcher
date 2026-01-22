@@ -68,12 +68,10 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
-
       PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: ""
-
       REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
     volumes: *rails_vols
@@ -82,15 +80,16 @@ services:
       - sh
       - -ec
       - |
-        set -e
+        set -eu
 
         echo "[db_init] checking gems..."
         bundle check
 
         DB_NAME="pp_production"
+        echo "[db_init] checking database exists: $$DB_NAME"
 
-        echo "[db_init] checking database exists: ${DB_NAME}"
-        if psql -h "${PGHOST}" -p "${PGPORT}" -U "${PGUSER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" | grep -q 1; then
+        EXISTS="$$(psql -h "$$PGHOST" -p "$$PGPORT" -U "$$PGUSER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$$DB_NAME'")"
+        if [ "$$EXISTS" = "1" ]; then
           echo "[db_init] database exists, skip db:create"
         else
           echo "[db_init] database not found, running db:create..."
@@ -104,7 +103,6 @@ services:
         bundle exec rails db:seed
 
         echo "[db_init] done"
-
   web:
     image: pattern-patcher:rails
     container_name: pp-web
