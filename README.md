@@ -30,6 +30,39 @@ Instead, it is an **engineering-grade solution that respects Git workflows and h
 ### Review
 <img src="docs/review.gif" width="900" />
 
+
+## How to run
+
+#### clone repository
+
+```bash
+git clone https://github.com/HM2468/pattern-patcher.git
+cd pattern-patcher
+```
+
+
+#### local run
+```bash
+# start redis and postgres started first
+# get ruby 3.4.1 installed
+# then
+bundle install
+yarnpkg install --frozen-lockfile
+rails db:create
+rails db:migrate
+rails db:seed
+bin/dev
+```
+
+#### docker run
+```bash
+docker pull ruby:3.4.1-slim-bullseye
+docker pull postgres:14.20
+docker pull redis:alpine
+docker buildx build  -f Dockerfile -t pattern-patcher:rails .
+docker compose up -d
+```
+
 ## Background
 
 In large legacy codebases, it is common to encounter requirements such as:
