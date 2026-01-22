@@ -1,102 +1,154 @@
-# PatternPatcher
+# **PatternPatcher**
 
-PatternPatcher helps teams apply **AI- or rule-generated code changes at scale with confidence**.
+**PatternPatcher** is a tool for applying **large-scale, AI- or rule-generated code changes** in a way that is **safe, reviewable, and production-ready**.
 
-It combines **precise pattern scanning**, **human-in-the-loop review**, and **file-scoped Git commits** to make large refactors **safe, auditable, and production-ready**.
+Instead of performing risky one-click rewrites, PatternPatcher enforces **human review, character-level precision, and file-scoped Git commits**, making every change **auditable, reversible, and worth committing**.
 
-Rather than performing risky one-click rewrites, PatternPatcher is designed to respect real-world engineering constraints:
-- Git history readability
-- Incremental rollouts
+It is designed for real-world engineering constraints:
+
+- Readable Git history
+
+- Incremental rollout
+
 - Explicit human approval
-- Deterministic and reversible changes
+
+- Deterministic application
+
+- Safe failure and conflict handling
 
 
-## Key Features
+* * *
 
-- 🔍 **Pattern-based scanning**
-  Identify exact code occurrences across large repositories using configurable patterns.
+## **Why PatternPatcher Exists**
 
-- 👀 **Human review workflow**
-  Every change is reviewed and approved (or rejected) individually before being applied.
+Large legacy codebases frequently require changes such as:
 
-- 🎯 **Character-level precision**
-  Patches are applied only when the original code matches exactly—no silent overwrites.
+- Systematic replacement of text, APIs, comments, or i18n keys
+
+- Gradual migration from old patterns to new standards
+
+- AI- or rule-generated suggestions that **cannot be auto-committed**
+
+- Mandatory human review and conflict detection
+
+- Strict control over Git commit granularity
+
+
+### **Limitations of Existing Approaches**
+
+| **Approach** | **Core Problems** |
+| --- | --- |
+| Scripts / regex | Invisible changes, no review, no rollback |
+| IDE batch replace | No intent tracking, no collaboration, unsafe |
+| One-shot AI rewrites | Non-deterministic, unreviewable, extremely risky |
+| Diff-based patching | Fragile under concurrent edits |
+
+From an engineering perspective, the hard part is **not generating changes**, but ensuring that:
+
+> Every change is understandable, verifiable, traceable, and safe to commit.
+
+PatternPatcher is built around this conclusion.
+
+* * *
+
+## **Positioning in the AI Era**
+
+AI tools (Cursor, MCP, Copilot, etc.) excel at:
+
+- Small local edits
+
+- Interactive refactors
+
+- Context-aware code generation
+
+
+However, at large scale they face fundamental limits:
+
+- **Reliability**: context truncation and model uncertainty
+
+- **Timeliness**: multi-round inference becomes uncontrollable
+
+- **Cost**: whole-repo changes are economically expensive
+
+- **Reviewability**: AI outputs results, not reviewable change units
+
+
+PatternPatcher does not replace AI.
+
+Instead, it answers a different question:
+
+> *How can AI- or rule-generated changes be reviewed, trusted, and safely committed at scale?*
+
+* * *
+
+## **Core Design Principles**
+
+1.  **Human review is mandatory**
+
+    Auto-generation ≠ production-ready code
+
+2.  **Change intent must be explicit**
+
+    Every modification is a deliberate, reviewable unit
+
+3.  **Precision over guessing**
+
+    Changes apply only when the original code matches exactly
+
+4.  **Git history is a first-class concern**
+
+    Commits must remain readable and meaningful
+
+5.  **Failures must be safe and recoverable**
+
+    No silent overwrites, no partial corruption
+
+
+* * *
+
+## **Key Features**
+
+- 🔍 **Pattern-based repository scanning**
+
+    Identify exact occurrences using configurable language- and regex-based rules.
+
+- 👀 **Human-in-the-loop review workflow**
+
+    Every change is approved or rejected individually.
+
+- 🎯 **Character-level application precision**
+
+    Changes apply only if the original text matches exactly.
 
 - 📁 **File-scoped Git commits**
-  Each file is committed independently, preserving clean and readable Git history.
 
-- 🔁 **Conflict-aware and reversible**
-  Conflicts and failures are explicitly detected and safely handled.
+    Each file is committed independently, preserving clean Git history.
 
----
+- 🔁 **Conflict-aware and reversible execution**
 
-## Typical Use Cases
-
-- Large-scale i18n or copy migrations
-- Gradual API / SDK upgrades
-- Legacy code style normalization
-- AI-assisted refactoring with mandatory human confirmation
-- Safe batch modifications in collaborative teams
-
----
-
-## Background
-
-In large legacy codebases, it is common to encounter requirements such as:
-
-- Systematic batch replacement of text, APIs, comments, or i18n keys
-- Gradual migration from old code patterns to new ones
-- AI- or rule-generated modification suggestions that **cannot be auto-committed**
-- Mandatory human review, conflict detection, and incremental application
-- Strict adherence to Git commit granularity and readable history
-
-Limitations of traditional approaches:
-
-- Scripts / regex: invisible, unreviewable, irreversible
-- One-shot AI rewrites: uncontrollable and extremely risky
-- IDE batch replace: no context, no collaboration, no intent tracking
-
-PatternPatcher starts from an engineering conclusion:
-
-> The hard part of large-scale code changes is not *how* to change the code,  
-> but *how to ensure every change is understandable, verifiable, and traceable*.
-
-### Why PatternPatcher still matters in the AI era
-
-AI coding tools such as Cursor or MCP are highly effective for small-scale edits, local refactors, and interactive development.  
-However, when facing **large repositories, hundreds of files, and tens of thousands of changes**, fundamental engineering limitations remain unavoidable:
-
-- **Reliability**: context truncation and model uncertainty make cross-file batch changes nondeterministic
-- **Timeliness**: long inference times and multi-round context passing become uncontrollable at scale
-- **Cost**: high token consumption makes whole-repo refactoring economically unsustainable
-- **Reviewability**: AI produces *results*, not *individually reviewable change intentions*
-
-In real engineering practice, large-scale code changes **must** eventually be reviewed by humans, confirmed piece by piece, and committed incrementally.
-
-PatternPatcher does not aim to replace AI. Instead, it:
-
-> Bridges AI’s generative power with the engineering world’s need for control, traceability, and commit safety.
-
-It does not ask *“Can we change the code?”*  
-It asks:
-
-> *“How can we ensure that every change at scale is still worth committing?”*
+    Conflicts and failures are detected explicitly and handled safely.
 
 
-## Core Capabilities
+* * *
 
-### 1. Pattern-Based Repository Scanning (Scan)
+## **Core Concepts**
 
-The system scans the entire repository using configured patterns (language, file type, regex rules, etc.), producing precise match results.
+### **1\. Pattern-Based Scanning (Scan)**
+
+The repository is scanned using configured patterns.
 
 Each match records:
 
 - File path
-- Line number (`line_at`)
-- Character range (`line_char_start...line_char_end`)
-- Original matched text (`matched_text`)
 
-```text
+- Line number (line_at)
+
+- Character range (line_char_start, line_char_end)
+
+- Original matched text (matched_text)
+
+
+```
 RepositoryFile
   └── Occurrence
         - line_at
@@ -105,70 +157,136 @@ RepositoryFile
         - matched_text
 ```
 
-2. OccurrenceReview: the Smallest Reviewable Patch Unit
+These coordinates become the **only trusted reference** for applying changes.
 
-Each Occurrence generates an OccurrenceReview, representing one potential code change.
+* * *
+
+### **2\. OccurrenceReview: The Smallest Reviewable Unit**
+
+Each Occurrence generates an OccurrenceReview, representing **one minimal code change**.
 
 An OccurrenceReview contains:
+
 - Original context
-- Rendered new code (rendered_code)
+
+- Rendered replacement code
+
 - Review status:
-- pending
-- approved
-- rejected
+
+    - pending
+
+    - approved
+
+    - rejected
+
 - Apply status:
-- not_applied
-- applied
-- conflict
-- failed
 
-One OccurrenceReview = one minimal modification unit that can be approved or rejected independently.
+    - not_applied
 
-3. Character-Level Precise Patch Application
+    - applied
 
-PatternPatcher does not rely on diff guessing.
-Instead, it validates changes using the exact coordinates recorded during scanning:
+    - conflict
 
+    - failed
+
+
+> One OccurrenceReview = one independently reviewable and decidable change.
+
+* * *
+
+### **3\. Character-Level Patch Application**
+
+PatternPatcher does not apply diffs blindly.
+
+Instead, it validates changes using exact coordinates:
+
+```
 lines[line_at - 1][start...end] == matched_text
+```
 
-- Exact match → allowed to apply
-- Mismatch → detected as a conflict
+- ✅ Exact match → apply allowed
+
+- ❌ Mismatch → conflict detected
+
 
 This guarantees:
-- Manual or external edits are automatically detected
+
+- External edits are detected automatically
+
 - No silent overwrites
-- Deterministic application results
 
-4. Working Tree Writes + Git Index Control
+- Fully deterministic behavior
 
-The apply process is strictly layered:
-	1.	Modify only the working tree file
-	2.	Run:
 
-```bash
+* * *
+
+### **4\. Git-Controlled Apply Process**
+
+The apply flow is strictly layered:
+
+1.  Modify only the working tree
+
+2.  Stage only the target file:
+
+
+```
 git add -- <file>
 ```
 
+3.  Commit only when **all reviews for that file are approved**:
 
-	3.	Only if all OccurrenceReviews for that file are approved
-	4.	Run:
-
-```bash
+```
 git commit -m "..." -- <file>
 ```
 
-
 ✔ Each file is committed exactly once
+
 ✔ Approval order does not matter
-✔ Other staged files are never accidentally committed
 
-## Overall Architecture
+✔ Other staged files are never affected
 
-```text
+* * *
+
+## **Failure and Conflict Handling**
+
+### **Conflict Detection**
+
+If file content no longer matches the scan record:
+
+- No write occurs
+
+- apply_status = conflict
+
+- Full error context is returned
+
+
+### **Write Failure**
+
+- I/O or permission errors
+
+- Partial changes are rolled back
+
+- apply_status = failed
+
+
+### **Git Operation Failure**
+
+- Errors from git add or git commit
+
+- Error output is preserved
+
+- Already-applied files remain unaffected
+
+
+* * *
+
+## **Overall Architecture**
+
+```
 Repository
   ├── RepositoryFile
-  │     └── Occurrence (scan result)
-  │            └── OccurrenceReview (human review)
+  │     └── Occurrence
+  │            └── OccurrenceReview
   │
   ├── ScanRun / Snapshot
   │
@@ -179,163 +297,93 @@ Repository
          └── git cat-file / ls-tree
 ```
 
-Key service object:
+Key service:
+
 - ApproveOccurrenceReviewService
-- Resource validation
-- Patch application
-- Conflict detection
-- git add
-- File-scoped commit
-- Fully recoverable error handling
 
-## Core Workflow
+    - Validation
 
-Full Flow of a Single Approval
+    - Patch application
 
-User clicks Approve
-  ↓
-ApproveOccurrenceReviewService
-  1. Validate Occurrence / File / Repository / GitCli
-  2. Apply patch with character-level precision
-  3. Update review status to approved
-  4. git add <file>
-  5. If all reviews for the file are approved
-        → git commit -- <file>
+    - Conflict detection
 
-Every step:
-- Explicitly returns success or failure
-- Preserves full error context
-- Never swallows errors or skips implicitly
+    - Git staging & commit
 
-## Git Integration Strategy
+    - Safe error handling
 
-File-Scoped Commits
 
-Using native Git capabilities:
+* * *
 
-```bash
-git commit -m "message" -- <file_path>
-```
+## **Typical Use Cases**
 
-This guarantees:
-- Even if other files are staged
-- The commit includes only the specified file
-
-Disabling Git Hooks for Automation
-
-In real-world projects, repositories often include:
-- husky / pre-commit hooks
-- eslint / rubocop / stylelint
-- environment-dependent checks
-
-Automated commits use:
-
-```bash
-git commit --no-verify -- <file>
-```
-
-The goal is not to bypass standards, but to:
-- Prevent automation from being blocked by local environments
-- Preserve developers’ normal commit workflows
-
-## Failure and Conflict Handling
-
-Conflict Detection
-
-When file content differs from the scanned record:
-- The file is not written
-- apply_status is set to conflict
-- A clear error message is returned
-
-Write Failure
-- File permission or I/O errors
-- Temporary changes are rolled back
-- apply_status is set to failed
-
-Git Operation Failure
-- Errors from git add or git commit
-- Full error output is preserved
-- Already-applied files remain unaffected
-
-## Key Design Decisions
-
-Why not use git diff / patch directly?
-- Diff describes results, not intent
-- Diff can be misapplied when files change concurrently
-- Diff cannot reliably express which semantic fragment should be replaced
-
-PatternPatcher instead chooses:
-
-Exact coordinates + original text
-as the only trusted source for applying changes.
-
-Why separate Review and Apply?
-- Auto-generation ≠ production-ready
-- Humans must see:
-- Context
-- Old vs new code
-- Semantic correctness
-- Review is a product feature, not an implementation detail
-
-## Use Cases
 - Large-scale i18n or copy migrations
-- Semi-automated API / SDK upgrades
-- Legacy code style → new standards
-- AI-generated code that requires human confirmation
+
+- Gradual API / SDK upgrades
+
+- Legacy code normalization
+
+- AI-generated refactors requiring human approval
+
 - Safe batch modifications in collaborative teams
 
-## Non-Goals
 
-PatternPatcher intentionally does not aim to:
-- ❌ Automatically fix all code issues
+* * *
+
+## **Non-Goals**
+
+PatternPatcher intentionally does **not** aim to:
+
 - ❌ Perform unreviewed one-click rewrites
-- ❌ Replace CI, linting, or code review processes
 
-## Current Status
+- ❌ Replace CI, linting, or code review
+
+- ❌ Automatically “fix everything”
+
+
+* * *
+
+## **Current Status**
+
 - ✅ Core workflow fully implemented
-- ✅ Validated in real large-scale repositories
-- ✅ Supports conflict detection, rollback, and file-scoped commits
-- 🚧 Potential future extensions:
-- Dry-run mode
-- Batch approval
-- Enhanced review UI
-- Pluggable AI patch generators
 
-## Summary
+- ✅ Validated in large real-world repositories
 
-The value of PatternPatcher is not speed, but trust:
+- 🚧 Possible future extensions:
 
-It makes large-scale code changes reliable, controllable, and traceable.
+    - Dry-run mode
 
-It focuses not on technical showmanship, but on
-the real complexity and risk management required in production engineering.
+    - Batch approval
 
-## Commercial Use
+    - Enhanced review UI
 
-PatternPatcher is licensed under AGPL-3.0.
-
-Commercial use (including internal enterprise use or SaaS)
-requires either full source code disclosure under AGPL or a separate commercial license.
-
-Contact: huangmiao2468@gmail.com
+    - Pluggable AI generators
 
 
+* * *
+
+## **Summary**
+
+PatternPatcher optimizes for **trust, not speed**.
+
+It ensures that even at massive scale, every code change remains:
+
+- Understandable
+
+- Reviewable
+
+- Traceable
+
+- Worth committing
 
 
+* * *
 
-## Design Philosophy
-
-PatternPatcher is built on a simple but strict principle:
-
-> Large-scale code changes must remain **understandable, verifiable, and worth committing**.
-
-It does not aim to replace AI tools.
-Instead, it **bridges AI generation with engineering-grade control**, ensuring that every change can be reviewed, trusted, and safely merged.
-
----
-
-## License
+## **License**
 
 PatternPatcher is licensed under **AGPL-3.0**.
 
-For commercial use or alternative licensing, please contact the author.
+Commercial use (including internal enterprise use or SaaS)
+
+requires either AGPL compliance or a separate commercial license.
+
+📧 Contact: **huangmiao2468@gmail.com**
