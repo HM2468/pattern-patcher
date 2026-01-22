@@ -10,22 +10,16 @@ class GitCli
   attr_reader :repository, :timeout_seconds, :logger, :root_path
 
   validates :repository, presence: true
+  validate :root_path_must_be_valid
 
   def initialize(repository, timeout_seconds: 20, logger: nil)
     @timeout_seconds = timeout_seconds.to_i
     @logger = logger || (defined?(Rails) ? Rails.logger : nil)
-
-    unless repository.is_a?(Repository)
-      errors.add(:repository, "must be a Repository instance")
-      return
-    end
-
     @repository = repository
-    @root_path  = File.expand_path(repository.root_path.to_s)
 
-    validate_root_path!
-  rescue => e
-    errors.add(:base, e.message)
+    # ✅ Critical fix:
+    # Always use resolved_root_path (production: /work/repos/<rel>, dev/test: absolute)
+    @root_path = repository&.resolved_root_path&.to_s.to_s
   end
 
   # --------------------------------------------------
@@ -96,7 +90,7 @@ class GitCli
     return false if ok # 0 => no diff
 
     # run_git_quiet? returns false when exitstatus==1 (diff exists)
-    return true
+    true
   end
 
   # --------------------------------------------------
@@ -122,7 +116,6 @@ class GitCli
       .reject(&:empty?)
       .map do |line|
         # format: <mode> <type> <sha>\t<path>
-        # e.g.:   100644 blob a1b2c3...\tapp/models/foo.rb
         left, path = line.split("\t", 2)
         next if path.nil?
 
@@ -196,14 +189,26 @@ class GitCli
     raise RuntimeError, "Invalid GitCli: #{errors.full_messages.join(', ')}" unless valid?
   end
 
-  def validate_root_path!
-    raise ArgumentError, "repository.root_path is blank" if root_path.nil? || root_path.empty?
-    raise ArgumentError, "repository.root_path does not exist: #{root_path}" unless Dir.exist?(root_path)
+  def root_path_must_be_valid
+    unless repository.is_a?(Repository)
+      errors.add(:repository, "must be a Repository instance")
+      return
+    end
+
+    if root_path.nil? || root_path.empty?
+      errors.add(:base, "resolved root_path is blank")
+      return
+    end
+
+    unless Dir.exist?(root_path)
+      errors.add(:base, "repository root does not exist: #{root_path}")
+      return
+    end
 
     git_dot = File.join(root_path, ".git")
     return if File.directory?(git_dot) || File.file?(git_dot)
 
-    raise ArgumentError, "#{root_path} is not a git repository root (.git not found)"
+    errors.add(:base, "#{root_path} is not a git repository root (.git not found)")
   end
 
   def normalize_exts(exts)

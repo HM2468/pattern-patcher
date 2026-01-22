@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-
 # app/models/repository.rb
+
 class Repository < ApplicationRecord
   has_many :repository_files
   has_many :repository_snapshots
@@ -39,7 +39,8 @@ class Repository < ApplicationRecord
   # - production: ENV[GIT_WORKSPACE_ROOT] + root_path
   def resolved_root_path
     if Rails.env.production?
-      Pathname.new(ENV.fetch("GIT_WORKSPACE_ROOT")).join(root_path.to_s).expand_path
+      base = Pathname.new(ENV.fetch("GIT_WORKSPACE_ROOT")).expand_path
+      base.join(root_path.to_s).cleanpath.expand_path
     else
       Pathname.new(root_path.to_s).expand_path
     end
@@ -74,7 +75,7 @@ class Repository < ApplicationRecord
   end
 
   def validate_root_path_for_development!
-    # 开发环境：必须是绝对路径（更明确，避免“我以为是相对路径”的误操作）
+    # 开发环境：必须是绝对路径
     pn = Pathname.new(root_path)
 
     unless pn.absolute?
@@ -101,10 +102,10 @@ class Repository < ApplicationRecord
       return
     end
 
-    # 生产环境：root_path 必须是相对路径（防止把宿主机绝对路径写进 DB）
+    # 生产环境：root_path 必须是相对路径
     rp = Pathname.new(root_path)
     if rp.absolute?
-      errors.add(:root_path, "must be a relative path under GIT_WORKSPACE_ROOT in production (e.g. myrepo)")
+      errors.add(:root_path, "must be a relative path under GIT_WORKSPACE_ROOT in production (e.g. gitee)")
       return
     end
 
@@ -133,10 +134,9 @@ class Repository < ApplicationRecord
   end
 
   def create_snapshot
-    # 注意：create_snapshot 会在 transaction commit 后执行，
-    # 此时 git_cli 依赖的 root_path 校验已经通过
+    # transaction commit 后执行
     commit_sha = git_cli.current_snapshot
-    return if commit_sha.nil?
+    return if commit_sha.nil? || commit_sha.empty?
 
     repository_snapshots.create!(commit_sha: commit_sha, metadata: {})
   end
