@@ -7,10 +7,6 @@ class RepositoryImportJob < ApplicationJob
     repo = Repository.find_by(id: repository_id)
     return if repo.nil?
 
-    root = repo.root_path.to_s
-    return if root.blank?
-    return unless Dir.exist?(root)
-
     now = Time.current
     git_cli = repo.git_cli
     # List all files in the repository
