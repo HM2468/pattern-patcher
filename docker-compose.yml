@@ -1,37 +1,62 @@
+# docker-compose.yml
+# - local tool stack: postgres + redis + rails(web/sidekiq) + one-shot db_init
+# - gems cache uses a named volume (bundle_cache) so it won't be overwritten by host path
+# - source code / repos / db / redis are bind-mounted to host for easy inspection
+# ---- volume anchors (centralized mounts) ----
+x-anchors:
+  # postgres data persisted on host
+  pg_vols: &pg_vols
+    - /Users/miaohuang/work/pp_docker_run/postgres:/var/lib/postgresql/data
+
+  # redis data persisted on host
+  redis_vols: &redis_vols
+    - /Users/miaohuang/work/pp_docker_run/redis:/data
+
+  # rails source code (host -> container)
+  rails_code_vols: &rails_code_vols
+    - /Users/miaohuang/work/patternpatcher:/rails:cached
+
+  # git workspace (host -> container)
+  repos_vols: &repos_vols
+    - /Users/miaohuang/work/pp_docker_run/repos:/work/repos
+
+  # rails vols used by db_init/web/sidekiq
+  # NOTE: bundle_cache is a NAMED volume, not a host path (fixes repeated bundle install)
+  rails_vols: &rails_vols
+    - /Users/miaohuang/work/patternpatcher:/rails:cached
+    - bundle_cache:/usr/local/bundle
+    - /Users/miaohuang/work/pp_docker_run/repos:/work/repos
+    - /Users/miaohuang/work/pp_docker_run/postgres:/var/lib/postgresql/data
+
 services:
   postgres:
     image: postgres:14.20
-    container_name: patternpatcher-postgres
+    container_name: pp-postgres
     environment:
-      POSTGRES_DB: patternpatcher_production
-      POSTGRES_USER: patternpatcher
-      POSTGRES_PASSWORD: patternpatcher_password
-    volumes:
-      - pg_data:/var/lib/postgresql/data
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_USER: postgres
+    volumes: *pg_vols
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U patternpatcher -d patternpatcher_production"]
-      interval: 5s
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
       timeout: 3s
-      retries: 20
+      retries: 40
 
   redis:
     image: redis:alpine
-    container_name: patternpatcher-redis
+    container_name: pp-redis
     command: ["redis-server", "--appendonly", "yes"]
-    volumes:
-      - redis_data:/data
+    volumes: *redis_vols
     healthcheck:
       test: ["CMD", "redis-cli", "PING"]
-      interval: 5s
+      interval: 3s
       timeout: 3s
-      retries: 20
+      retries: 40
 
-  web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: pattern-patcher:base
-    container_name: patternpatcher-web
+  # one-shot: only runs when PGDATA has no init flag
+  db_init:
+    image: pattern-patcher:rails
+    container_name: pp-db-init
     depends_on:
       postgres:
         condition: service_healthy
@@ -40,21 +65,69 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
-      DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
-      REDIS_URL: redis://redis:6379
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ""
+      REDIS_URL: redis://redis:6379/0
+      GIT_WORKSPACE_ROOT: /work/repos
+    volumes: *rails_vols
+    command:
+      - sh
+      - -ec
+      - |
+        set -e
+        echo "[db_init] ensure gems..."
+        bundle check || bundle install
+
+        FLAG_FILE=/var/lib/postgresql/data/.pp_db_inited
+        if [ -f "$$FLAG_FILE" ]; then
+          echo "[db_init] already initialized, skip"
+          exit 0
+        fi
+
+        echo "[db_init] running db:create db:migrate db:seed..."
+        bundle exec rails db:create
+        bundle exec rails db:migrate
+        bundle exec rails db:seed
+
+        touch "$$FLAG_FILE"
+        echo "[db_init] done"
+  web:
+    image: pattern-patcher:rails
+    container_name: pp-web
+    depends_on:
+      db_init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_LOG_TO_STDOUT: "1"
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ""
+      REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
     ports:
       - "3000:3000"
-    volumes:
-      - rails_storage:/rails/storage
-      - /Users/miaohuang/work/repos:/work/repos
+    volumes: *rails_vols
+    command:
+      - sh
+      - -ec
+      - |
+        bundle check || bundle install
+        bundle exec rails server -b 0.0.0.0 -p 3000
 
   sidekiq:
-    image: pattern-patcher:base
-    container_name: patternpatcher-sidekiq
+    image: pattern-patcher:rails
+    container_name: pp-sidekiq
     depends_on:
+      db_init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
@@ -62,15 +135,19 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
-      DATABASE_URL: postgres://patternpatcher:patternpatcher_password@postgres:5432/patternpatcher_production
-      REDIS_URL: redis://redis:6379
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY:-}
-      SECRET_KEY_BASE: ${SECRET_KEY_BASE:-}
+      PGHOST: postgres
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: ""
+      REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
-    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
-    volumes:
-      - /Users/miaohuang/work/repos:/work/repos
+    volumes: *rails_vols
+    command:
+      - sh
+      - -ec
+      - |
+        bundle check || bundle install
+        bundle exec sidekiq -C config/sidekiq.yml
+
 volumes:
-  pg_data:
-  redis_data:
-  rails_storage:
+  bundle_cache:
