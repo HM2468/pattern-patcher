@@ -2,9 +2,10 @@
 # - local tool stack: postgres + redis + rails(web/sidekiq) + one-shot db_init
 # - gems cache uses a named volume (bundle_cache) so it won't be overwritten by host path
 # - source code / repos / db / redis are bind-mounted to host for easy inspection
+
 # ---- volume anchors (centralized mounts) ----
 x-anchors:
-  # postgres data persisted on host
+  # postgres data persisted on host (mounted as parent dir)
   pg_vols: &pg_vols
     - /Users/miaohuang/work/pp_docker_run/postgres:/var/lib/postgresql/data
 
@@ -21,12 +22,11 @@ x-anchors:
     - /Users/miaohuang/work/pp_docker_run/repos:/work/repos
 
   # rails vols used by db_init/web/sidekiq
-  # NOTE: bundle_cache is a NAMED volume, not a host path (fixes repeated bundle install)
+  # NOTE: bundle_cache is a NAMED volume, not a host path
   rails_vols: &rails_vols
     - /Users/miaohuang/work/patternpatcher:/rails:cached
     - bundle_cache:/usr/local/bundle
     - /Users/miaohuang/work/pp_docker_run/repos:/work/repos
-    - /Users/miaohuang/work/pp_docker_run/postgres:/var/lib/postgresql/data
 
 services:
   postgres:
@@ -35,9 +35,12 @@ services:
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_USER: postgres
+
+      # critical: use a SUBDIR under the mount point to avoid ".DS_Store"/dotfiles issues
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes: *pg_vols
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 3s
       timeout: 3s
       retries: 40
@@ -53,7 +56,7 @@ services:
       timeout: 3s
       retries: 40
 
-  # one-shot: only runs when PGDATA has no init flag
+  # one-shot: create db if missing, then always migrate + seed
   db_init:
     image: pattern-patcher:rails
     container_name: pp-db-init
@@ -65,34 +68,43 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
+
       PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: ""
+
       REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
     volumes: *rails_vols
+    working_dir: /rails
     command:
       - sh
       - -ec
       - |
         set -e
-        echo "[db_init] ensure gems..."
-        bundle check || bundle install
 
-        FLAG_FILE=/var/lib/postgresql/data/.pp_db_inited
-        if [ -f "$$FLAG_FILE" ]; then
-          echo "[db_init] already initialized, skip"
-          exit 0
+        echo "[db_init] checking gems..."
+        bundle check
+
+        DB_NAME="pp_production"
+
+        echo "[db_init] checking database exists: ${DB_NAME}"
+        if psql -h "${PGHOST}" -p "${PGPORT}" -U "${PGUSER}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='${DB_NAME}'" | grep -q 1; then
+          echo "[db_init] database exists, skip db:create"
+        else
+          echo "[db_init] database not found, running db:create..."
+          bundle exec rails db:create
         fi
 
-        echo "[db_init] running db:create db:migrate db:seed..."
-        bundle exec rails db:create
+        echo "[db_init] running db:migrate..."
         bundle exec rails db:migrate
+
+        echo "[db_init] running db:seed..."
         bundle exec rails db:seed
 
-        touch "$$FLAG_FILE"
         echo "[db_init] done"
+
   web:
     image: pattern-patcher:rails
     container_name: pp-web
@@ -106,20 +118,23 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
+
       PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: ""
+
       REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
     ports:
       - "3000:3000"
     volumes: *rails_vols
+    working_dir: /rails
     command:
       - sh
       - -ec
       - |
-        bundle check || bundle install
+        bundle check
         bundle exec rails server -b 0.0.0.0 -p 3000
 
   sidekiq:
@@ -135,18 +150,21 @@ services:
     environment:
       RAILS_ENV: production
       RAILS_LOG_TO_STDOUT: "1"
+
       PGHOST: postgres
       PGPORT: "5432"
       PGUSER: postgres
       PGPASSWORD: ""
+
       REDIS_URL: redis://redis:6379/0
       GIT_WORKSPACE_ROOT: /work/repos
     volumes: *rails_vols
+    working_dir: /rails
     command:
       - sh
       - -ec
       - |
-        bundle check || bundle install
+        bundle check
         bundle exec sidekiq -C config/sidekiq.yml
 
 volumes:
