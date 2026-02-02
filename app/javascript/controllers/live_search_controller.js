@@ -9,11 +9,11 @@ import { Controller } from "@hotwired/stimulus"
 //        data-live-search-repo-id-value="3"
 //        data-live-search-frame-id-value="repo_right"
 //        data-live-search-min-length-value="0">
-// - url_template: 后端接口（可包含 __REPO_ID__ 占位符）
-// - param_name: 过滤参数名（默认 "q"）
-// - frame_id: 需要刷新哪个 turbo-frame（默认 "repo_right"）
-// - delay: 停止输入多久触发（ms）
-// - min_length: 最小触发长度（默认 0；比如 2 表示至少输入2个字符才触发）
+// - url_template: backend endpoint (may include the __REPO_ID__ placeholder)
+// - param_name: query parameter name (default: "q")
+// - frame_id: which turbo-frame to refresh (default: "repo_right")
+// - delay: debounce delay after typing stops (ms)
+// - min_length: minimum input length to trigger (default: 0; e.g., 2 means trigger only when >= 2 chars)
 export default class extends Controller {
   static values = {
     delay: { type: Number, default: 1200 },
@@ -45,7 +45,7 @@ export default class extends Controller {
     const raw = (this.element.value || "")
     const value = raw.trim()
 
-    // 去抖后，如果内容没变化就不刷新
+    // After debounce, do not refresh if the value hasn't changed
     if (value === this._last) return
     this._last = value
 
@@ -58,18 +58,18 @@ export default class extends Controller {
     let url = this.urlTemplateValue || ""
     if (!url) return
 
-    // 支持 __REPO_ID__ 替换
+    // Support __REPO_ID__ placeholder replacement
     if (this.repoIdValue) {
       url = url.replaceAll("__REPO_ID__", encodeURIComponent(this.repoIdValue))
     }
 
-    // 拼 query
+    // Build query params
     const u = new URL(url, window.location.origin)
 
-    // 清理分页，避免搜索仍停留在旧页
+    // Reset pagination so searches don't stay on an old page
     u.searchParams.delete("page")
 
-    // 保证互斥：如果当前是 text_filter，就清掉 path_filter；反之亦然
+    // Enforce mutual exclusivity: if using text_filter, clear path_filter; and vice versa
     const pn = (this.paramNameValue || "q")
     if (pn === "text_filter") u.searchParams.delete("path_filter")
     if (pn === "path_filter") u.searchParams.delete("text_filter")
@@ -77,11 +77,11 @@ export default class extends Controller {
     if (value.length > 0) {
       u.searchParams.set(pn, value)
     } else {
-      // 允许清空过滤时回到无过滤状态：移除该参数
+      // Allow clearing the filter to return to the unfiltered state: remove this param
       u.searchParams.delete(pn)
     }
 
-    // 通过 turbo-frame 刷新右侧区域
+    // Refresh the target area via turbo-frame
     frame.src = u.toString()
     frame.reload()
   }

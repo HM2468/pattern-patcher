@@ -20,11 +20,9 @@ export default class extends Controller {
   };
 
   connect() {
-    // 初始状态：按钮禁用 + 同步全选状态
     this.updateHintAndButtons();
     this.syncCheckAllState();
 
-    // Select All：用事件监听绑定在当前节点上（Turbo replace 后会自动重新 connect）
     if (this.hasCheckAllTarget) {
       this._onCheckAllChange = this.onCheckAllChange.bind(this);
       this.checkAllTarget.addEventListener("change", this._onCheckAllChange);
@@ -37,7 +35,6 @@ export default class extends Controller {
     }
   }
 
-  // tbody change：任意 file checkbox 改变都走这里
   onTbodyChange(e) {
     const t = e.target;
     if (!t) return;
@@ -52,7 +49,6 @@ export default class extends Controller {
   onCheckAllChange() {
     const checked = !!this.checkAllTarget.checked;
 
-    // 永远选中当前页的所有 file checkbox（只查 this.element 内部）
     this.fileChecks().forEach((c) => {
       c.checked = checked;
     });
@@ -62,7 +58,7 @@ export default class extends Controller {
 
   onBulkDeleteClick() {
     const ids = this.selectedIds();
-    if (ids.length === 0) return; // disabled anyway
+    if (ids.length === 0) return;
 
     this.fillHiddenIds(this.deleteIdsBoxTarget, ids);
 
@@ -75,7 +71,7 @@ export default class extends Controller {
 
   onBulkScanClick() {
     const ids = this.selectedIds();
-    if (ids.length === 0) return; // disabled anyway
+    if (ids.length === 0) return;
 
     this.fillHiddenIds(this.scanIdsBoxTarget, ids);
 
@@ -84,7 +80,6 @@ export default class extends Controller {
       return;
     }
 
-    // 只保留一个 scan_hint_message（按你的要求移除 scan_all_hint）
     const msg = this.scanHintMessageValue || "";
     if (msg.length > 0) {
       this.scanTriggerTarget.dataset.confirmMessageHtml = msg;
@@ -93,10 +88,7 @@ export default class extends Controller {
     this.scanTriggerTarget.click();
   }
 
-  // -------- helpers --------
-
   fileChecks() {
-    // 只在当前 panel 内查找，避免拿到别的页面/frame 的 checkbox
     return this.hasFileCheckTarget ? this.fileCheckTargets : [];
   }
 
@@ -113,7 +105,6 @@ export default class extends Controller {
       this.hintTarget.textContent = count > 0 ? `Selected: ${count}` : "200/page";
     }
 
-    // 按你的要求：没选中 => Scan/Delete 都不可点
     if (this.hasBulkScanBtnTarget) this.bulkScanBtnTarget.disabled = (count === 0);
     if (this.hasBulkDeleteBtnTarget) this.bulkDeleteBtnTarget.disabled = (count === 0);
   }

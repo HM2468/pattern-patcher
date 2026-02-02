@@ -2,7 +2,7 @@
 import { Controller } from "@hotwired/stimulus"
 import consumer from "channels/consumer"
 
-// 监听 ActionCable 广播到 process_runs 的消息：
+// listen ActionCable broadcast to process_runs channel
 // {id, kind, ts, payload: {status, total, succeeded, failed, processed, percent, batches_total, batches_done, occ_revc}}
 export default class extends Controller {
   static values = {
@@ -59,7 +59,7 @@ export default class extends Controller {
     const currentStatus = (card.dataset.processRunStatus || "").toString()
     if (currentStatus === "running" && payload.status) {
       this.setText(card, '[data-process-runs-target="status"]', payload.status)
-      // 同步 dataset，避免后续仍被当作 running（比如已变成 succeeded/failed）
+      // sync dataset，avoid future updates when status is not running
       card.dataset.processRunStatus = payload.status
     }
   }
