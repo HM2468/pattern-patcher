@@ -1,25 +1,25 @@
 /* app/assets/stylesheets/repository-files.css */
 
 .{
-  /* 关键：panel 内部自己管理滚动，外部不要再滚这个区域 */
+  /* Key: manage scrolling inside the panel itself; do not allow outer containers to scroll this area */
   overflow: hidden;
 }
 
-/* header table 不滚 */
+/* Header table should not scroll */
 .repo-files-head {
-  /* 可选：让顶部更稳 */
+  /* Optional: keep the header stable */
   flex: 0 0 auto;
 }
 
-/* 中间滚动区域只滚 tbody 部分 */
+/* Only the tbody (middle section) should be scrollable */
 .repo-files-body-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
-  /* 可选：滚动更顺滑 */
+  /* Optional: smoother scrolling on touch devices */
   -webkit-overflow-scrolling: touch;
 }
 
-/* pagination 固定底部 */
+/* Pagination fixed at the bottom */
 .repo-files-pagination {
   flex: 0 0 auto;
 }

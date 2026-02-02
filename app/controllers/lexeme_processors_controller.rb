@@ -131,9 +131,9 @@ class LexemeProcessorsController < ApplicationController
 
   # - nil/blank => "cannot be blank"
   # - JSON.parse error => "invalid json format: ..."
-  # - parsed not Hash => "must be a JSON object"
+  # - parsed value is not a Hash => "must be a JSON object"
   # - {} => "cannot be empty" (if allow_empty_object: false)
-  # 返回：Hash（成功）或 {}（失败时也返回 {}，但我们会提前 render，不会继续 save）
+  # Returns: Hash (on success) or {} (on failure; still returns {}, but we render early and do not proceed to save)
   def parse_required_json_object(raw, field:, record:, allow_empty_object:)
     if raw.is_a?(Hash)
       obj = raw
