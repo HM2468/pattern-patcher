@@ -12,12 +12,10 @@ AllCops:
   TargetRubyVersion: 3.3
   TargetRailsVersion: 8.0
 
-  # 建议开启：避免因不同编辑器/OS 换行导致 diff
   DisplayCopNames: true
   DisplayStyleGuide: true
   ExtraDetails: true
 
-  # RuboCop 扫描范围
   Include:
     - "Rakefile"
     - "config.ru"
@@ -43,17 +41,13 @@ AllCops:
     - "bin/rubocop"
     - "bin/setup"
     - "bin/update"
-    - "config/initializers/devise.rb" # 例：第三方生成文件（按需删）
-    - "config/initializers/simple_form.rb" # 例：第三方生成文件（按需删）
-
-# ---------------------------
-# Layout / Style (更利于 -A 自动修复)
-# ---------------------------
+    - "config/initializers/devise.rb"
+    - "config/initializers/simple_form.rb"
 
 Layout/LineLength:
   Max: 120
   AllowedPatterns:
-    - '\A\s*#' # 注释允许更长（也可删）
+    - '\A\s*#'
   Exclude:
     - "config/routes.rb"
 
@@ -134,13 +128,8 @@ Style/NumericPredicate:
 Style/SignalException:
   EnforcedStyle: semantic
 
-# Ruby 3.3 / Rails 8 常见写法友好
 Style/HashExcept:
   Enabled: true
-
-# ---------------------------
-# Lint (尽量不阻碍自动修复，但保留质量闸门)
-# ---------------------------
 
 Lint/UselessAssignment:
   Enabled: true
@@ -153,10 +142,6 @@ Lint/UnusedMethodArgument:
   Enabled: true
   AllowUnusedKeywordArguments: true
   IgnoreEmptyMethods: true
-
-# ---------------------------
-# Metrics（默认稍微放宽，让项目更容易落地；可逐步收紧）
-# ---------------------------
 
 Metrics/MethodLength:
   Max: 25
@@ -268,10 +253,6 @@ Naming/PredicateName:
   ForbiddenPrefixes:
     - is_
     - have_
-
-# ---------------------------
-# Security（可选）
-# ---------------------------
 
 Security:
   Enabled: true

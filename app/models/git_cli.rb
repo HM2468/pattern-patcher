@@ -17,14 +17,10 @@ class GitCli
     @logger = logger || (defined?(Rails) ? Rails.logger : nil)
     @repository = repository
 
-    # ✅ Critical fix:
-    # Always use resolved_root_path (production: /work/repos/<rel>, dev/test: absolute)
     @root_path = repository&.resolved_root_path&.to_s.to_s
   end
 
-  # --------------------------------------------------
   # git add -- <path>
-  # --------------------------------------------------
   def add_file(path)
     ensure_ready!
     path = path.to_s.strip
@@ -34,9 +30,7 @@ class GitCli
     true
   end
 
-  # --------------------------------------------------
   # git commit -m "<message>"
-  # --------------------------------------------------
   def commit(message)
     ensure_ready!
     msg = message.to_s.strip
@@ -46,9 +40,8 @@ class GitCli
     true
   end
 
-  # --------------------------------------------------
+
   # git commit -m "<message>" [--no-verify] -- <file_path>
-  # --------------------------------------------------
   def commit_file(message, file_path, no_verify: false)
     ensure_ready!
 
@@ -65,21 +58,18 @@ class GitCli
     true
   end
 
-  # --------------------------------------------------
+
   # git diff --cached --quiet
-  # --------------------------------------------------
   def has_changes?
     ensure_ready!
     diff_cached_quiet? ? false : true
   end
 
-  # --------------------------------------------------
+
   # git diff --cached --quiet -- <file_path>
-  #
   # exit status:
   #   0 => no diff for this path
   #   1 => has diff for this path
-  # --------------------------------------------------
   def has_changes_for_path?(file_path)
     ensure_ready!
 
@@ -93,12 +83,10 @@ class GitCli
     true
   end
 
-  # --------------------------------------------------
+
   # list_blob_paths(ref:, exts:)
-  #
   # Instead of `git ls-tree ... | awk ...`, parse in Ruby (no shell).
   # Returns: [[sha, path], ...]
-  # --------------------------------------------------
   def list_blob_paths(ref: "HEAD", exts: nil)
     ensure_ready!
 
@@ -132,9 +120,8 @@ class GitCli
       .compact
   end
 
-  # --------------------------------------------------
+
   # git rev-parse <ref>
-  # --------------------------------------------------
   def current_snapshot(ref: "HEAD")
     ensure_ready!
     ref = ref.to_s.strip
@@ -143,10 +130,9 @@ class GitCli
     run_git!("rev-parse", ref).to_s.strip
   end
 
-  # --------------------------------------------------
+
   # git ls-tree <ref> -- <file_path>
   # -> returns blob sha or nil
-  # --------------------------------------------------
   def current_file_blob(ref: "HEAD", file_path:)
     ensure_ready!
 
@@ -164,9 +150,7 @@ class GitCli
     sha&.strip
   end
 
-  # --------------------------------------------------
   # git cat-file -p <blob>
-  # --------------------------------------------------
   def read_file(blob)
     ensure_ready!
 
