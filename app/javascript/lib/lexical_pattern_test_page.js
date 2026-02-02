@@ -32,8 +32,6 @@
     document.head.appendChild(style);
   }
 
-  // Build highlighted HTML by sequentially finding each returned match from cursor.
-  // First version: does not handle overlapping matches; items not found are skipped.
   function buildHighlightedHtml(text, matches) {
     let cursor = 0;
     let html = "";
@@ -61,7 +59,7 @@
     nextBtn.disabled = !enabled;
   }
 
-  // Only scroll inside the editor (not the whole page)
+
   function scrollIntoEditorView(editor, el) {
     const editorRect = editor.getBoundingClientRect();
     const elRect = el.getBoundingClientRect();
@@ -69,7 +67,6 @@
     const topVisible = editor.scrollTop;
     const bottomVisible = topVisible + editor.clientHeight;
 
-    // element position in editor's scroll coordinate system
     const elTop = (elRect.top - editorRect.top) + editor.scrollTop;
     const elBottom = elTop + elRect.height;
 
@@ -94,7 +91,6 @@
   async function run() {
     injectStyleOnce();
 
-    // Always locate by id (robust against class changes)
     const editor  = byId("test_editor");
     const scanBtn = byId("scan_btn");
     const prevBtn = byId("prev_btn");
@@ -190,7 +186,7 @@
       focusMatch(editor, matchEls, currentIndex);
     }
 
-    // ✅ bind events by id
+    // bind events by id
     scanBtn.addEventListener("click", handleScan);
     prevBtn.addEventListener("click", handlePrev);
     nextBtn.addEventListener("click", handleNext);

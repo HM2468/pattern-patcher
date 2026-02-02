@@ -36,7 +36,7 @@ export default class extends Controller {
     const card = document.getElementById(`process_run_${runId}`)
     if (!card) return
 
-    // ---- update progress percent + bar ----
+    // update progress percent + bar
     if (payload.percent !== undefined && payload.percent !== null) {
       const pct = Number(payload.percent)
       if (!Number.isNaN(pct)) {
@@ -45,17 +45,17 @@ export default class extends Controller {
       }
     }
 
-    // ---- update counters (real-time) ----
+    // update counters (real-time)
     this.setNumber(card, '[data-process-runs-target="succeeded"]', payload.succeeded)
     this.setNumber(card, '[data-process-runs-target="failed"]', payload.failed)
     this.setNumber(card, '[data-process-runs-target="processed"]', payload.processed)
     this.setNumber(card, '[data-process-runs-target="occRevc"]', payload.occ_revc)
 
-    // ---- batches ----
+    // batches
     this.setNumber(card, '[data-process-runs-target="batchesTotal"]', payload.batches_total)
     this.setNumber(card, '[data-process-runs-target="batchesDone"]', payload.batches_done)
 
-    // ---- status rule: only live-update when current status is running ----
+    // status rule: only live-update when current status is running
     const currentStatus = (card.dataset.processRunStatus || "").toString()
     if (currentStatus === "running" && payload.status) {
       this.setText(card, '[data-process-runs-target="status"]', payload.status)
@@ -64,7 +64,7 @@ export default class extends Controller {
     }
   }
 
-  // ---------- helpers ----------
+  // helpers
   setText(root, selector, value) {
     if (value === undefined || value === null) return
     const el = root.querySelector(selector)

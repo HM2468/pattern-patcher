@@ -1,10 +1,4 @@
 // app/javascript/lib/confirm_log.js
-// Plain JS confirm modal.
-// Fixes:
-// - Move focus out BEFORE hiding (avoid aria-hidden blocked)
-// - Restore focus back to the trigger button
-// - Use `inert` to prevent focusing hidden modal
-// - Optionally auto-close on Turbo submit end
 
 const PopConfirmLog = {
   pendingForm: null,

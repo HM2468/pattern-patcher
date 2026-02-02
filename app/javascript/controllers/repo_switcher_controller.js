@@ -12,10 +12,10 @@ export default class extends Controller {
     const id = event.target.value
     if (!id) return
 
-    // 左侧 show frame
+    // left side show frame
     Turbo.visit(this.showUrlTemplateValue.replace("__ID__", id), { frame: "repo_show" })
 
-    // 右侧主区域：默认切到 files（你也可以切到 scan_runs 等）
+    // right side files frame
     Turbo.visit(this.filesUrlTemplateValue.replace("__ID__", id), { frame: "repo_right" })
   }
 }
