@@ -23,7 +23,7 @@
   gap: 0.25rem;                /* space-y-1 */
   font-size: 0.875rem;         /* text-sm */
   color: #b91c1c;              /* red-700 */
-  padding-left: 0;             /* 防止 ul 默认缩进 */
+  padding-left: 0;
   list-style: none;
 }
 

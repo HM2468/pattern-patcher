@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 # app/services/approve_occurrence_review_service.rb
 class ApproveOccurrenceReviewService
   Result = Struct.new(:ok?, :message, :errors, :committed, keyword_init: true)
@@ -51,9 +50,8 @@ class ApproveOccurrenceReviewService
           backtrace: e.backtrace&.first(10)
         )
 
-        # 给前端：短消息
         @errors << "git commit failed (details logged)."
-        @errors << e.message.to_s.byteslice(0, 300) # 再给一点点上下文
+        @errors << e.message.to_s.byteslice(0, 300)
         return fail_result
       end
     end
@@ -71,9 +69,7 @@ class ApproveOccurrenceReviewService
 
   private
 
-  # -----------------------------
   # init validations
-  # -----------------------------
   def validate_presence
     unless @review.is_a?(OccurrenceReview)
       @errors << "Invalid input: occ_rev must be an OccurrenceReview"
@@ -85,9 +81,7 @@ class ApproveOccurrenceReviewService
     @errors << "Missing git cli" if @git_cli.nil?
   end
 
-  # -----------------------------
   # apply patch (moved from model)
-  # -----------------------------
   def apply_patch!
     rendered = @review.rendered_code.to_s
     if rendered.blank?

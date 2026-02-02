@@ -151,8 +151,8 @@ class FileScanService
       return occ
     end
 
-    # 已存在：不重置 status（避免覆盖人工 review）
-    # 但可以修正定位字段/上下文
+    # Exists: do not reset status (to avoid overwriting manual reviews)
+    # But can update line/char/byte offsets and context
     changed = false
 
     if occ.line_at != line_at
@@ -179,7 +179,8 @@ class FileScanService
       occ.context = context.to_s
       changed = true
     end
-    # 保证 scan_run_id 仍然满足 NOT NULL
+
+    # ensure scan_run_id is NOT NULL
     if occ.scan_run_id != @scan_run.id
       occ.scan_run_id = @scan_run.id
       changed = true

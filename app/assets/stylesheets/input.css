@@ -104,7 +104,7 @@
   border: 1px solid #c7d2fe; /* indigo-200 */
   border-radius: 0.75rem;   /* rounded-xl */
 
-  padding: 0.75rem 1rem;    /* 接近 p-3 + px-4 */
+  padding: 0.75rem 1rem;    /* approximately p-3 + px-4 */
   font-size: 0.875rem;      /* text-sm */
   line-height: 1.4;
 
@@ -134,7 +134,7 @@
    ========================= */
 
 .dropdown-select {
-  /* 继承 form-select 的整体风格 */
+  /* Inherit the overall style of form-select */
   display: block;
   width: 100%;
 
@@ -142,9 +142,9 @@
   border-radius: 0.75rem;    /* rounded-xl */
 
   padding: 0.5rem 1rem;      /* py-2 px-4 */
-  padding-right: 2.75rem;    /* 给箭头留空间 */
+  padding-right: 2.75rem;    /* reserve space for the arrow */
   font-size: 0.875rem;       /* text-sm */
-  font-weight: 600;          /* 让选中的 repo 更“标题感” */
+  font-weight: 600;          /* make the selected repo feel more like a title */
 
   background-color: #ffffff;
   color: #0f172a;            /* slate-900 */

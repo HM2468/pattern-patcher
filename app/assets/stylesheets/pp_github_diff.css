@@ -65,7 +65,7 @@
   vertical-align: top;
 }
 
-/* ===== colgroup：固定两列行号宽度，防止重叠 ===== */
+/* ===== colgroup: fixed width for line number column ===== */
 .pp-diff-table col.pp-col-lineno {
   width: 40px;
 }
@@ -112,7 +112,7 @@
   overflow-x: auto;
 }
 
-/* hover（只让 context 更像 GitHub） */
+/* ===== hover effect for context lines ===== */
 .pp-diff-table tr:hover .pp-blob-code-context {
   background: #f6f8fa;
 }

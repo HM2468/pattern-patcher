@@ -5,7 +5,7 @@ class ScanRunFile < ApplicationRecord
   belongs_to :repository_file
 
   validates :status, presence: true
-  # 幂等保护（DB 层已有 unique index，这里是双保险）
+  # Idempotency protection (DB already has a unique index, this is just extra insurance)
   validates :repository_file_id,
             uniqueness: { scope: :scan_run_id }
 

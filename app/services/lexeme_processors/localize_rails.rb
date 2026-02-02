@@ -30,7 +30,6 @@ module LexemeProcessors
         i18n_key  = ::Support::YamlBatchTranslator.normalize_i18n_key(one["i18n_key"])
         trans     = one["trans_text"].to_s
 
-        # 兜底：模型没给 key / key 太烂
         i18n_key = fallback_key(item.fetch(:normalized_text).to_s) if i18n_key.blank?
 
         {

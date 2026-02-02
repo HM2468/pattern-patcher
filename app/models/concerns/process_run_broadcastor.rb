@@ -8,7 +8,7 @@ module ProcessRunBroadcastor
   DEFAULT_THROTTLE_WINDOW = 0.5 # seconds
 
   # Public instance methods
-  # 实时进度广播（带节流）
+  # Broadcast progress with throttling
   def broadcast_progress_throttled(throttle_window: DEFAULT_THROTTLE_WINDOW)
     return if terminal_status?
     return unless acquire_broadcast_throttle!(window: throttle_window)
@@ -31,7 +31,6 @@ module ProcessRunBroadcastor
     )
   end
 
-  # 从 Redis 读进度并拼 payload
   def build_progress_payload_from_cache
     total = read_counter(total_count_key)
     succ  = read_counter(succeed_count_key)
@@ -79,7 +78,7 @@ module ProcessRunBroadcastor
     )
   end
 
-  # 节流：一个时间窗内只允许一次广播
+  # Throttling: only allow one broadcast per time window
   def acquire_broadcast_throttle!(window:)
     Rails.cache.write(
       broadcast_throttle_key,

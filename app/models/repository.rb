@@ -32,8 +32,8 @@ class Repository < ApplicationRecord
     repository_snapshots.order(created_at: :desc).first
   end
 
-  # 给别处用：返回“真实可用的绝对路径”
-  # - dev/test: root_path 本身就是绝对路径
+  # For use elsewhere: returns the actual usable absolute path
+  # - dev/test: root_path itself is already an absolute path
   # - production: ENV[GIT_WORKSPACE_ROOT] + root_path
   def resolved_root_path
     if Rails.env.production?
@@ -54,10 +54,10 @@ class Repository < ApplicationRecord
     return if root_path.blank?
 
     if Rails.env.production?
-      # 生产环境：只存相对路径（避免把宿主机绝对路径写入 DB）
+      # Production: store only relative paths (avoid persisting host absolute paths in DB)
       self.root_path = root_path.sub(%r{\A/+}, "")
     else
-      # 开发/测试：允许用户填相对路径，但最终存绝对路径更稳
+      # Development/Test: allow relative input, but persist absolute paths for stability
       self.root_path = File.expand_path(root_path)
     end
   end
@@ -73,7 +73,7 @@ class Repository < ApplicationRecord
   end
 
   def validate_root_path_for_development!
-    # 开发环境：必须是绝对路径
+    # Development/Test: must be an absolute path
     pn = Pathname.new(root_path)
 
     unless pn.absolute?
@@ -100,7 +100,7 @@ class Repository < ApplicationRecord
       return
     end
 
-    # 生产环境：root_path 必须是相对路径
+    # Production: root_path must be a relative path
     rp = Pathname.new(root_path)
     if rp.absolute?
       errors.add(:root_path, "must be a relative path under GIT_WORKSPACE_ROOT in production (e.g. gitee)")
@@ -110,7 +110,7 @@ class Repository < ApplicationRecord
     base = Pathname.new(workspace).expand_path
     full = base.join(root_path).cleanpath
 
-    # 防目录穿越：root_path = ../../etc
+    # Prevent directory traversal: root_path = ../../etc
     unless full.to_s.start_with?(base.to_s + File::SEPARATOR) || full == base
       errors.add(:root_path, "is invalid (path traversal detected)")
       return
@@ -128,7 +128,7 @@ class Repository < ApplicationRecord
   end
 
   def create_snapshot
-    # transaction commit 后执行
+    # Executed after the transaction is committed
     commit_sha = git_cli.current_snapshot
     return if commit_sha.nil? || commit_sha.empty?
 
