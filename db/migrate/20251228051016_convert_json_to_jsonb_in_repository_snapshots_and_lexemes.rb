@@ -16,7 +16,6 @@ class ConvertJsonToJsonbInRepositorySnapshotsAndLexemes < ActiveRecord::Migratio
   end
 
   def down
-    # 回滚：jsonb -> json
     change_column :repository_snapshots,
       :metadata,
       :json,
