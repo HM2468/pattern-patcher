@@ -147,7 +147,7 @@ module LexemeProcessors
         rescue => e
           Rails.cache.increment(run.failed_count_key, 1)
 
-          # best-effort：标记失败，但不要再抛异常影响后续
+          # best-effort：标记失败，但不要再抛异常影响后续处理
           begin
             lexeme.update(process_status: "failed")
           rescue => _e2

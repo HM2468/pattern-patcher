@@ -158,7 +158,7 @@ require "openai"
           parsed[k10]["i18n_key"]  = parsed[k10]["i18n_key"].to_s
           parsed[k10]["trans_text"] = parsed[k10]["trans_text"].to_s
 
-          # 关键兜底：插值占位符不能丢
+          # Validate placeholders in translated text
           src = input_map[k10].to_s
           dst = parsed[k10]["trans_text"].to_s
           phs = self.class.placeholders(src)

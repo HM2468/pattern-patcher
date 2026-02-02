@@ -16,7 +16,6 @@ module LexemeProcessorsHelper
     locale: "string",
   }.freeze
 
-  # 给 placeholder 用：永远返回默认 JSON（pretty）
   def lexeme_processor_default_json_placeholder(field)
     data =
       case field.to_sym
@@ -28,7 +27,6 @@ module LexemeProcessorsHelper
     JSON.pretty_generate(deep_stringify_keys(data))
   end
 
-  # 给 value 用：如果记录里有值，就返回记录的 pretty JSON；否则返回 nil（让 value 为空）
   def lexeme_processor_json_value_or_nil(lexeme_processor, field)
     raw = extract_json_field(lexeme_processor, field)
     return nil unless raw.is_a?(Hash) && raw.present?
@@ -36,7 +34,6 @@ module LexemeProcessorsHelper
     JSON.pretty_generate(deep_stringify_keys(raw))
   end
 
-  # 判空（nil / {} / 空 hash）
   def lexeme_processor_json_blank?(lexeme_processor, field)
     raw = extract_json_field(lexeme_processor, field)
     raw.blank? || raw == {}
