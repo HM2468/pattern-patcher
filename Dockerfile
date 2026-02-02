@@ -5,7 +5,7 @@ FROM ruby:3.4.1-slim-bullseye
 
 WORKDIR /rails
 
-# ---- Base deps for local tool usage (build + runtime) ----
+# Base deps for local tool usage (build + runtime)
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       ca-certificates \
@@ -32,15 +32,15 @@ ENV BUNDLE_PATH="/usr/local/bundle" \
 # Keep gems cache reusable across containers
 VOLUME ["/usr/local/bundle"]
 
-# ---- Install Ruby gems (cached by Gemfile/Gemfile.lock) ----
+# Install Ruby gems (cached by Gemfile/Gemfile.lock)
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
-# ---- Install JS deps (cached by package.json/yarn.lock) ----
+# Install JS deps (cached by package.json/yarn.lock)
 COPY package.json yarn.lock ./
 RUN if [ -f package.json ]; then yarnpkg install --frozen-lockfile; fi
 
 # NOTE:
-# - 不 COPY . .
-# - 不写 CMD / ENTRYPOINT
-# - 代码由 docker-compose 通过 bind mount 挂载进来
+# - Do NOT COPY . .
+# - Do NOT define CMD / ENTRYPOINT
+# - Source code is bind-mounted into the container by docker-compose
