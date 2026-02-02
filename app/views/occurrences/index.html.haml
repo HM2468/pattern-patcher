@@ -10,7 +10,7 @@
 %div{ class: "h-full overflow-hidden" }
   %div#occurrences_panel{ class: "flex flex-col h-full overflow-hidden rounded-2xl" }
 
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %div{ class: "bg-indigo-100 text-gray-600 border-b border-gray-100 mx-5 rounded-2xl" }
       %div{ class: "px-6 py-3 flex items-center justify-left gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
@@ -23,7 +23,7 @@
           = hidden_field_tag :filter_type, params[:filter_type]
           = hidden_field_tag :scan_run_id, scan_run_id if scan_run_id.present?
 
-        -# ===== Combined filter dropdown + input (single control) =====
+        -# Combined filter dropdown + input (single control)
         %div{ class: "inline-flex items-center" }
           %div{ class: "inline-flex items-center rounded-md bg-white shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500 overflow-hidden" }
             = form_with url: occurrences_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
@@ -53,7 +53,7 @@
               oninput: "var form=this.previousElementSibling; if(form){form.dataset.searchValue=this.value||''}"
             }
 
-    -# ===== Scroll area: ONLY body scrolls =====
+    -# Scroll area: ONLY body scrolls
     %div#occurrences_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
       %div{ class: "px-6 py-4 space-y-4" }
         - if !defined?(@occurrences) || @occurrences.blank?
@@ -67,7 +67,7 @@
             - next if diff.nil?
             = render "diff", diff: diff, occ: occ
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div{ class: "sticky bottom-0" }
       - if defined?(@occurrences) && @occurrences.respond_to?(:current_page) && @occurrences.any?
         = render "shared/pagination", collection: @occurrences, options: pagination_options

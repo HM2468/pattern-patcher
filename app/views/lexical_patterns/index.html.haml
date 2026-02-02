@@ -6,7 +6,7 @@
     class: "flex flex-col mx-auto h-full max-w-4xl overflow-hidden"
   }
 
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %div{ class: "text-gray-600" }
       %div{ class: "px-10 py-3 flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
@@ -15,7 +15,7 @@
         %div{ class: "shrink-0 flex gap-2" }
           = link_to "New", new_lexical_pattern_path, class: "button-primary"
 
-    -# ===== Scroll area: ONLY body scrolls =====
+    -# Scroll area: ONLY body scrolls
     %div#lexical_patterns_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
       %div{ class: "px-6 py-4 space-y-4" }
 
@@ -33,7 +33,7 @@
           -# Keep empty state container in DOM for Turbo replace (even when not empty)
           %div#lexical_patterns_empty_state{ class: "hidden" }
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
       %div{ class: "px-6 py-3" }
         - if @lexical_patterns.any?

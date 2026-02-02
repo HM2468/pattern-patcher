@@ -59,7 +59,7 @@
   background-color: #fee2e2; /* red-100 */
 }
 
-/* ===== Tooltip rendered in <body> (NOT clipped by overflow) ===== */
+/* Tooltip rendered in <body> (NOT clipped by overflow) */
 .app-tooltip {
   position: fixed;             /* fixed relative to viewport */
   z-index: 2147483647;

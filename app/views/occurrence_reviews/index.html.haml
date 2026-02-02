@@ -11,13 +11,13 @@
 %div{ class: "h-full overflow-hidden" }
   %div#occurrence_reviews_panel{ class: "flex flex-col h-full overflow-hidden rounded-2xl" }
 
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %div{ class: "bg-indigo-100 text-gray-600 border-b border-gray-100 mx-5 rounded-2xl" }
       %div{ class: "px-6 py-3 flex items-center justify-left gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
           %div{ class: "text-lg font-semibold text-gray-900" } Reviews
 
-        -# ===== Status dropdown =====
+        -# Status dropdown
         = form_with url: occurrence_reviews_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
           = hidden_field_tag :page, nil
           = hidden_field_tag :text_filter, params[:text_filter]
@@ -30,7 +30,7 @@
               class: "font-mono text-xs text-gray-900 bg-transparent border-0 p-0 pr-6 focus:ring-0 focus:outline-none cursor-pointer",
               onchange: "this.form.submit()"
 
-        -# ===== Combined filter dropdown + input (single control) =====
+        -# Combined filter dropdown + input (single control)
         %div{ class: "inline-flex items-center" }
           %div{ class: "inline-flex items-center rounded-md bg-white shadow-sm ring-1 ring-gray-200 hover:ring-gray-300 focus-within:ring-2 focus-within:ring-indigo-500 overflow-hidden" }
             = form_with url: occurrence_reviews_path, method: :get, local: true, data: { turbo: false }, class: "inline-flex items-center" do
@@ -60,7 +60,7 @@
               oninput: "var form=this.previousElementSibling; if(form){form.dataset.searchValue=this.value||''}"
             }
 
-    -# ===== Scroll area: ONLY body scrolls =====
+    -# Scroll area: ONLY body scrolls
     %div#occ_revs_body_scroll{ class: "pp-scroll-gutter-stable flex-1 overflow-y-auto" }
       %div{ class: "px-6 py-4 space-y-4" }
         - if !defined?(@occurrence_reviews) || @occurrence_reviews.blank?
@@ -80,7 +80,7 @@
               filter_type: filter_type,
               input_value: input_value
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div{ class: "sticky bottom-0" }
       - if defined?(@occurrence_reviews) && @occurrence_reviews.respond_to?(:current_page) && @occurrence_reviews.any?
         = render "shared/pagination", collection: @occurrence_reviews, options: pagination_options

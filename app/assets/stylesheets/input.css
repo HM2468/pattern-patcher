@@ -1,10 +1,7 @@
 /* app/assets/stylesheets/input.css */
 /* Custom Input Styles */
 
-/* =========================
-   Base form control
-   ========================= */
-
+/* Base form control */
 .form-input,
 .form-textarea,
 .form-select {
@@ -25,9 +22,7 @@
     box-shadow 0.15s ease;
 }
 
-/* =========================
-   Focus state
-   ========================= */
+/* Focus state */
 
 .form-input:focus,
 .form-textarea:focus,
@@ -38,9 +33,7 @@
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.35); /* indigo-400 ring */
 }
 
-/* =========================
-   Textarea specifics
-   ========================= */
+/* Textarea specifics */
 
 .form-textarea {
   resize: vertical;
@@ -48,9 +41,7 @@
   line-height: 1.4;
 }
 
-/* =========================
-   Select specifics
-   ========================= */
+/* Select specifics */
 
 .form-select {
   appearance: none;
@@ -65,9 +56,7 @@
   padding-right: 2.5rem;
 }
 
-/* =========================
-   Disabled state
-   ========================= */
+/* Disabled state */
 
 .form-input:disabled,
 .form-textarea:disabled,
@@ -77,9 +66,7 @@
   cursor: not-allowed;
 }
 
-/* =========================
-   Error state (optional)
-   ========================= */
+/* Error state (optional) */
 
 .form-input.is-invalid,
 .form-textarea.is-invalid,
@@ -93,9 +80,7 @@
   box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.35);
 }
 
-/* =========================
-   Contenteditable editor
-   ========================= */
+/* Contenteditable editor */
 
 .form-editor {
   display: block;
@@ -129,9 +114,7 @@
   pointer-events: none;
 }
 
-/* =========================
-   Dropdown select (native <select>)
-   ========================= */
+/* Dropdown select (native <select>) */
 
 .dropdown-select {
   /* Inherit the overall style of form-select */

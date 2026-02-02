@@ -1,6 +1,6 @@
 /* app/assets/stylesheets/pp_github_diff.css */
 
-/* ===== container ===== */
+/* container */
 .pp-diff {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 12.5px;
@@ -14,7 +14,7 @@
   background: #ffffff;
 }
 
-/* ===== header ===== */
+/* header */
 .pp-diff-header {
   display: flex;
   justify-content: space-between;
@@ -48,7 +48,7 @@
 .pp-diff-stats .pp-del { color: #cf222e; font-weight: 600; }
 .pp-diff-stats .pp-neutral { color: #57606a; }
 
-/* ===== table base ===== */
+/* table base */
 .pp-diff-body {
   background: #ffffff;
 }
@@ -65,7 +65,7 @@
   vertical-align: top;
 }
 
-/* ===== colgroup: fixed width for line number column ===== */
+/* colgroup: fixed width for line number column */
 .pp-diff-table col.pp-col-lineno {
   width: 40px;
 }
@@ -74,7 +74,7 @@
   width: auto;
 }
 
-/* ===== gutter (line numbers) ===== */
+/* gutter (line numbers) */
 .pp-blob-num {
   width: 40px;
   min-width: 40px;
@@ -97,7 +97,7 @@
   background: #ffffff;
 }
 
-/* ===== code cell ===== */
+/* code cell */
 .pp-blob-code {
   width: auto;
   background: #ffffff;
@@ -112,12 +112,12 @@
   overflow-x: auto;
 }
 
-/* ===== hover effect for context lines ===== */
+/* hover effect for context lines */
 .pp-diff-table tr:hover .pp-blob-code-context {
   background: #f6f8fa;
 }
 
-/* ===== hunk header ===== */
+/* hunk header */
 .pp-hunk td {
   background: #ddf4ff;
 }
@@ -127,7 +127,7 @@
   font-weight: 600;
 }
 
-/* ===== deletion / addition backgrounds ===== */
+/* deletion / addition backgrounds */
 .pp-blob-num-del,
 .pp-blob-code-del {
   background: #ffebe9;
@@ -147,7 +147,7 @@
     inset 0 -1px 0 rgba(27, 31, 36, 0.04);
 }
 
-/* ===== +/- sign via pseudo element ===== */
+/* +/- sign via pseudo element */
 .pp-line-del::before,
 .pp-line-add::before {
   display: inline-block;
@@ -160,7 +160,7 @@
 .pp-line-del::before { content: "-"; }
 .pp-line-add::before { content: "+"; }
 
-/* ===== inline highlight for changed segment ===== */
+/* inline highlight for changed segment */
 .highlighted_deletion,
 .highlighted_addition {
   display: inline;

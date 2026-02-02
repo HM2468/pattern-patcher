@@ -1,5 +1,5 @@
 /* app/assets/stylesheets/repository-show.css */
-/* ===== Repo stats cards (left sidebar) ===== */
+/* Repo stats cards (left sidebar) */
 
 .repo-stat-card {
   display: flex;
@@ -51,7 +51,7 @@
   color: #312e81;                     /* indigo-900 */
 }
 
-/* ===== Repo meta fields (Root Path / Permitted ext) ===== */
+/* Repo meta fields (Root Path / Permitted ext) */
 
 .repo-meta-block {
   display: flex;
@@ -65,7 +65,7 @@
   color: #374151;         /* gray-700 */
 }
 
-/* ===== Repo meta fields (Root Path / Permitted ext) ===== */
+/* Repo meta fields (Root Path / Permitted ext) */
 
 .repo-meta-block {
   display: flex;

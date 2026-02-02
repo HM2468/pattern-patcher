@@ -5,7 +5,7 @@
     class: "max-w-4xl mx-auto flex flex-col h-full overflow-hidden rounded-2xl"
   }
 
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %div{ class: "text-gray-600 border-b border-gray-200" }
       %div{ class: "px-6 py-3 flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
@@ -17,7 +17,7 @@
             data: tooltip_data(tip: "Back") do
             = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
-    -# ===== Scroll area: ONLY body scrolls =====
+    -# Scroll area: ONLY body scrolls
     %div#scan_runs_body_scroll{
       class: "pp-scroll-gutter-stable flex-1 overflow-y-auto",
       data: { controller: "scan-runs", scan_runs_channel_value: "ScanRunsChannel" }
@@ -29,7 +29,7 @@
           - @scan_runs.each do |sr|
             = render partial: "scan_run", locals: { scan_run: sr, progress: @progress_by_id[sr.id] }
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div{ class: "repo-files-pagination sticky bottom-0 z-10 bg-white border-t border-gray-200" }
       %div{ class: "px-6 py-3" }
         = render "shared/pagination",

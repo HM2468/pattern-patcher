@@ -11,7 +11,7 @@ class LexemesController < ApplicationController
 
     base = Lexeme.all
 
-    # ===== Status filter =====
+    # Status filter
     base =
       case @status
       when "pending"   then base.pending
@@ -22,12 +22,12 @@ class LexemesController < ApplicationController
         base
       end
 
-    # ===== Text filter (lexeme.source_text) =====
+    # Text filter (lexeme.source_text)
     if @text_filter.present?
       base = base.where("lexemes.source_text ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(@text_filter)}%")
     end
 
-    # ===== Path filter (occurrence.repository_file.path) =====
+    # Path filter (occurrence.repository_file.path)
     if @path_filter.present?
       escaped = ActiveRecord::Base.sanitize_sql_like(@path_filter)
       base = base.joins(occurrences: :repository_file).where("repository_files.path ILIKE ?", "%#{escaped}%").distinct

@@ -25,7 +25,7 @@
     }
   }
 
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %table#repo_files_table_head{ class: "w-full text-sm table-fixed repo-files-head" }
       %thead{ class: "bg-indigo-100 text-gray-600" }
         %tr
@@ -72,7 +72,7 @@
                   data: { action: "repo-files#onBulkDeleteClick", repo_files_target: "bulkDeleteBtn" }
                 } Delete
 
-    -# ===== Scroll area: ONLY tbody scrolls =====
+    -# Scroll area: ONLY tbody scrolls
     - if no_match
       %div#repo_files_body_scroll{ class: "repo-files-body-scroll flex-1 overflow-y-auto" }
         %div{ class: "bg-gray-100 rounded-2xl p-6 text-sm text-gray-600" }
@@ -99,7 +99,7 @@
                       %div{ class: "truncate font-mono text-sm text-gray-900", title: f.path }
                         = f.path
 
-    -# ===== hidden forms MUST be inside #repo_files_panel so repo-files controller can find targets =====
+    -# hidden forms MUST be inside #repo_files_panel so repo-files controller can find targets
     %div{ class: "hidden" }
       = form_with url: scan_runs_path, method: :post, local: true do
         = hidden_field_tag :repository_id, repository.id, id: "bulk_scan_repository_id"
@@ -134,7 +134,7 @@
           }
         } Delete
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div#repo_files_pagination{
       class: "repo-files-pagination sticky bottom-0 bg-white border-t border-gray-200"
     }

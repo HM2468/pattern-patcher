@@ -1,7 +1,5 @@
 /* app/assets/stylesheets/application.css */
-/* =========================
-   Form error component
-   ========================= */
+/* Form error component */
 
 .form-errors {
   border: 1px solid #fecaca;   /* red-200 */

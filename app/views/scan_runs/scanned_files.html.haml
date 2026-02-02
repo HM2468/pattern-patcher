@@ -4,7 +4,7 @@
   %div#scan_run_files_panel{
     class: "flex flex-col h-full overflow-hidden rounded-2xl"
   }
-    -# ===== Fixed Header (NOT scroll) =====
+    -# Fixed Header (NOT scroll)
     %div{ class: "bg-indigo-100 text-gray-600 px-4 py-3 border-b border-gray-200" }
       %div{ class: "flex items-center justify-between gap-3" }
         %div{ class: "flex flex-col items-start text-left leading-tight min-w-0" }
@@ -17,7 +17,7 @@
             data: tooltip_data(tip: "Back") do
             = svg_icon("arrow-uturn-left", class_name: "w-6 h-6")
 
-    -# ===== Scroll area: ONLY table body scrolls =====
+    -# Scroll area: ONLY table body scrolls
     - if @scan_run_files.blank?
       %div{ class: "flex-1 overflow-y-auto" }
         %div{ class: "p-6 text-gray-700" } No scanned files found.
@@ -34,7 +34,7 @@
                     %div{ class: "col-span-3 text-right font-mono text-xs text-gray-700" }
                       = scan_run_file.status.to_s
 
-    -# ===== Fixed Footer Pagination =====
+    -# Fixed Footer Pagination
     %div{
       class: "flex justify-center items-center gap-2 p-4 bg-white border-t border-gray-200"
     }
