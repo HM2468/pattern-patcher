@@ -104,15 +104,15 @@ class ProcessRun < ApplicationRecord
   end
 
   # Batch scheduling
-  # 根据 token 估算，把 lexemes 切分为多个 batch
+  # Split lexemes into multiple batches based on estimated token usage
   #
   # @param lexemes [Array<Lexeme>]
-  # @param max_tokens [Integer] 单个 batch 的最大 token 数
+  # @param max_tokens [Integer] maximum token count per batch
   # @return [Array<Array<Lexeme>>]
   #
-  # 注意：
-  # - 会按 token 大小排序（long first）
-  # - 返回顺序不保证与输入一致
+  # Notes:
+  # - Items are sorted by token size (long first)
+  # - The returned order is not guaranteed to match the input order
   #
   def batch_by_token(lexemes, max_tokens: nil)
     limit = max_tokens || max_token_size
@@ -127,7 +127,7 @@ class ProcessRun < ApplicationRecord
     current_tokens = 0
 
     items.each do |lx, tokens|
-      # 单条超过上限：单独成批
+      # Single item exceeds the limit: put it in its own batch
       if tokens >= limit
         batches << [lx]
         next
@@ -150,13 +150,13 @@ class ProcessRun < ApplicationRecord
 
   private
 
-  # 从 processor config 中读取 batch token 上限
+  # Read batch token limit from processor config
   def max_token_size
     config = lexeme_processor&.default_config || {}
     config['batch_token_limit'] || DEFAULT_MAX_TOKENS_PER_BATCH
   end
 
-  # 粗略 token 估算：UTF-8 bytes / 4
+  # Rough token estimation: UTF-8 bytes / 4
   def estimate_tokens(text)
     s = text.to_s.encode(
       "UTF-8",
