@@ -104,12 +104,6 @@ class DiffBatch
   end
 
   #  highlighting builders
-  #
-  # Ensures DiffBatch produces the same old/new line behavior as your show actions:
-  # - old_line_override / new_line contain HTML with <span class="..."> for inline highlight
-  # - char range is aligned to the blob's actual line text
-  # - when passing Occurrence: new_line is nil
-  #
   # IMPORTANT:
   # - line_char_end is treated as EXCLUSIVE (Ruby slice style: [s...e])
   #

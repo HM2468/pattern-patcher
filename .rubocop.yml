@@ -219,10 +219,6 @@ Performance/RedundantMerge:
 Bundler/OrderedGems:
   Enabled: false
 
-# ---------------------------
-# RSpec（如果你不用 RSpec，可以删除 rubocop-rspec gem + require）
-# ---------------------------
-
 RSpec:
   Enabled: true
 

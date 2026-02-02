@@ -15,7 +15,7 @@ class RenameLexemeProcessJobsToProcessRuns < ActiveRecord::Migration[8.0]
     # 3) rename 主表
     rename_table :lexeme_process_jobs, :process_runs
 
-    # 4) rename 主表索引（按你 schema 里的名字逐个改）
+    # 4) rename 主表索引
     if index_name_exists?(:process_runs, "index_lexeme_process_jobs_on_lexeme_processor_id")
       rename_index :process_runs,
         "index_lexeme_process_jobs_on_lexeme_processor_id",
@@ -47,7 +47,6 @@ class RenameLexemeProcessJobsToProcessRuns < ActiveRecord::Migration[8.0]
     end
 
     # 原 unique index: idx_lexeme_process_results_unique (lexeme_process_job_id, lexeme_id)
-    # 改列名后，索引本身仍在，但名字不改也能用；这里按你的要求也改名。
     if index_name_exists?(:lexeme_process_results, "idx_lexeme_process_results_unique")
       rename_index :lexeme_process_results,
         "idx_lexeme_process_results_unique",
@@ -59,8 +58,6 @@ class RenameLexemeProcessJobsToProcessRuns < ActiveRecord::Migration[8.0]
 
     add_foreign_key :lexeme_process_results, :process_runs,
       column: :process_run_id
-
-    # （lexeme_process_results -> lexemes 的外键不变，不需要处理）
   end
 
   def down

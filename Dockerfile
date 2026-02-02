@@ -37,7 +37,6 @@ COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
 # ---- Install JS deps (cached by package.json/yarn.lock) ----
-# (如果你 repo 没有这些文件，请确保存在，或删掉这段两行)
 COPY package.json yarn.lock ./
 RUN if [ -f package.json ]; then yarnpkg install --frozen-lockfile; fi
 

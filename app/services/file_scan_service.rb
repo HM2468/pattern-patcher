@@ -116,8 +116,6 @@ class FileScanService
   # Occurrence create (dedupe by match_fingerprint)
   # Global unique:
   # match_fingerprint = sha_digest("#{repository_file_id}:#{byte_start}:#{byte_end}:#{lexeme_id}")
-  # NOTE: 你现在的 occurrences 仍然包含 scan_run_id NOT NULL，所以这里必须写 scan_run_id。
-  # 如果你后续真的要移除 occurrences.scan_run_id，那就把 scan_run_id 移到 observation 表去。
   def create_occurrence!(
     lexeme:,
     matched_text:,
@@ -154,7 +152,7 @@ class FileScanService
     end
 
     # 已存在：不重置 status（避免覆盖人工 review）
-    # 但可以修正定位字段/上下文（如果你希望保持最新）
+    # 但可以修正定位字段/上下文
     changed = false
 
     if occ.line_at != line_at
@@ -181,7 +179,7 @@ class FileScanService
       occ.context = context.to_s
       changed = true
     end
-    # 保证 scan_run_id 仍然满足 NOT NULL（同时允许你追踪“最近一次看到它的 run”）
+    # 保证 scan_run_id 仍然满足 NOT NULL
     if occ.scan_run_id != @scan_run.id
       occ.scan_run_id = @scan_run.id
       changed = true

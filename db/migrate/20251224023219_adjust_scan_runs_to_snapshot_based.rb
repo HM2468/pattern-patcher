@@ -2,7 +2,7 @@
 
 class AdjustScanRunsToSnapshotBased < ActiveRecord::Migration[8.0]
   def change
-    # 1) 新增 repository_snapshot_id（先加，便于你做数据回填）
+    # 1) 新增 repository_snapshot_id
     unless column_exists?(:scan_runs, :repository_snapshot_id)
       add_reference :scan_runs, :repository_snapshot, null: true, foreign_key: true
     end
@@ -12,7 +12,7 @@ class AdjustScanRunsToSnapshotBased < ActiveRecord::Migration[8.0]
       rename_column :scan_runs, :patterns_snapshot, :pattern_snapshot
     end
 
-    # patterns_snapshot 目前是 string，你新设计是 text
+    # patterns_snapshot
     change_column :scan_runs, :pattern_snapshot, :text if column_exists?(:scan_runs, :pattern_snapshot)
 
     # 3) 新增 cursor(json)
@@ -33,7 +33,7 @@ class AdjustScanRunsToSnapshotBased < ActiveRecord::Migration[8.0]
         name: "index_scan_runs_on_repository_file_id"
     end
 
-    # 6) 新增新索引（按你最新设计：unique(snapshot, pattern) + index(status)）
+    # 6) 新增新索引
     unless index_exists?(:scan_runs,
       %i[repository_snapshot_id lexical_pattern_id], unique: true, name: "index_scan_runs_snapshot_pattern_unique")
       add_index :scan_runs, %i[repository_snapshot_id lexical_pattern_id],
@@ -48,7 +48,7 @@ class AdjustScanRunsToSnapshotBased < ActiveRecord::Migration[8.0]
 
     remove_column :scan_runs, :repository_file_id if column_exists?(:scan_runs, :repository_file_id)
 
-    # 8) 最后把 repository_snapshot_id 设为 NOT NULL（你确定新流程都写入了再打开）
+    # 8) 最后把 repository_snapshot_id 设为 NOT NULL
     change_column_null :scan_runs, :repository_snapshot_id, false
   end
 end
