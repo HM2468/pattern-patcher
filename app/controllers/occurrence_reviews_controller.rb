@@ -50,10 +50,10 @@ class OccurrenceReviewsController < ApplicationController
     idx = [idx, raw_lines.length - 1].min if raw_lines.any?
     old_line_from_blob = raw_lines[idx].to_s
 
-    # 用 blob 的真实 old_line 构建“带高亮”的 old/new 行
+    # Build highlighted old/new lines using the real old_line from the blob
     old_line_highlighted =
       if @occurrence.line_char_start && @occurrence.line_char_end
-        # 用 blob 行覆盖 occurrence.context，确保 char range 对齐
+        # Override occurrence.context with the blob line to ensure char ranges align
         @occurrence.context = old_line_from_blob if @occurrence.respond_to?(:context=)
         @occurrence.highlighted_deletion.to_s
       else

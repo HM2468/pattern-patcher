@@ -44,9 +44,11 @@ class LexemeProcessFinalizeJob < ApplicationJob
 
   private
 
-  # 说明：
-  # - RedisCacheStore 支持 unless_exist: true，可用作锁
-  # - 这里不使用 fetch，因为 fetch 会在 key 已存在时返回旧值，难以判定“是否抢到锁”
+  # Notes:
+  # - RedisCacheStore supports `unless_exist: true`, which can be used as a lock
+  # - We do not use `fetch` here because `fetch` returns the existing value
+  #   when the key already exists, making it difficult to determine
+  #   whether the lock was successfully acquired
   def acquire_lock(key, ttl:)
     Rails.cache.write(key, SecureRandom.hex(12), expires_in: ttl, unless_exist: true)
   rescue => e

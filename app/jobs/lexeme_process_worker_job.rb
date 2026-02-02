@@ -10,13 +10,13 @@ class LexemeProcessWorkerJob < ApplicationJob
     run = ProcessRun.find_by(id: process_run_id)
     return if run.nil?
 
-    # 已经结束就不做（避免 finalize 后残余任务继续写）
+    # Do nothing if already finished (avoid residual jobs writing after finalize)
     return if %w[succeeded failed].include?(run.status)
 
     processor = run.init_processor
     unless processor
       Rails.logger&.error("[LexemeProcessWorkerJob] init_processor returned nil run_id=#{run.id}")
-      # 该 batch 视为失败（尽力累加失败数）
+      # Treat this batch as failed (best-effort failure count increment)
       Rails.cache.increment(run.failed_count_key, lexeme_ids.size) rescue nil
       return
     end
@@ -32,7 +32,7 @@ class LexemeProcessWorkerJob < ApplicationJob
       "[LexemeProcessWorkerJob] batch failed run_id=#{process_run_id} ids=#{lexeme_ids.take(20)} err=#{e.class}: #{e.message}"
     )
 
-    # run 已经查询过，可能在 rescue 时为 nil（极端情况）
+    # `run` was already queried, but it may be nil in rescue (edge cases)
     if defined?(run) && run
       begin
         Lexeme.where(id: lexeme_ids).update_all(process_status: "failed", updated_at: Time.current)
@@ -47,7 +47,7 @@ class LexemeProcessWorkerJob < ApplicationJob
       end
     end
   ensure
-    # 统一在 ensure 里推进 batches_done + 广播进度 + 尝试 finalize
+    # Advance batches_done + broadcast progress + attempt finalize in ensure
     if defined?(run) && run
       bump_batch_done!(run)
       run.broadcast_progress_throttled
@@ -70,7 +70,7 @@ class LexemeProcessWorkerJob < ApplicationJob
     return if total_batches <= 0
     return unless done_batches >= total_batches
 
-    # 触发 finalize（finalize 内部有锁，worker 可多次触发）
+    # Trigger finalize (finalize has an internal lock; workers may trigger multiple times)
     LexemeProcessFinalizeJob.perform_later(run.id)
   rescue => e
     Rails.logger&.error("[LexemeProcessWorkerJob] try_finalize! err=#{e.class}: #{e.message}")
