@@ -5,7 +5,7 @@ module LexemeProcessors
   class BaseProcessor
     attr_reader :config, :processor, :run
 
-    # config: job_config merged with default_config (可在 job 层做 merge 提供过来)
+    # config: job_config merged with default_config
     def initialize(config: {}, processor: nil, run: nil)
       @config = (config || {}).deep_dup
       @processor = processor
@@ -13,21 +13,21 @@ module LexemeProcessors
       raise ArgumentError, "run is required" unless @run&.id
     end
 
-    # 子类必须实现：
+    # Subclasses must implement:
     # @param lex_arr [Array<Hash>]
     # @return [Array<Hash>] results
     #
-    # 输入 lex_arr 每项格式（统一）：
+    # Input lex_arr item format (standardized):
     #  { id: 123, normalized_text: "...", metadata: {...} }
     #
-    # 输出 results 每项格式（统一）：
+    # Output results item format (standardized):
     #  { id: 123, output_json: {...}, metadata: {...} }
     #
     def run_process(lex_arr: [])
       raise NotImplementedError, "#{self.class} must implement #run_process"
     end
 
-    # 将 occurrence 中的 matched_text 替换为 rendered_code
+    # Replace occurrence.matched_text with rendered_code
     #
     # @param config [Hash]
     # @param lexeme_metadata [Hash]
@@ -54,26 +54,17 @@ module LexemeProcessors
       end
     end
 
-    # 逐条写入产物 + 逐条更新 lexeme 状态 + 逐条更新进度
-    #
-    # 设计目标：
-    # - 本地单机工具：用“逐条”换更细粒度的进度 & 更易定位失败记录
-    # - 单条失败不影响其它记录（best-effort）
-    #
-    # 关键改进点：
-    # - 预加载 Lexeme / Occurrence / RepositoryFile，避免 N+1
-    # - transaction 缩小到：LexemeProcessResult + Lexeme 状态（必要的一致性）
-    # - Occurrence status 用 update_all 批量落库（减少 SQL）
-    #
+    # Persist outputs one-by-one + update lexeme status one-by-one + update progress one-by-one
     # @param results [Array<Hash>]
     def write_results!(results: [])
       return if results.blank?
 
-      # ---- 1) normalize ids + preload records (avoid N+1) ----
+      # 1) normalize ids + preload records (avoid N+1)
       lexeme_ids = results.map { |r| (r[:id] || r["id"]).to_i }.uniq
       lexemes_by_id = ::Lexeme.where(id: lexeme_ids).index_by(&:id)
 
-      # 只处理当前仍是 unprocessed 的 occurrences，并预加载 repository_file 避免 occ.repository_file N+1
+      # Only process occurrences that are still unprocessed, and preload repository_file
+      # to avoid occ.repository_file N+1 queries
       occs_by_lexeme_id =
         ::Occurrence
           .where(lexeme_id: lexeme_ids)
@@ -91,17 +82,17 @@ module LexemeProcessors
           next
         end
 
-        # 当前 lexeme 对应的未处理 occurrences（可能为空）
+        # Unprocessed occurrences for current lexeme (may be empty)
         occs = occs_by_lexeme_id[lexeme_id] || []
 
-        # 统一提取 res_attrs，避免 block 作用域/异常导致外部用到 nil
+        # Normalize extracted res_attrs to avoid nil usage caused by block scope/exceptions
         res_attrs = {
           metadata: (res[:metadata] || res["metadata"] || {}),
           output_json: (res[:output_json] || res["output_json"] || {})
         }
 
         begin
-          # ---- 2) minimal transaction: result row + lexeme status ----
+          # 2) minimal transaction: result row + lexeme status
           ::LexemeProcessResult.transaction do
             res_ar = ::LexemeProcessResult.find_or_initialize_by(
               process_run_id: run.id,
@@ -112,11 +103,11 @@ module LexemeProcessors
             lexeme.update!(process_status: "processed")
           end
 
-          # ---- 3) occurrences: build review results (no big transaction) ----
+          # 3) occurrences: build review results (no big transaction)
           processed_occ_ids = []
 
           occs.each do |occ|
-            # repository_file 已 includes 预加载
+            # repository_file is preloaded via includes
             rendered_code, metadata = generate_rendered_code(
               config: config,
               lexeme_metadata: lexeme.metadata || {},
@@ -138,7 +129,7 @@ module LexemeProcessors
             processed_occ_ids << occ.id
           end
 
-          # ---- 4) bulk update occurrence status ----
+          # 4) bulk update occurrence status
           if processed_occ_ids.any?
             ::Occurrence.where(id: processed_occ_ids).update_all(status: "processed", updated_at: Time.current)
           end
@@ -147,7 +138,7 @@ module LexemeProcessors
         rescue => e
           Rails.cache.increment(run.failed_count_key, 1)
 
-          # best-effort：标记失败，但不要再抛异常影响后续处理
+          # Best-effort: mark lexeme as failed, but do not re-raise and block subsequent processing
           begin
             lexeme.update(process_status: "failed")
           rescue => _e2
