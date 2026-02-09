@@ -1,6 +1,6 @@
 /* app/assets/stylesheets/repository-files.css */
 
-.{
+.repo-files-panel{
   /* Key: manage scrolling inside the panel itself; do not allow outer containers to scroll this area */
   overflow: hidden;
 }
