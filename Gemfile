@@ -42,7 +42,7 @@ group :development do
   gem "faker"
   gem "web-console"
   gem "rubocop", require: false
-  gem "rubocop-rails", "~> 2.34.2", require: false
+  gem "rubocop-rails", "~> 2.34.3", require: false
   gem "rubocop-rspec", require: false
   gem "dotenv-rails"
   gem "rails-erd", "~> 1.7"
