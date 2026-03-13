@@ -66,3 +66,4 @@ docker pull redis:alpine
 docker buildx build  -f Dockerfile -t pattern-patcher:rails .
 docker compose up -d
 ```
+
